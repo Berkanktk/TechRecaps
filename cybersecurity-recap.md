@@ -28,13 +28,176 @@ nslookup example.com
 ```
 
 ## Firewalls & IDS/IPS
-```bash
-# iptables (Linux firewall)
-iptables -A INPUT -p tcp --dport 22 -s 192.168.1.0/24 -j ACCEPT
-iptables -A INPUT -p tcp --dport 22 -j DROP
 
-# Snort rule (IDS)
-alert tcp any any -> 192.168.1.0/24 80 (msg:"HTTP Attack"; content:"../"; sid:1001;)
+### Firewall Types
+
+#### 1. Packet Filtering Firewalls (Stateless)
+**Mechanism**: Examines individual packets based on static rules (IP addresses, ports, protocols)
+- **Advantages**: Fast, low resource usage, simple configuration
+- **Disadvantages**: No context awareness, vulnerable to connection hijacking, IP spoofing
+```bash
+# iptables packet filtering examples
+iptables -A INPUT -p tcp --dport 22 -s 192.168.1.0/24 -j ACCEPT    # Allow SSH from local network
+iptables -A INPUT -p tcp --dport 80 -j ACCEPT                      # Allow HTTP
+iptables -A INPUT -p tcp --dport 443 -j ACCEPT                     # Allow HTTPS
+iptables -A INPUT -j DROP                                          # Default deny
+```
+
+#### 2. Stateful Inspection Firewalls
+**Mechanism**: Tracks connection state and context, maintains connection table
+- **Advantages**: Context-aware decisions, prevents connection hijacking, better security
+- **Disadvantages**: Higher resource usage, more complex configuration
+```bash
+# iptables stateful rules
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT   # Allow established connections
+iptables -A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT # Allow new SSH connections
+iptables -A OUTPUT -m state --state NEW,ESTABLISHED -j ACCEPT      # Allow outbound traffic
+```
+
+#### 3. Application Layer/Proxy Firewalls
+**Mechanism**: Acts as intermediary, inspects application-layer data, understands protocols
+- **Advantages**: Deep packet inspection, application-aware filtering, content filtering
+- **Disadvantages**: Higher latency, resource intensive, single point of failure
+```bash
+# Squid proxy firewall configuration
+acl localnet src 192.168.1.0/24
+acl allowed_sites dstdomain .example.com .trusted.org
+http_access allow localnet allowed_sites
+http_access deny all
+```
+
+#### 4. Next-Generation Firewalls (NGFW)
+**Mechanism**: Combines traditional firewall with IPS, application awareness, threat intelligence
+- **Features**: Application control, user identity awareness, SSL inspection, sandboxing
+- **Examples**: Palo Alto Networks, Fortinet FortiGate, Cisco ASA with FirePOWER
+```bash
+# Example NGFW policy (Palo Alto CLI)
+set rulebase security rules "Block-Malware" application "web-browsing"
+set rulebase security rules "Block-Malware" service "application-default"
+set rulebase security rules "Block-Malware" action "deny"
+set rulebase security rules "Block-Malware" log-setting "default"
+```
+
+### Intrusion Detection Systems (IDS)
+
+#### How IDS Works
+**Detection Methods**:
+1. **Signature-based**: Matches known attack patterns (like antivirus signatures)
+2. **Anomaly-based**: Detects deviations from normal behavior using statistical analysis
+3. **Hybrid**: Combines signature and anomaly detection
+
+**Types**:
+- **NIDS (Network IDS)**: Monitors network traffic
+- **HIDS (Host IDS)**: Monitors individual host activities
+
+```bash
+# Snort IDS configuration and rules
+# /etc/snort/snort.conf
+var HOME_NET 192.168.1.0/24
+var EXTERNAL_NET !$HOME_NET
+
+# Snort rules (/etc/snort/rules/local.rules)
+alert tcp any any -> $HOME_NET 80 (msg:"HTTP Attack Detected"; content:"../"; sid:1001; rev:1;)
+alert icmp any any -> $HOME_NET any (msg:"ICMP Ping Detected"; sid:1002; rev:1;)
+alert tcp any any -> $HOME_NET 22 (msg:"SSH Brute Force"; detection_filter:track by_src, count 5, seconds 60; sid:1003;)
+
+# Run Snort
+snort -A console -q -c /etc/snort/snort.conf -i eth0
+```
+
+#### OSSEC HIDS Example
+```bash
+# OSSEC agent configuration (/var/ossec/etc/ossec.conf)
+<ossec_config>
+  <syscheck>
+    <directories check_all="yes">/etc,/usr/bin,/usr/sbin</directories>
+    <directories check_all="yes" realtime="yes">/home</directories>
+  </syscheck>
+
+  <localfile>
+    <log_format>syslog</log_format>
+    <location>/var/log/auth.log</location>
+  </localfile>
+</ossec_config>
+
+# OSSEC rules (/var/ossec/rules/local_rules.xml)
+<rule id="100001" level="10">
+  <if_matched_sid>5715</if_matched_sid>
+  <description>Multiple SSH login failures</description>
+  <group>authentication_failures,</group>
+</rule>
+```
+
+### Intrusion Prevention Systems (IPS)
+
+#### How IPS Works
+**Mechanism**: Inline deployment, actively blocks detected threats in real-time
+- **Inline Mode**: Traffic passes through IPS, can block malicious packets
+- **Detection + Prevention**: Combines IDS detection with active response
+- **Response Actions**: Drop packets, reset connections, block IP addresses
+
+```bash
+# Suricata IPS configuration
+# /etc/suricata/suricata.yaml
+default-rule-path: /etc/suricata/rules
+rule-files:
+  - suricata.rules
+  - emerging-threats.rules
+
+# Suricata rules (/etc/suricata/rules/local.rules)
+drop tcp any any -> $HOME_NET 80 (msg:"SQL Injection Attempt"; content:"union select"; nocase; sid:2001;)
+drop tcp any any -> $HOME_NET any (msg:"Port Scan Detected"; flags:S; threshold:type both, track by_src, count 10, seconds 60; sid:2002;)
+reject tcp any any -> $HOME_NET 22 (msg:"SSH Brute Force Block"; detection_filter:track by_src, count 5, seconds 60; sid:2003;)
+
+# Run Suricata in IPS mode
+suricata -c /etc/suricata/suricata.yaml -i eth0 --runmode autofp
+```
+
+### IDS vs IPS Comparison
+| Feature | IDS | IPS |
+|---------|-----|-----|
+| **Deployment** | Out-of-band (passive) | Inline (active) |
+| **Response** | Alerts only | Blocks + alerts |
+| **Performance Impact** | Minimal | Can introduce latency |
+| **Detection** | After-the-fact | Real-time prevention |
+| **False Positives** | Less critical | Can block legitimate traffic |
+| **Network Impact** | None if fails | Single point of failure |
+
+### SIEM Integration
+```bash
+# Forward IDS/IPS logs to SIEM
+# Syslog configuration for centralized logging
+echo "*.* @@siem-server:514" >> /etc/rsyslog.conf
+systemctl restart rsyslog
+
+# Splunk Universal Forwarder for Snort logs
+[monitor:///var/log/snort/alert]
+sourcetype = snort_alert
+index = security
+
+# ELK stack Logstash configuration for Suricata
+input {
+  file {
+    path => "/var/log/suricata/eve.json"
+    codec => "json"
+    type => "suricata"
+  }
+}
+
+filter {
+  if [type] == "suricata" {
+    date {
+      match => [ "timestamp", "ISO8601" ]
+    }
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => ["localhost:9200"]
+    index => "suricata-%{+YYYY.MM.dd}"
+  }
+}
 ```
 
 ## VPN Technologies
@@ -730,23 +893,143 @@ iptables -A INPUT -p icmp --icmp-type echo-request -j DROP
 ```
 
 ### Protocol Attacks
-**Goal**: Consume server resources (CPU, memory, connection tables)
-- **SYN Flood**: Half-open TCP connections exhaust connection table
-- **Ping of Death**: Oversized packets cause buffer overflows
-- **Smurf Attack**: ICMP broadcast with spoofed source IP
+**Goal**: Consume server resources (CPU, memory, connection tables) by exploiting protocol weaknesses
 
+#### TCP-Based Attacks
+
+##### Land Attack
+**Mechanism**: Sends packets with identical source and destination IP/port, causing infinite loops or crashes
 ```bash
-# SYN flood protection
+# Detection
+tcpdump -i any 'src host X.X.X.X and dst host X.X.X.X and src port Y and dst port Y'
+
+# Prevention with iptables
+iptables -A INPUT -s $SERVER_IP --sport $PORT -d $SERVER_IP --dport $PORT -j DROP
+```
+
+##### SYN Flood
+**Mechanism**: Overwhelms server by sending many SYN requests without completing handshake
+```bash
+# Detection - Monitor half-open connections
+netstat -an | grep SYN_RECV | wc -l                # Count SYN_RECV connections
+ss -s                                              # Connection statistics
+
+# Protection
 echo 1 > /proc/sys/net/ipv4/tcp_syncookies        # Enable SYN cookies
 sysctl -w net.ipv4.tcp_max_syn_backlog=2048       # Increase SYN backlog
+sysctl -w net.ipv4.tcp_synack_retries=3           # Reduce retries
 
-# Monitor half-open connections
-netstat -an | grep SYN_RECV | wc -l               # Count SYN_RECV connections
-ss -s                                              # Connection statistics
+# Advanced SYN flood protection with iptables
+iptables -A INPUT -p tcp --syn -m limit --limit 1/s --limit-burst 3 -j ACCEPT
+iptables -A INPUT -p tcp --syn -j DROP
+```
+
+##### SYN-ACK Flood
+**Mechanism**: Floods victim with SYN-ACK packets, forcing it to waste resources responding
+```bash
+# Detection
+tcpdump -i any 'tcp[tcpflags] & (tcp-syn|tcp-ack) == (tcp-syn|tcp-ack)'
+
+# Mitigation
+iptables -A INPUT -p tcp --tcp-flags SYN,ACK SYN,ACK -m limit --limit 10/minute -j ACCEPT
+iptables -A INPUT -p tcp --tcp-flags SYN,ACK SYN,ACK -j DROP
+```
+
+##### ACK+PSH+SYN Flood
+**Mechanism**: Sends TCP packets with unusual flag combinations to confuse or overload systems
+```bash
+# Detection of suspicious flag combinations
+tcpdump -i any 'tcp[tcpflags] & (tcp-ack|tcp-push|tcp-syn) == (tcp-ack|tcp-push|tcp-syn)'
+
+# Block unusual flag combinations
+iptables -A INPUT -p tcp --tcp-flags ALL SYN,ACK,PSH -j DROP          # Block ACK+PSH+SYN
+iptables -A INPUT -p tcp --tcp-flags ALL ALL -j DROP                  # Christmas tree packets
+iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP                 # Null packets
+iptables -A INPUT -p tcp --tcp-flags SYN,FIN SYN,FIN -j DROP          # SYN+FIN combination
+```
+
+##### TCP Reset Attack
+**Mechanism**: Sends spoofed RST packets to forcibly close active connections
+```bash
+# Detection
+tcpdump -i any 'tcp[tcpflags] & tcp-rst != 0'
+
+# Generate TCP reset attack (for testing purposes only)
+# hping3 -R -p 80 -s 12345 target.com
+
+# Protection - Rate limit RST packets from external sources
+iptables -A INPUT -p tcp --tcp-flags RST RST -m limit --limit 5/minute -j ACCEPT
+iptables -A INPUT -p tcp --tcp-flags RST RST -j DROP
+
+# Monitor for connection reset attacks
+netstat -s | grep -i reset
+```
+
+#### UDP-Based Attacks
+
+##### UDP Flood
+**Mechanism**: Sends massive number of UDP packets to overload bandwidth or CPU resources
+```bash
+# Detection
+netstat -su | grep -i udp                         # UDP statistics
+tcpdump -i any 'udp and length > 1000'           # Monitor large UDP packets
+
+# Generate UDP flood (for testing purposes only)
+# hping3 -2 -p 80 --flood target.com
+
+# Mitigation
+iptables -A INPUT -p udp -m limit --limit 50/second -j ACCEPT
+iptables -A INPUT -p udp -j DROP
+
+# Rate limit specific UDP ports
+iptables -A INPUT -p udp --dport 53 -m limit --limit 20/second -j ACCEPT    # DNS
+iptables -A INPUT -p udp --dport 123 -m limit --limit 10/second -j ACCEPT   # NTP
+```
+
+##### Fraggle Attack
+**Mechanism**: UDP version of Smurf attack using broadcast addresses on Echo (port 7) and Chargen (port 19) services
+```bash
+# Detection
+tcpdump -i any 'udp and (port 7 or port 19) and dst host broadcast'
+
+# Disable vulnerable services
+systemctl disable echo                    # Disable Echo service
+systemctl disable chargen               # Disable Character Generator service
+
+# Block broadcast traffic to vulnerable ports
+iptables -A INPUT -p udp --dport 7 -m pkttype --pkt-type broadcast -j DROP
+iptables -A INPUT -p udp --dport 19 -m pkttype --pkt-type broadcast -j DROP
+
+# Disable IP forwarding for broadcast packets
+echo 0 > /proc/sys/net/ipv4/conf/all/bc_forwarding
+```
+
+##### DNS Flood
+**Mechanism**: Overwhelms DNS server with large numbers of legitimate or fake lookup requests
+```bash
+# Detection
+dig @target.dns.server test.example.com  # Test DNS responsiveness
+tcpdump -i any 'port 53' | head -100     # Monitor DNS traffic
+
+# DNS server protection (BIND configuration)
+# /etc/bind/named.conf.options
+rate-limit {
+    responses-per-second 10;
+    window 5;
+    slip 2;
+};
+
+# Query rate limiting with iptables
+iptables -A INPUT -p udp --dport 53 -m string --string "google.com" --algo bm -m recent --set --name dns_flood
+iptables -A INPUT -p udp --dport 53 -m recent --update --seconds 60 --hitcount 10 --name dns_flood -j DROP
+
+# Monitor DNS query patterns
+journalctl -u named | grep "rate limit"
 ```
 
 ### Application Layer Attacks (Layer 7)
 **Goal**: Exhaust application resources with seemingly legitimate requests
+
 - **HTTP Flood**: High volume of HTTP GET/POST requests
 - **Slowloris**: Slow, partial HTTP requests to exhaust connection pool
 - **R.U.D.Y. (R-U-Dead-Yet)**: Slow POST requests with incomplete data
@@ -765,54 +1048,430 @@ fail2ban-client status                    # Check fail2ban status
 fail2ban-client set apache-overflows bantime 3600
 ```
 
-### Amplification Attacks
-**Goal**: Amplify attack traffic using vulnerable services that respond with larger packets
-- **DNS Amplification**: Small DNS queries → Large DNS responses
-- **NTP Amplification**: Uses NTP monlist command for 200x amplification
-- **Memcached Amplification**: Up to 51,000x amplification factor
-- **SSDP Amplification**: UPnP Simple Service Discovery Protocol
+### Reflection Attacks
+**Mechanism**: Attackers fake the victim's IP address (IP spoofing) and send requests to legitimate servers, which then unknowingly send large responses to the victim.
+
+**How Reflection Works**:
+1. **IP Spoofing**: Attacker spoofs victim's IP as source address
+2. **Request to Reflector**: Sends small requests to legitimate servers (reflectors)
+3. **Amplified Response**: Servers send large responses to spoofed IP (victim)
+4. **Traffic Amplification**: Small request generates much larger response
 
 ```bash
-# DNS amplification detection
+# Common reflection attack vectors and detection
+
+# DNS Reflection Detection
+tcpdump -i any 'src port 53 and dst host VICTIM_IP'
+dig @target.dns.server ANY isc.org                    # Test for large responses
+
+# NTP Reflection Detection
+tcpdump -i any 'src port 123 and dst host VICTIM_IP'
+ntpdc -c monlist target.ntp.server                    # Check for vulnerable monlist
+
+# SNMP Reflection Detection
+tcpdump -i any 'src port 161 and dst host VICTIM_IP'
+snmpwalk -v2c -c public target.snmp.server            # Test SNMP response size
+
+# Memcached Reflection Detection
+tcpdump -i any 'src port 11211 and dst host VICTIM_IP'
+echo -en "\x00\x00\x00\x00\x00\x01\x00\x00stats\r\n" | nc -u target.server 11211
+
+# SSDP/UPnP Reflection Detection
+tcpdump -i any 'src port 1900 and dst host VICTIM_IP'
+```
+
+**Protection Against Being Used as Reflector**:
+```bash
+# DNS Server Protection (BIND)
+# /etc/bind/named.conf.options
+options {
+    recursion no;                                      # Disable open recursion
+    allow-recursion { 192.168.1.0/24; };             # Limit to authorized networks
+    rate-limit {
+        responses-per-second 10;
+        window 5;
+        slip 2;
+        exempt-clients { 192.168.1.0/24; };
+    };
+};
+
+# NTP Server Protection
+# /etc/ntp.conf
+disable monitor                                        # Disable monlist command
+restrict default kod nomodify notrap nopeer noquery
+restrict -6 default kod nomodify notrap nopeer noquery
+
+# SNMP Protection
+# /etc/snmp/snmpd.conf
+rocommunity private 192.168.1.0/24                   # Restrict community access
+syslocation "Private Network"
+syscontact "admin@private.network"
+
+# Memcached Protection
+memcached -l 127.0.0.1 -U 0                          # Localhost only, disable UDP
+
+# Block reflection requests at firewall level
+iptables -A INPUT -p udp --dport 53 -m string --string "ANY" --algo bm -j DROP     # Block DNS ANY queries
+iptables -A INPUT -p udp --dport 123 -m string --string "monlist" --algo bm -j DROP # Block NTP monlist
+iptables -A INPUT -p udp --dport 1900 -j DROP                                       # Block SSDP
+iptables -A INPUT -p udp --dport 11211 -s ! 127.0.0.1 -j DROP                     # Block external Memcached
+```
+
+**Protection Against Being Victim of Reflection**:
+```bash
+# Upstream filtering (ISP/Network Provider level)
+# Implement BCP 38 (ingress filtering) to prevent IP spoofing
+
+# Local protection measures
+# Rate limit inbound traffic on commonly reflected ports
+iptables -A INPUT -p udp --sport 53 -m limit --limit 100/second -j ACCEPT     # DNS responses
+iptables -A INPUT -p udp --sport 123 -m limit --limit 50/second -j ACCEPT     # NTP responses
+iptables -A INPUT -p udp --sport 161 -m limit --limit 20/second -j ACCEPT     # SNMP responses
+iptables -A INPUT -p udp --sport 11211 -m limit --limit 10/second -j ACCEPT   # Memcached responses
+
+# Monitor for reflection attacks
+tcpdump -i any 'udp and (src port 53 or src port 123 or src port 161 or src port 11211)' | head -100
+
+# Detect amplification ratio
+# Compare inbound vs outbound traffic on reflection ports
+netstat -su | grep -E "(packets received|packets sent)"
+```
+
+**Common Reflection Services and Amplification Factors**:
+| Service | Port | Protocol | Amplification Factor | Request Size | Response Size |
+|---------|------|----------|---------------------|--------------|---------------|
+| DNS | 53 | UDP | 28-54x | 60 bytes | 1700-3200 bytes |
+| NTP | 123 | UDP | 200x | 8 bytes | 1600 bytes |
+| SNMP | 161 | UDP | 6.3x | 87 bytes | 550 bytes |
+| NetBIOS | 137 | UDP | 3.8x | 50 bytes | 190 bytes |
+| SSDP | 1900 | UDP | 30.8x | 65 bytes | 2000 bytes |
+| Memcached | 11211 | UDP | 10,000-51,000x | 15 bytes | 750KB+ |
+| CharGen | 19 | UDP | 358x | 1 byte | 358 bytes |
+
+
+### Amplification Attacks
+**Goal**: Amplify attack traffic using vulnerable services that respond with larger packets
+
+#### DNS Amplification
+**Mechanism**: Small DNS queries (60 bytes) → Large DNS responses (up to 4000+ bytes)
+```bash
+# Detection
 dig @8.8.8.8 ANY isc.org                 # Large DNS response test
 tcpdump -i any 'port 53 and greater 512' # Monitor large DNS packets
 
-# NTP amplification check
+# Test for open DNS resolvers (vulnerable to abuse)
+dig @target.dns.server google.com        # Should only work for authorized clients
+
+# Protection for DNS servers
+# /etc/bind/named.conf.options
+recursion no;                            # Disable recursion for authoritative servers
+allow-recursion { 192.168.1.0/24; };     # Limit recursive queries to local network
+
+# Rate limiting with iptables
+iptables -A INPUT -p udp --dport 53 -m recent --set --name dns_query
+iptables -A INPUT -p udp --dport 53 -m recent --update --seconds 60 --hitcount 20 -j DROP
+```
+
+#### NTP Amplification
+**Mechanism**: Uses NTP monlist command for up to 200x amplification
+```bash
+# Check if NTP server is vulnerable
 ntpdc -c monlist target.ntp.server       # Check if monlist is enabled
 ntpq -c rv target.ntp.server             # Query NTP server
 
-# Memcached protection
-memcached -l 127.0.0.1                   # Bind to localhost only
-iptables -A INPUT -p udp --dport 11211 -s ! 127.0.0.1 -j DROP
+# Secure NTP configuration (/etc/ntp.conf)
+disable monitor                          # Disable monlist command
+restrict default kod nomodify notrap nopeer noquery    # Restrict access
+restrict -6 default kod nomodify notrap nopeer noquery
 
-# Prevention: Disable reflector services
-systemctl disable avahi-daemon           # Disable SSDP
-echo "disable monitor" >> /etc/ntp.conf  # Disable NTP monlist
+# Alternative: use restrict with specific permissions
+restrict 192.168.1.0 mask 255.255.255.0 nomodify notrap
+
+# Block NTP monlist requests
+iptables -A INPUT -p udp --dport 123 -m string --string "monlist" --algo bm -j DROP
 ```
 
-### DDoS Mitigation Strategies
+#### Memcached Amplification
+**Mechanism**: Up to 51,000x amplification factor using UDP Memcached
 ```bash
-# Network-level mitigation
-# Rate limiting
+# Test for vulnerable Memcached servers
+echo -en "\x00\x00\x00\x00\x00\x01\x00\x00stats\r\n" | nc -u target.server 11211
+
+# Secure Memcached configuration
+memcached -l 127.0.0.1                   # Bind to localhost only
+memcached -U 0                           # Disable UDP completely
+
+# Block external access to Memcached
+iptables -A INPUT -p udp --dport 11211 -s ! 127.0.0.1 -j DROP
+iptables -A INPUT -p tcp --dport 11211 -s ! 192.168.1.0/24 -j DROP
+
+# Monitor for Memcached abuse
+tcpdump -i any 'port 11211 and udp' | grep -v localhost
+```
+
+#### SSDP Amplification
+**Mechanism**: UPnP Simple Service Discovery Protocol can provide significant amplification
+```bash
+# Detection
+tcpdump -i any 'port 1900 and udp'      # Monitor SSDP traffic
+
+# Disable UPnP/SSDP services
+systemctl disable avahi-daemon           # Disable SSDP
+systemctl stop upnp                      # Stop UPnP services
+
+# Block SSDP traffic
+iptables -A INPUT -p udp --dport 1900 -j DROP
+iptables -A OUTPUT -p udp --dport 1900 -j DROP
+
+# Disable UPnP in router/firewall settings
+# Set "UPnP Enable" to "Disable" in router configuration
+```
+
+## DDoS Mitigation Strategies
+
+### 1. Rate Limiting & Traffic Filtering
+**Purpose**: Restrict excessive requests or connections to prevent resource exhaustion
+```bash
+# Connection rate limiting
 iptables -A INPUT -p tcp --dport 80 -m limit --limit 25/minute --limit-burst 100 -j ACCEPT
+iptables -A INPUT -p tcp --dport 443 -m limit --limit 25/minute --limit-burst 100 -j ACCEPT
+
+# Per-IP connection limiting
+iptables -A INPUT -p tcp --syn --dport 80 -m connlimit --connlimit-above 10 -j REJECT
+iptables -A INPUT -p tcp --syn --dport 443 -m connlimit --connlimit-above 10 -j REJECT
+
+# UDP rate limiting
+iptables -A INPUT -p udp -m limit --limit 50/second --limit-burst 100 -j ACCEPT
+iptables -A INPUT -p udp -j DROP
 
 # Block specific attack patterns
 iptables -A INPUT -p tcp --tcp-flags ALL ALL -j DROP          # Christmas tree packets
 iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP         # Null packets
+iptables -A INPUT -p tcp --tcp-flags SYN,FIN SYN,FIN -j DROP  # SYN+FIN combination
+```
 
-# Geographic blocking (using GeoIP)
-iptables -A INPUT -m geoip --src-cc CN,RU -j DROP
+### 2. SYN Flood Protection (SYN Cookies, SYN Proxy)
+**Purpose**: Prevent half-open connections from overloading server resources
+```bash
+# Enable SYN cookies (kernel-level protection)
+echo 1 > /proc/sys/net/ipv4/tcp_syncookies
+sysctl -w net.ipv4.tcp_syncookies=1
 
-# Traffic analysis
-# Monitor connection counts
+# Tune TCP parameters for SYN flood protection
+sysctl -w net.ipv4.tcp_max_syn_backlog=2048      # Increase SYN backlog
+sysctl -w net.ipv4.tcp_synack_retries=2          # Reduce SYN-ACK retries
+sysctl -w net.ipv4.tcp_syn_retries=2             # Reduce SYN retries
+sysctl -w net.ipv4.tcp_fin_timeout=30            # Reduce FIN timeout
+
+# SYN proxy with iptables (SYNPROXY target)
+iptables -t raw -A PREROUTING -p tcp -m tcp --syn -j CT --notrack
+iptables -A INPUT -p tcp -m conntrack --ctstate INVALID,UNTRACKED -j SYNPROXY --sack-perm --timestamp --wscale 7 --mss 1460
+iptables -A INPUT -m conntrack --ctstate INVALID -j DROP
+
+# Monitor SYN flood attacks
+netstat -an | grep SYN_RECV | wc -l              # Count half-open connections
+ss -s | grep -i syn                              # Connection statistics
+```
+
+### 3. Firewalls & IDS/IPS Integration
+**Purpose**: Identify and block unusual traffic patterns at the network level
+```bash
+# Advanced iptables rules for DDoS protection
+iptables -N ddos-protect
+iptables -A INPUT -j ddos-protect
+
+# Limit new connections per minute
+iptables -A ddos-protect -p tcp --syn -m recent --name ddos --set
+iptables -A ddos-protect -p tcp --syn -m recent --name ddos --update --seconds 60 --hitcount 20 -j DROP
+
+# Protect against port scans
+iptables -A ddos-protect -p tcp --tcp-flags SYN,ACK,FIN,RST RST -m limit --limit 1/s -j ACCEPT
+
+# Suricata rules for DDoS detection
+# /etc/suricata/rules/ddos.rules
+drop tcp any any -> $HOME_NET any (msg:"SYN Flood Detected"; flags:S; threshold:type both, track by_src, count 100, seconds 60; sid:1001;)
+drop udp any any -> $HOME_NET any (msg:"UDP Flood Detected"; threshold:type both, track by_src, count 1000, seconds 60; sid:1002;)
+alert icmp any any -> $HOME_NET any (msg:"ICMP Flood Detected"; threshold:type both, track by_src, count 50, seconds 60; sid:1003;)
+```
+
+### 4. Web Application Firewall (WAF)
+**Purpose**: Protect against malicious application-layer attacks
+```bash
+# ModSecurity configuration for Apache
+# /etc/modsecurity/modsecurity.conf
+SecRule REQUEST_HEADERS:User-Agent "@detectSQLi" "id:1001,phase:2,block,msg:'SQL Injection in User-Agent'"
+SecRule REQUEST_URI "@detectXSS" "id:1002,phase:1,block,msg:'XSS Attack Detected'"
+
+# Rate limiting rules
+SecAction "id:900001,phase:1,pass,initcol:ip=%{REMOTE_ADDR},initcol:global=global"
+SecRule IP:REQUEST_COUNT "@gt 100" "id:900002,phase:1,deny,msg:'Request rate exceeded'"
+
+# Nginx rate limiting
+# /etc/nginx/nginx.conf
+http {
+    limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
+    limit_req_zone $binary_remote_addr zone=api:10m rate=5r/s;
+
+    server {
+        location / {
+            limit_req zone=one burst=5 nodelay;
+        }
+
+        location /api/ {
+            limit_req zone=api burst=10 nodelay;
+        }
+    }
+}
+
+# Cloudflare-style protection with Nginx
+location / {
+    # Challenge suspicious requests
+    if ($http_user_agent ~* (bot|crawler|spider)) {
+        return 503;
+    }
+
+    # Block common attack patterns
+    if ($request_uri ~* (eval|union|select|insert|drop)) {
+        return 403;
+    }
+}
+```
+
+### 5. BCP 38 (Ingress Filtering)
+**Purpose**: Stop spoofed IP packets at the ISP level to prevent reflection attacks
+```bash
+# Router/ISP level configuration
+# Configure upstream provider to implement BCP 38
+
+# Local network anti-spoofing
+iptables -A INPUT -s 10.0.0.0/8 -i eth0 -j DROP       # Block private IPs from internet
+iptables -A INPUT -s 192.168.0.0/16 -i eth0 -j DROP   # Block RFC 1918 addresses
+iptables -A INPUT -s 172.16.0.0/12 -i eth0 -j DROP    # Block private ranges
+
+# Reverse path filtering (kernel level)
+echo 1 > /proc/sys/net/ipv4/conf/all/rp_filter
+for interface in /proc/sys/net/ipv4/conf/*/rp_filter; do
+    echo 1 > $interface
+done
+
+# Source address validation
+sysctl -w net.ipv4.conf.all.rp_filter=1
+sysctl -w net.ipv4.conf.default.rp_filter=1
+```
+
+### 6. Reflection & Amplification Controls
+**Purpose**: Disable open DNS resolvers, secure NTP servers, and limit large query responses
+```bash
+# DNS server hardening (BIND)
+# /etc/bind/named.conf.options
+options {
+    recursion no;                                    # Disable recursive queries
+    allow-recursion { none; };                       # No recursive queries allowed
+    rate-limit {
+        responses-per-second 10;
+        window 5;
+        slip 2;
+        exempt-clients { 192.168.1.0/24; };
+    };
+};
+
+# NTP server hardening
+# /etc/ntp.conf
+disable monitor                                      # Disable monlist
+restrict default kod nomodify notrap nopeer noquery
+restrict -6 default kod nomodify notrap nopeer noquery
+restrict 127.0.0.1
+restrict -6 ::1
+
+# Memcached security
+memcached -l 127.0.0.1 -U 0                        # Localhost only, no UDP
+
+# SNMP security
+community readonly_community {
+    source 192.168.1.0/24;                         # Restrict source networks
+    oid 1.3.6.1.2.1.1;                             # Limit OID access
+}
+
+# Disable unnecessary services
+systemctl disable chargen                           # Character generator
+systemctl disable echo                              # Echo service
+systemctl disable discard                           # Discard service
+systemctl disable avahi-daemon                      # mDNS/SSDP
+```
+
+### 7. Advanced Monitoring and Response
+```bash
+# Real-time traffic monitoring
+iftop -i eth0 -P                                   # Real-time bandwidth by port
+nethogs eth0                                       # Per-process network usage
+iperf3 -s                                          # Network performance testing
+
+# DDoS detection script
+#!/bin/bash
+# ddos_monitor.sh
+THRESHOLD=1000
+INTERFACE="eth0"
+
+while true; do
+    PPS=$(cat /sys/class/net/$INTERFACE/statistics/rx_packets)
+    sleep 1
+    PPS_NEW=$(cat /sys/class/net/$INTERFACE/statistics/rx_packets)
+    PPS_DIFF=$((PPS_NEW - PPS))
+
+    if [ $PPS_DIFF -gt $THRESHOLD ]; then
+        echo "DDoS detected: $PPS_DIFF packets/second"
+        # Trigger mitigation
+        iptables -A INPUT -i $INTERFACE -m limit --limit 100/second -j ACCEPT
+        iptables -A INPUT -i $INTERFACE -j DROP
+    fi
+done
+
+# Geographic blocking with GeoIP
+iptables -A INPUT -m geoip --src-cc CN,RU,KP -j DROP
+
+# Traffic analysis and top talkers
 netstat -an | awk '/^tcp/ {++S[$NF]} END {for(a in S) print a, S[a]}'
-
-# Top source IPs
-netstat -ntu | awk '{print $5}' | cut -d: -f1 | sort | uniq -c | sort -n
+netstat -ntu | awk '{print $5}' | cut -d: -f1 | sort | uniq -c | sort -nr | head -10
 
 # Bandwidth monitoring
-vnstat -i eth0 -h                        # Hourly traffic stats
+vnstat -i eth0 -h                                  # Hourly stats
+vnstat -i eth0 -d                                  # Daily stats
+iftop -i eth0 -t -s 60                            # 60-second sample
 ```
+
+### 8. Cloud-Based DDoS Protection
+```bash
+# Cloudflare configuration
+# Enable "Under Attack Mode" for aggressive protection
+# Configure rate limiting rules
+# Set up custom WAF rules
+
+# AWS Shield Advanced with CloudFront
+aws configure set region us-east-1
+aws shield describe-protection --resource-arn arn:aws:cloudfront::123456789:distribution/E1234567890
+
+# Load balancer configuration for DDoS mitigation
+# /etc/haproxy/haproxy.cfg
+frontend web_frontend
+    bind *:80
+    bind *:443 ssl crt /etc/ssl/certs/
+
+    # Rate limiting
+    stick-table type ip size 100k expire 30s store http_req_rate(10s)
+    http-request track-sc0 src
+    http-request reject if { sc_http_req_rate(0) gt 20 }
+
+    # Connection limiting
+    tcp-request connection reject if { src_conn_rate(Proxy) gt 10 }
+
+    default_backend web_servers
+
+# CDN configuration for DDoS protection
+# Configure edge caching to absorb traffic
+# Enable automatic scaling based on traffic patterns
+```
+
+These comprehensive mitigation strategies provide multiple layers of protection against various types of DDoS attacks, from network-level filtering to application-layer protection and cloud-based solutions.
 
 # Malware Analysis
 
@@ -1164,6 +1823,333 @@ Inside `id_token`:
 - `name`, `email`: User profile claims
 
 Client uses `id_token` to authenticate user and `access_token` to access user info.
+
+# JSON Web Tokens (JWT) Security
+
+## JWT Structure and Components
+JWT is a compact, URL-safe token format for securely transmitting information between parties as a JSON object.
+
+**Structure**: `header.payload.signature`
+
+```javascript
+// Header (Base64URL encoded)
+{
+  "alg": "HS256",    // Algorithm used for signing
+  "typ": "JWT"       // Token type
+}
+
+// Payload (Base64URL encoded)
+{
+  "sub": "1234567890",                // Subject (user ID)
+  "name": "John Doe",                 // Custom claims
+  "iat": 1516239022,                  // Issued at
+  "exp": 1516242622,                  // Expiration time
+  "iss": "https://auth.example.com",  // Issuer
+  "aud": "client_app"                 // Audience
+}
+
+// Signature (Algorithm dependent)
+HMACSHA256(
+  base64UrlEncode(header) + "." + base64UrlEncode(payload),
+  secret
+)
+```
+
+### JWT Creation and Verification
+```python
+import jwt
+import datetime
+
+# Create JWT
+payload = {
+    'user_id': 123,
+    'username': 'john_doe',
+    'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1),
+    'iat': datetime.datetime.utcnow(),
+    'iss': 'auth-service'
+}
+
+secret = 'your-secret-key'
+token = jwt.encode(payload, secret, algorithm='HS256')
+
+# Verify JWT
+try:
+    decoded = jwt.decode(token, secret, algorithms=['HS256'])
+    print(f"Valid token for user: {decoded['username']}")
+except jwt.ExpiredSignatureError:
+    print("Token has expired")
+except jwt.InvalidTokenError:
+    print("Invalid token")
+```
+
+## JWT Security Vulnerabilities and Attacks
+
+### 1. Algorithm Confusion Attacks
+**Attack**: Changing algorithm from RS256 to HS256 to bypass signature verification
+
+```python
+# Vulnerable verification (accepts any algorithm)
+def vulnerable_verify(token, secret):
+    return jwt.decode(token, secret, algorithms=['HS256', 'RS256'])
+
+# Secure verification (explicit algorithm)
+def secure_verify(token, secret):
+    return jwt.decode(token, secret, algorithms=['HS256'])  # Only allow expected algorithm
+```
+
+**Mitigation**:
+- Always specify allowed algorithms explicitly
+- Never use algorithm "none"
+- Separate keys for different algorithms
+
+### 2. None Algorithm Attack
+**Attack**: Setting algorithm to "none" to create unsigned tokens
+
+```javascript
+// Malicious JWT header
+{
+  "alg": "none",
+  "typ": "JWT"
+}
+
+// Payload (admin privileges escalation)
+{
+  "sub": "1234567890",
+  "role": "admin",
+  "exp": 1999999999
+}
+```
+
+**Mitigation**:
+```python
+# Secure JWT verification
+def secure_decode(token, secret):
+    # Explicitly reject 'none' algorithm
+    return jwt.decode(
+        token,
+        secret,
+        algorithms=['HS256'],  # Never include 'none'
+        options={"verify_signature": True}
+    )
+```
+
+### 3. Weak Secret/Key Attacks
+**Attack**: Brute forcing weak HMAC secrets
+
+```bash
+# JWT brute force with hashcat
+hashcat -a 0 -m 16500 jwt_token.txt wordlist.txt
+
+# JWT cracking with john
+./jwt2john.py jwt_token > jwt_hash.txt
+john jwt_hash.txt --wordlist=wordlist.txt
+```
+
+**Mitigation**:
+- Use cryptographically strong secrets (256+ bits)
+- Prefer asymmetric algorithms (RS256) for distributed systems
+- Implement key rotation
+
+### 4. Token Replay Attacks
+**Attack**: Reusing valid tokens after logout or privilege changes
+
+**Mitigation**:
+```python
+# Implement token blacklist
+blacklisted_tokens = set()
+
+def verify_token(token):
+    if token in blacklisted_tokens:
+        raise ValueError("Token has been revoked")
+
+    payload = jwt.decode(token, secret, algorithms=['HS256'])
+
+    # Check against current user permissions
+    if not user_has_permission(payload['user_id'], payload['role']):
+        raise ValueError("User permissions have changed")
+
+    return payload
+
+def logout(token):
+    blacklisted_tokens.add(token)
+```
+
+### 5. Information Disclosure
+**Attack**: Sensitive data exposure in JWT payload (Base64 encoded, not encrypted)
+
+```javascript
+// BAD: Sensitive information in payload
+{
+  "user_id": 123,
+  "credit_card": "4111-1111-1111-1111",  // Exposed!
+  "ssn": "123-45-6789"                   // Exposed!
+}
+
+// GOOD: Only necessary, non-sensitive claims
+{
+  "user_id": 123,
+  "role": "user",
+  "permissions": ["read_profile", "update_profile"]
+}
+```
+
+## JWT vs Other Token Formats
+
+### JWT vs Opaque Tokens
+| Feature | JWT | Opaque Tokens |
+|---------|-----|---------------|
+| **Structure** | Self-contained JSON | Random string |
+| **Validation** | Local signature check | Database lookup |
+| **Revocation** | Complex (blacklist needed) | Simple (delete from DB) |
+| **Size** | Larger (contains data) | Smaller |
+| **Performance** | Faster validation | Slower (DB query) |
+| **Security** | Information disclosure risk | No data exposure |
+
+### JWT-VC (Verifiable Credentials) vs JSON-LD VC
+
+#### JWT-VC (JWT-based Verifiable Credentials)
+**Structure**: Standard JWT format with VC-specific claims
+```javascript
+{
+  "iss": "https://university.edu/issuer",           // Issuer (University)
+  "sub": "did:example:ebfeb1f712ebc6f1c276e12ec21",  // Subject (Student)
+  "vc": {
+    "@context": ["https://www.w3.org/2018/credentials/v1"],
+    "type": ["VerifiableCredential", "UniversityDegree"],
+    "credentialSubject": {
+      "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+      "degree": {
+        "type": "BachelorDegree",
+        "name": "Bachelor of Science in Computer Science"
+      }
+    }
+  },
+  "exp": 1735689600,
+  "iat": 1640995200
+}
+```
+
+**Advantages**:
+- Compact, URL-safe format
+- Easy integration with existing JWT infrastructure
+- Wide library support
+- Fast verification
+
+**Disadvantages**:
+- Limited cryptographic signature options
+- Less flexible than JSON-LD
+- Algorithm confusion vulnerabilities
+
+#### JSON-LD VC (JSON-LD Verifiable Credentials)
+**Structure**: JSON-LD with linked data semantics and embedded proofs
+```json
+{
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://example.org/university/v1"
+  ],
+  "id": "https://university.edu/credentials/3732",
+  "type": ["VerifiableCredential", "UniversityDegree"],
+  "issuer": "https://university.edu/issuer",
+  "issuanceDate": "2021-01-01T00:00:00Z",
+  "expirationDate": "2025-12-31T23:59:59Z",
+  "credentialSubject": {
+    "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+    "degree": {
+      "type": "BachelorDegree",
+      "name": "Bachelor of Science in Computer Science",
+      "degreeSchool": "School of Engineering"
+    }
+  },
+  "proof": {
+    "type": "Ed25519Signature2020",
+    "created": "2021-01-01T00:00:00Z",
+    "verificationMethod": "https://university.edu/issuer/keys/1",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "z58DAdFfa9SkqZMVPiQjHs1A..."
+  }
+}
+```
+
+**Advantages**:
+- Rich semantic meaning with linked data
+- Multiple signature algorithms (Ed25519, BBS+, etc.)
+- Supports selective disclosure and zero-knowledge proofs
+- More flexible credential modeling
+
+**Disadvantages**:
+- Larger size due to JSON-LD context
+- More complex to implement and validate
+- Requires understanding of RDF and linked data concepts
+
+### Comparison Table: JWT-VC vs JSON-LD VC
+| Feature | JWT-VC | JSON-LD VC |
+|---------|--------|------------|
+| **Format** | Compact JWT | Expanded JSON-LD |
+| **Size** | Smaller | Larger |
+| **Semantics** | Limited | Rich (linked data) |
+| **Signatures** | JWT algorithms (RS256, ES256) | Multiple (Ed25519, BBS+, etc.) |
+| **Privacy** | Limited | Advanced (ZKP, selective disclosure) |
+| **Complexity** | Lower | Higher |
+| **Interoperability** | JWT ecosystem | W3C standards |
+| **Revocation** | JWT-based mechanisms | Status list, bitstring status |
+
+### Security Best Practices for JWT
+```python
+# Secure JWT implementation
+import jwt
+from datetime import datetime, timedelta
+import secrets
+
+class SecureJWT:
+    def __init__(self):
+        self.secret = secrets.token_urlsafe(32)  # Strong secret
+        self.algorithm = 'HS256'
+        self.expiry_hours = 1
+
+    def create_token(self, user_id, role):
+        payload = {
+            'user_id': user_id,
+            'role': role,
+            'iat': datetime.utcnow(),
+            'exp': datetime.utcnow() + timedelta(hours=self.expiry_hours),
+            'iss': 'secure-app',
+            'jti': secrets.token_urlsafe(16)  # Unique token ID for revocation
+        }
+        return jwt.encode(payload, self.secret, algorithm=self.algorithm)
+
+    def verify_token(self, token):
+        try:
+            # Strict verification with all checks enabled
+            payload = jwt.decode(
+                token,
+                self.secret,
+                algorithms=[self.algorithm],  # Explicit algorithm
+                options={
+                    "verify_signature": True,
+                    "verify_exp": True,
+                    "verify_iat": True,
+                    "verify_iss": True,
+                    "require": ["exp", "iat", "iss", "jti"]  # Required claims
+                },
+                issuer='secure-app'
+            )
+
+            # Additional business logic checks
+            if self.is_token_revoked(payload.get('jti')):
+                raise jwt.InvalidTokenError("Token has been revoked")
+
+            return payload
+
+        except jwt.ExpiredSignatureError:
+            raise ValueError("Token has expired")
+        except jwt.InvalidTokenError as e:
+            raise ValueError(f"Invalid token: {str(e)}")
+
+    def is_token_revoked(self, jti):
+        # Check against revocation list (implement according to your needs)
+        return jti in self.revoked_tokens
+```
 
 
 # Mobile Security
