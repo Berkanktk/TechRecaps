@@ -2,13 +2,16 @@
 
 ## TCP/IP Stack
 **Purpose**: Foundation of internet communication
-```
-Application Layer: HTTP, HTTPS, FTP, SSH, DNS
-Transport Layer: TCP, UDP
-Network Layer: IP, ICMP, ARP
-Data Link Layer: Ethernet, WiFi
-Physical Layer: Cables, Radio waves
-```
+
+| Layer | OSI Model | TCP/IP Model | Protocols | Protocol Data Unit | Description |
+|---|---|---|---|---|---|
+| 7 | Application | Application | FTP, HTTP, Telnet, SMTP, DNS, SSH | Data | Network Process to application |
+| 6 | Presentation | Application | JPEG, PNG, MPEG, Sockets, HTML, IMAP | Data | Data representation and encryption |
+| 5 | Session | Application | NFS, SQL, PAP, RPC, RTP, API's | Data | Interhost communication |
+| 4 | Transport | Transport | TCP, UDP, SSL, TLS | Segment (TCP) / Datagram (UDP) | End-to-end connection and reliability |
+| 3 | Network | Internet | IPv4, IPv6, ICMP | Packet | Path determination (Logical addressing) |
+| 2 | Data Link | Network Access | ARP, CDP, STP, VLAN, Switch, Bridge | Frame | MAC and LLC (Physical addressing) |
+| 1 | Physical | Network Access | Ethernet, WI-FI, CAT, DSL, RJ45, 100Base-TX, Hub, Repeater | Bits | Media, signal and binary transmission |
 
 ## Network Protocols
 ```bash
@@ -223,6 +226,44 @@ public_key.verify(
 )
 ```
 
+## Encoding & Data Representation
+Encoding transforms data from one format to another for storage, transmission, or compatibility purposes (reversible without a key).
+
+```bash
+# Base64 encoding/decoding
+echo "Hello World" | base64                    # SGVsbG8gV29ybGQK
+echo "SGVsbG8gV29ybGQK" | base64 -d            # Hello World
+
+# URL encoding
+curl -G -d "param=hello world" http://example.com    # param=hello%20world
+
+# Hex encoding
+echo "Hello" | xxd                             # 48656c6c6f0a
+echo "48656c6c6f" | xxd -r -p                  # Hello
+
+# HTML encoding
+&lt; &gt; &amp; &quot; &#39;                    # < > & " '
+```
+
+```python
+import base64
+import urllib.parse
+import html
+
+# Base64
+data = "Hello World"
+encoded = base64.b64encode(data.encode()).decode()    # SGVsbG8gV29ybGQ=
+decoded = base64.b64decode(encoded).decode()          # Hello World
+
+# URL encoding
+url_encoded = urllib.parse.quote("hello world")      # hello%20world
+url_decoded = urllib.parse.unquote(url_encoded)      # hello world
+
+# HTML encoding
+html_encoded = html.escape("<script>alert('xss')</script>")
+html_decoded = html.unescape(html_encoded)
+```
+
 ## Hashing
 Hashing transforms data into a fixed-size string of characters, which is typically a digest that represents the original data.
 
@@ -259,6 +300,16 @@ $ nmap -sV -sC -p- target.com      # Scan all ports with default scripts and ver
 # Directory bruteforcing
 $ dirb http://target.com /usr/share/wordlists/dirb/common.txt
 $ gobuster dir -u http://target.com -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+
+# Wfuzz - Web application fuzzer
+$ wfuzz -c -z file,/usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt --hc 404 http://target.com/FUZZ
+$ wfuzz -c -z file,/usr/share/wordlists/SecLists/Discovery/Web-Content/common.txt --hc 404,403 http://target.com/FUZZ.php
+$ wfuzz -c -z file,/usr/share/wordlists/SecLists/Discovery/Web-Content/big.txt --sc 200 http://target.com/FUZZ
+
+# Ffuf - Fast web fuzzer written in Go
+$ ffuf -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://target.com/FUZZ
+$ ffuf -w /usr/share/wordlists/SecLists/Discovery/Web-Content/common.txt -u http://target.com/FUZZ -fc 404,403
+$ ffuf -w /usr/share/wordlists/SecLists/Discovery/Web-Content/raft-medium-directories.txt -u http://target.com/FUZZ/ -mc 200,301,302
 
 # DNS enumeration
 $ dig @8.8.8.8 target.com any     # Query all DNS records
@@ -437,6 +488,330 @@ grep "Failed password" /var/log/auth.log            # Failed SSH login attempts
 
 # Windows Event Logs
 Get-WinEvent -LogName Security | Where-Object {$_.Id -eq 4625}    # Failed login attempts
+```
+
+## SIEM Tools
+
+### Splunk
+Splunk is a platform for searching, monitoring, and analyzing machine-generated big data through a web-style interface.
+
+```bash
+# Splunk Search Processing Language (SPL)
+index=security sourcetype=firewall action=blocked           # Search blocked firewall events
+index=web_logs status=404 | stats count by clientip         # Count 404 errors by IP
+index=windows EventCode=4625 | timechart count by src_ip    # Failed login attempts over time
+
+# Splunk commands
+./splunk start                                              # Start Splunk
+./splunk stop                                               # Stop Splunk
+./splunk add monitor /var/log/apache2/access.log           # Add log file monitoring
+./splunk list inputstatus                                  # Check input status
+
+# Search examples
+sourcetype=access_combined | eval hour=strftime(_time,"%H") | stats count by hour
+index=security | where match(src_ip, "^192\.168\.1\.")     # Filter by IP range
+index=* | search "failed" OR "error" | head 100            # Search for failures
+```
+
+**Key Features:**
+- **Real-time monitoring**: Live dashboards and alerts
+- **Machine learning**: Anomaly detection and predictive analytics
+- **Correlation**: Link events across different data sources
+- **Visualization**: Charts, graphs, and custom dashboards
+
+### ELK Stack (Elasticsearch, Logstash, Kibana)
+Open-source platform for collecting, parsing, storing, and visualizing log data.
+
+#### Logstash Configuration
+```ruby
+# /etc/logstash/conf.d/apache.conf
+input {
+  file {
+    path => "/var/log/apache2/access.log"
+    start_position => "beginning"
+  }
+}
+
+filter {
+  grok {
+    match => { "message" => "%{COMBINEDAPACHELOG}" }
+  }
+
+  date {
+    match => [ "timestamp", "dd/MMM/yyyy:HH:mm:ss Z" ]
+  }
+
+  mutate {
+    convert => { "response" => "integer" }
+    convert => { "bytes" => "integer" }
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => ["localhost:9200"]
+    index => "apache-logs-%{+YYYY.MM.dd}"
+  }
+}
+```
+
+#### Elasticsearch Queries
+```bash
+# Basic search
+curl -X GET "localhost:9200/apache-logs-*/_search?q=response:404"
+
+# Aggregation query
+curl -X GET "localhost:9200/apache-logs-*/_search" -H 'Content-Type: application/json' -d'
+{
+  "aggs": {
+    "top_ips": {
+      "terms": {
+        "field": "clientip.keyword",
+        "size": 10
+      }
+    }
+  }
+}'
+
+# Time-based query
+curl -X GET "localhost:9200/apache-logs-*/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "range": {
+      "@timestamp": {
+        "gte": "2024-01-01",
+        "lte": "2024-01-31"
+      }
+    }
+  }
+}'
+```
+
+#### Kibana Dashboards
+```json
+# Sample visualization for top source IPs
+{
+  "visualization": {
+    "title": "Top Source IPs",
+    "type": "pie",
+    "params": {
+      "grid": {"categoryLines": false, "style": {"color": "#eee"}},
+      "categoryAxes": [{"id": "CategoryAxis-1", "type": "category", "position": "bottom"}],
+      "valueAxes": [{"id": "ValueAxis-1", "name": "LeftAxis-1", "type": "value", "position": "left"}]
+    }
+  }
+}
+```
+
+#### ELK Management Commands
+```bash
+# Elasticsearch
+systemctl start elasticsearch                            # Start Elasticsearch
+curl -X GET "localhost:9200/_cluster/health"             # Check cluster health
+curl -X GET "localhost:9200/_cat/indices?v"              # List indices
+
+# Logstash
+/usr/share/logstash/bin/logstash -t                       # Test configuration
+systemctl start logstash                                  # Start Logstash
+tail -f /var/log/logstash/logstash-plain.log              # Monitor logs
+
+# Kibana
+systemctl start kibana                                    # Start Kibana
+# Access via http://localhost:5601
+```
+
+# Types of Cyber Attacks
+
+## Malware Types
+**Malware** is malicious software designed to harm, exploit, or gain unauthorized access to computer systems.
+
+### Virus
+- **Definition**: Self-replicating code that attaches to executable files
+- **Behavior**: Requires host file execution to spread
+- **Example**: Boot sector viruses, file infectors
+```bash
+# Detection
+clamscan -r /home/user/                   # ClamAV scan
+rkhunter --check                          # Rootkit detection
+```
+
+### Worm
+- **Definition**: Self-propagating malware that spreads across networks
+- **Behavior**: Replicates independently without user interaction
+- **Examples**: Code Red, Conficker, WannaCry
+```bash
+# Network monitoring for worm activity
+netstat -tuln | grep LISTEN              # Check listening ports
+ss -tuln                                 # Modern alternative
+tcpdump -i any 'port 445'                # Monitor SMB traffic (common worm vector)
+```
+
+### Trojan Horse
+- **Definition**: Appears legitimate but contains malicious code
+- **Behavior**: Relies on social engineering for installation
+- **Examples**: Remote Access Trojans (RATs), banking trojans
+
+### Ransomware
+- **Definition**: Encrypts victim's files and demands payment
+- **Behavior**: File encryption + ransom note display
+- **Examples**: WannaCry, Locky, CryptoLocker
+```bash
+# Prevention/Recovery
+# Regular backups
+rsync -av --delete /data/ /backup/
+# File integrity monitoring
+aide --check
+```
+
+### Spyware
+- **Definition**: Secretly collects user information
+- **Behavior**: Keylogging, screen capture, data theft
+- **Examples**: Keyloggers, screen recorders
+
+### Adware
+- **Definition**: Displays unwanted advertisements
+- **Behavior**: Pop-ups, browser hijacking, tracking
+
+### Rootkit
+- **Definition**: Hides malicious activity from detection
+- **Behavior**: Kernel-level or user-level system modification
+- **Detection**: Behavioral analysis, memory forensics
+```bash
+# Rootkit detection tools
+chkrootkit                               # Check for rootkits
+rkhunter --check                         # Rootkit Hunter
+unhide proc                              # Find hidden processes
+```
+
+### Botnet
+- **Definition**: Network of compromised computers (bots/zombies)
+- **Behavior**: Centralized command and control (C&C)
+- **Usage**: DDoS attacks, spam, cryptocurrency mining
+
+## Attack Vectors
+
+### Phishing
+- **Email phishing**: Fraudulent emails requesting credentials
+- **Spear phishing**: Targeted attacks on specific individuals
+- **Whaling**: Attacks targeting high-profile executives
+- **Smishing**: SMS-based phishing
+- **Vishing**: Voice/phone-based phishing
+
+### Social Engineering
+- **Pretexting**: Creating fake scenarios to gain trust
+- **Baiting**: Offering something enticing (USB drops)
+- **Tailgating**: Following authorized personnel into secure areas
+- **Quid pro quo**: Offering services in exchange for information
+
+### Advanced Persistent Threats (APT)
+- **Definition**: Long-term, stealthy attacks by skilled adversaries
+- **Characteristics**: Multi-stage, persistent presence, targeted
+- **Examples**: APT1 (China), Lazarus Group (North Korea)
+
+## DDoS (Distributed Denial of Service) Attacks
+DDoS attacks overwhelm target systems with traffic from multiple sources to disrupt normal operations.
+
+### Volume-Based Attacks (Volumetric)
+**Goal**: Consume bandwidth or network resources
+- **UDP Flood**: Sends large volumes of UDP packets to random ports
+- **ICMP Flood**: Overwhelms target with ICMP Echo Request packets
+- **Spoofed Packet Flood**: Uses spoofed IP addresses to hide attack source
+
+```bash
+# Detection and mitigation
+# Monitor network traffic
+iftop -i eth0                            # Real-time bandwidth usage
+netstat -s | grep -i drop                # Check dropped packets
+tcpdump -i any icmp                      # Monitor ICMP traffic
+
+# Rate limiting with iptables
+iptables -A INPUT -p icmp --icmp-type echo-request -m limit --limit 1/s -j ACCEPT
+iptables -A INPUT -p icmp --icmp-type echo-request -j DROP
+```
+
+### Protocol Attacks
+**Goal**: Consume server resources (CPU, memory, connection tables)
+- **SYN Flood**: Half-open TCP connections exhaust connection table
+- **Ping of Death**: Oversized packets cause buffer overflows
+- **Smurf Attack**: ICMP broadcast with spoofed source IP
+
+```bash
+# SYN flood protection
+echo 1 > /proc/sys/net/ipv4/tcp_syncookies        # Enable SYN cookies
+sysctl -w net.ipv4.tcp_max_syn_backlog=2048       # Increase SYN backlog
+
+# Monitor half-open connections
+netstat -an | grep SYN_RECV | wc -l               # Count SYN_RECV connections
+ss -s                                              # Connection statistics
+```
+
+### Application Layer Attacks (Layer 7)
+**Goal**: Exhaust application resources with seemingly legitimate requests
+- **HTTP Flood**: High volume of HTTP GET/POST requests
+- **Slowloris**: Slow, partial HTTP requests to exhaust connection pool
+- **R.U.D.Y. (R-U-Dead-Yet)**: Slow POST requests with incomplete data
+
+```bash
+# Application monitoring
+apache2ctl status                         # Apache server status
+nginx -t && nginx -s reload              # Nginx configuration test
+
+# Rate limiting in Nginx
+limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
+limit_req zone=one burst=5;
+
+# Fail2ban for automated blocking
+fail2ban-client status                    # Check fail2ban status
+fail2ban-client set apache-overflows bantime 3600
+```
+
+### Amplification Attacks
+**Goal**: Amplify attack traffic using vulnerable services that respond with larger packets
+- **DNS Amplification**: Small DNS queries → Large DNS responses
+- **NTP Amplification**: Uses NTP monlist command for 200x amplification
+- **Memcached Amplification**: Up to 51,000x amplification factor
+- **SSDP Amplification**: UPnP Simple Service Discovery Protocol
+
+```bash
+# DNS amplification detection
+dig @8.8.8.8 ANY isc.org                 # Large DNS response test
+tcpdump -i any 'port 53 and greater 512' # Monitor large DNS packets
+
+# NTP amplification check
+ntpdc -c monlist target.ntp.server       # Check if monlist is enabled
+ntpq -c rv target.ntp.server             # Query NTP server
+
+# Memcached protection
+memcached -l 127.0.0.1                   # Bind to localhost only
+iptables -A INPUT -p udp --dport 11211 -s ! 127.0.0.1 -j DROP
+
+# Prevention: Disable reflector services
+systemctl disable avahi-daemon           # Disable SSDP
+echo "disable monitor" >> /etc/ntp.conf  # Disable NTP monlist
+```
+
+### DDoS Mitigation Strategies
+```bash
+# Network-level mitigation
+# Rate limiting
+iptables -A INPUT -p tcp --dport 80 -m limit --limit 25/minute --limit-burst 100 -j ACCEPT
+
+# Block specific attack patterns
+iptables -A INPUT -p tcp --tcp-flags ALL ALL -j DROP          # Christmas tree packets
+iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP         # Null packets
+
+# Geographic blocking (using GeoIP)
+iptables -A INPUT -m geoip --src-cc CN,RU -j DROP
+
+# Traffic analysis
+# Monitor connection counts
+netstat -an | awk '/^tcp/ {++S[$NF]} END {for(a in S) print a, S[a]}'
+
+# Top source IPs
+netstat -ntu | awk '{print $5}' | cut -d: -f1 | sort | uniq -c | sort -n
+
+# Bandwidth monitoring
+vnstat -i eth0 -h                        # Hourly traffic stats
 ```
 
 # Malware Analysis
@@ -895,45 +1270,190 @@ volatility -f memory.dump --profile=Win7SP1x64 malfind
 # Common Interview Questions
 
 ## Network Security
-- **TCP vs UDP**: Connection-oriented vs connectionless
-- **SSL/TLS Handshake**: Certificate exchange, key agreement
-- **VPN Types**: Site-to-site, remote access, SSL VPN
-- **Firewall Types**: Packet filtering, stateful, application layer
+
+### Q: Explain the difference between TCP and UDP protocols.
+**TCP (Transmission Control Protocol)**:
+- Connection-oriented: Establishes connection before data transfer (3-way handshake)
+- Reliable: Guarantees packet delivery and order
+- Flow control: Manages data transmission rate
+- Error checking: Detects and retransmits lost packets
+- Higher overhead: More processing and bandwidth
+- Examples: HTTP, HTTPS, FTP, SSH
+
+**UDP (User Datagram Protocol)**:
+- Connectionless: No connection establishment required
+- Unreliable: No guarantee of delivery or order
+- No flow control: Sends data at maximum rate
+- Minimal error checking: Basic checksum only
+- Lower overhead: Faster and more efficient
+- Examples: DNS, DHCP, VoIP, gaming
+
+### Q: Walk me through the SSL/TLS handshake process.
+1. **Client Hello**: Client sends supported cipher suites, TLS version, random number
+2. **Server Hello**: Server responds with chosen cipher suite, certificate, random number
+3. **Certificate Verification**: Client validates server certificate against trusted CAs
+4. **Key Exchange**: Client generates pre-master secret, encrypts with server's public key
+5. **Session Key Generation**: Both sides derive symmetric session keys from pre-master secret
+6. **Finished Messages**: Both sides send encrypted "finished" messages to confirm handshake
+7. **Secure Communication**: All subsequent data encrypted with session keys
+
+### Q: What are the different types of firewalls?
+- **Packet Filtering**: Examines packet headers (IP, port, protocol) - stateless
+- **Stateful Inspection**: Tracks connection state and context - knows TCP session state
+- **Application Layer/Proxy**: Deep packet inspection, understands application protocols
+- **Next-Generation Firewall (NGFW)**: Combines traditional firewall with IPS, application awareness, threat intelligence
 
 ## Web Security
-- **OWASP Top 10**: Most critical web vulnerabilities
-- **XSS Types**: Stored, reflected, DOM-based
-- **CSRF Protection**: Tokens, same-site cookies
-- **SQL Injection**: Prevention with parameterized queries
+
+### Q: Explain the OWASP Top 10 and how to prevent each vulnerability.
+1. **Injection**: Use parameterized queries, input validation, ORM frameworks
+2. **Broken Authentication**: Implement MFA, secure session management, password policies
+3. **Sensitive Data Exposure**: Encrypt data at rest/transit, use HTTPS, proper key management
+4. **XML External Entities (XXE)**: Disable external entity processing, use JSON instead of XML
+5. **Broken Access Control**: Implement proper authorization, principle of least privilege
+6. **Security Misconfiguration**: Secure defaults, regular updates, configuration management
+7. **Cross-Site Scripting (XSS)**: Input validation, output encoding, CSP headers
+8. **Insecure Deserialization**: Avoid untrusted serialized data, integrity checks
+9. **Known Vulnerabilities**: Regular patching, dependency scanning, vulnerability management
+10. **Insufficient Logging**: Comprehensive logging, monitoring, alerting, SIEM integration
+
+### Q: What's the difference between stored, reflected, and DOM-based XSS?
+**Stored XSS**: Malicious script stored on server (database, file), executed when content viewed
+**Reflected XSS**: Script reflected off web application (URL parameter), not stored
+**DOM-based XSS**: Vulnerability in client-side JavaScript that modifies DOM unsafely
 
 ## Cryptography
-- **Symmetric vs Asymmetric**: Speed vs key distribution
-- **Hash Functions**: MD5, SHA-1, SHA-256 properties
-- **Digital Signatures**: Authentication, non-repudiation
-- **PKI**: Certificate authorities, trust chains
+
+### Q: When would you use symmetric vs asymmetric encryption?
+**Symmetric Encryption**:
+- Fast encryption/decryption of large amounts of data
+- Bulk data encryption (file encryption, disk encryption)
+- Stream ciphers for real-time communication
+- Challenge: Key distribution and management
+
+**Asymmetric Encryption**:
+- Key exchange and digital signatures
+- Small amounts of data (encrypting symmetric keys)
+- Public key infrastructure (PKI)
+- Slower but solves key distribution problem
+
+**Hybrid Approach**: Use asymmetric encryption to exchange symmetric keys, then use symmetric encryption for data
+
+### Q: Explain digital signatures and their purpose.
+Digital signatures provide:
+- **Authentication**: Verifies sender identity
+- **Integrity**: Ensures message hasn't been tampered with
+- **Non-repudiation**: Sender cannot deny sending the message
+
+Process:
+1. Hash the message using cryptographic hash function
+2. Encrypt hash with sender's private key (creates signature)
+3. Recipient decrypts signature with sender's public key
+4. Recipient hashes received message and compares with decrypted hash
 
 ## Incident Response
-- **NIST Framework**: Prepare, detect, contain, eradicate, recover
-- **Evidence Handling**: Chain of custody, forensics procedures
-- **Log Analysis**: SIEM, correlation, threat hunting
-- **Communication**: Internal teams, external stakeholders
+
+### Q: Walk me through the NIST Incident Response Framework.
+1. **Preparation**:
+   - Develop IR plan, procedures, and team
+   - Implement monitoring and detection tools
+   - Conduct training and exercises
+
+2. **Detection & Analysis**:
+   - Monitor for security events
+   - Analyze and validate incidents
+   - Determine scope and impact
+   - Document findings
+
+3. **Containment, Eradication & Recovery**:
+   - **Containment**: Isolate affected systems to prevent spread
+   - **Eradication**: Remove threat from environment
+   - **Recovery**: Restore systems to normal operation
+
+4. **Post-Incident Activity**:
+   - Lessons learned review
+   - Update procedures and controls
+   - Report to stakeholders
+
+### Q: How do you maintain chain of custody in digital forensics?
+- **Documentation**: Record who, what, when, where, why for every action
+- **Secure Storage**: Locked, climate-controlled, access-logged storage
+- **Hash Verification**: Calculate and verify file hashes at each transfer
+- **Access Logs**: Track everyone who accesses evidence
+- **Legal Admissibility**: Follow legal requirements for evidence handling
 
 ## Risk Management
-- **Risk Assessment**: Threat, vulnerability, impact
-- **Risk Treatment**: Accept, avoid, mitigate, transfer
-- **Compliance**: GDPR, PCI DSS, HIPAA, SOX
-- **Business Continuity**: Disaster recovery, backup strategies
+
+### Q: Explain the risk assessment process.
+1. **Asset Identification**: Catalog critical assets (data, systems, processes)
+2. **Threat Identification**: Identify potential threats (natural, human, technical)
+3. **Vulnerability Assessment**: Find weaknesses that threats could exploit
+4. **Risk Analysis**: Calculate risk = Threat × Vulnerability × Impact
+5. **Risk Evaluation**: Compare risks against risk tolerance/appetite
+6. **Risk Treatment**: Accept, avoid, mitigate, or transfer risks
+
+### Q: What's the difference between quantitative and qualitative risk assessment?
+**Quantitative**: Uses numerical values (ALE = ARO × SLE)
+- Annual Rate of Occurrence (ARO)
+- Single Loss Expectancy (SLE)
+- Annual Loss Expectancy (ALE)
+- More precise but requires extensive data
+
+**Qualitative**: Uses descriptive categories (High/Medium/Low)
+- Easier to implement
+- More subjective
+- Good for initial assessments
 
 ## Access Control
-- **AAA**: Authentication, authorization, accounting
-- **Identity Federation**: SAML, OAuth, OpenID Connect
-- **Privilege Escalation**: Vertical vs horizontal
-- **Zero Trust**: Never trust, always verify
+
+### Q: Explain the AAA security model.
+**Authentication**: "Who are you?"
+- Verifying user identity (passwords, biometrics, certificates)
+- Something you know, have, or are
+
+**Authorization**: "What can you do?"
+- Granting access to resources based on identity
+- Role-based (RBAC), attribute-based (ABAC), mandatory (MAC)
+
+**Accounting**: "What did you do?"
+- Logging and auditing user activities
+- Compliance, forensics, billing
+
+### Q: What is Zero Trust architecture?
+**Principle**: "Never trust, always verify"
+- Assume breach mentality
+- Verify every user and device
+- Least privilege access
+- Micro-segmentation
+- Continuous monitoring and validation
+
+**Components**:
+- Identity and access management
+- Device security and compliance
+- Network segmentation
+- Data protection
+- Monitoring and analytics
 
 ## Malware Analysis
-- **Static vs Dynamic**: Code analysis vs runtime behavior
-- **Packing**: Code obfuscation techniques
-- **Indicators of Compromise**: Files, network, registry
-- **Sandboxing**: Isolated execution environments
+
+### Q: Difference between static and dynamic malware analysis?
+**Static Analysis**:
+- Examining malware without execution
+- File properties, strings, disassembly
+- Safe but limited information
+- Tools: file, strings, objdump, IDA Pro
+
+**Dynamic Analysis**:
+- Executing malware in controlled environment
+- Runtime behavior, network traffic, system changes
+- More information but requires sandboxing
+- Tools: Process Monitor, Wireshark, sandbox environments
+
+### Q: What are Indicators of Compromise (IOCs)?
+- **File-based**: MD5/SHA hashes, file names, paths
+- **Network-based**: IP addresses, domains, URLs, protocols
+- **Registry-based**: Registry keys, values (Windows)
+- **Behavioral**: Process names, command lines, user accounts
+- **Usage**: Threat hunting, detection rules, incident response
 
 This comprehensive guide covers essential cybersecurity concepts, tools, and techniques for defensive security operations and interview preparation.
