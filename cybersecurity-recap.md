@@ -30,10 +30,21 @@
 - [Referrer-Policy](#referrer-policy)
 ### 3. [Cryptography](#cryptography)
 - [Symmetric Encryption](#symmetric-encryption)
+  - [AES (Advanced Encryption Standard)](#aes-advanced-encryption-standard)
+  - [DES (Data Encryption Standard)](#des-data-encryption-standard---legacy)
+  - [3DES (Triple DES)](#3des-triple-des)
+  - [ChaCha20](#chacha20)
 - [Asymmetric Encryption](#asymmetric-encryption)
+  - [RSA (Rivest-Shamir-Adleman)](#rsa-rivest-shamir-adleman)
+  - [ECC (Elliptic Curve Cryptography)](#ecc-elliptic-curve-cryptography)
+  - [DH (Diffie-Hellman Key Exchange)](#dh-diffie-hellman-key-exchange)
+  - [ECDH (Elliptic Curve Diffie-Hellman)](#ecdh-elliptic-curve-diffie-hellman)
+  - [ElGamal](#elgamal)
+  - [DSA (Digital Signature Algorithm)](#dsa-digital-signature-algorithm)
 - [Digital Signatures](#digital-signatures)
 - [Encoding & Data Representation](#encoding--data-representation)
 - [Hashing](#hashing)
+- [Cryptographic Algorithms Comprehensive Comparison](#cryptographic-algorithms-comprehensive-comparison)
 ### 4. [Penetration Testing](#penetration-testing)
 - [Reconnaissance](#reconnaissance)
 - [Vulnerability Scanning](#vulnerability-scanning)
@@ -452,36 +463,362 @@ Referrer-Policy: strict-origin-when-cross-origin
 ## Symmetric Encryption
 Symmetric encryption uses the same key for both encryption and decryption.
 
-```python
-# AES encryption
-from cryptography.fernet import Fernet
+### AES (Advanced Encryption Standard)
+**Technical Mechanism**: Block cipher using substitution-permutation network (SPN)
+- **Block Size**: 128 bits
+- **Key Sizes**: 128, 192, or 256 bits
+- **Rounds**: 10 (AES-128), 12 (AES-192), 14 (AES-256)
 
-# Generate key
+**How AES Works**:
+1. **Key Expansion**: Original key expanded into round keys
+2. **Initial Round**: AddRoundKey operation
+3. **Main Rounds** (9/11/13 times):
+   - **SubBytes**: S-box substitution for confusion
+   - **ShiftRows**: Cyclic shift of rows for diffusion
+   - **MixColumns**: Matrix multiplication for diffusion
+   - **AddRoundKey**: XOR with round key
+4. **Final Round**: SubBytes → ShiftRows → AddRoundKey (no MixColumns)
+
+```python
+# AES encryption examples
+from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
+import os
+
+# High-level AES with Fernet (AES-128 in CBC mode with HMAC)
 key = Fernet.generate_key()
 cipher = Fernet(key)
-
-# Encrypt
 message = b"Secret message"
 encrypted = cipher.encrypt(message)
-
-# Decrypt
 decrypted = cipher.decrypt(encrypted)
+
+# Low-level AES implementation
+def aes_encrypt_decrypt():
+    # Generate random 256-bit key and IV
+    key = os.urandom(32)  # 256-bit key
+    iv = os.urandom(16)   # 128-bit IV
+
+    # Create cipher
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+
+    # Encrypt
+    encryptor = cipher.encryptor()
+    plaintext = b"This is a secret message!" + b"\x00" * (16 - len(b"This is a secret message!") % 16)  # Padding
+    ciphertext = encryptor.update(plaintext) + encryptor.finalize()
+
+    # Decrypt
+    decryptor = cipher.decryptor()
+    decrypted = decryptor.update(ciphertext) + decryptor.finalize()
+
+    return ciphertext, decrypted.rstrip(b"\x00")
+
+# AES modes of operation
+# ECB (Electronic Codebook) - Not recommended
+cipher_ecb = Cipher(algorithms.AES(key), modes.ECB(), backend=default_backend())
+
+# CBC (Cipher Block Chaining) - Requires IV
+cipher_cbc = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+
+# GCM (Galois/Counter Mode) - Authenticated encryption
+cipher_gcm = Cipher(algorithms.AES(key), modes.GCM(os.urandom(12)), backend=default_backend())
+```
+
+### DES (Data Encryption Standard) - Legacy
+**Technical Mechanism**: Feistel network with 16 rounds
+- **Block Size**: 64 bits
+- **Key Size**: 56 bits (8 parity bits = 64 total)
+- **Status**: Deprecated due to small key space
+
+### 3DES (Triple DES)
+**Technical Mechanism**: Apply DES three times (Encrypt-Decrypt-Encrypt)
+- **Key Size**: 112 or 168 bits
+- **Status**: Legacy, being phased out for AES
+
+### ChaCha20
+**Technical Mechanism**: Stream cipher based on ARX operations (Add-Rotate-XOR)
+- **Key Size**: 256 bits
+- **Nonce**: 96 bits
+- **Advantages**: Fast in software, resistance to timing attacks
+
+```python
+# ChaCha20 encryption
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
+def chacha20_encrypt():
+    key = os.urandom(32)  # 256-bit key
+    nonce = os.urandom(12)  # 96-bit nonce
+
+    cipher = Cipher(algorithms.ChaCha20(key, nonce), mode=None, backend=default_backend())
+    encryptor = cipher.encryptor()
+
+    plaintext = b"Secret message"
+    ciphertext = encryptor.update(plaintext) + encryptor.finalize()
+
+    return ciphertext, key, nonce
 ```
 
 ## Asymmetric Encryption
 Asymmetric encryption uses a pair of keys: a public key for encryption and a private key for decryption.
 
+### RSA (Rivest-Shamir-Adleman)
+**Technical Mechanism**: Based on difficulty of factoring large prime numbers
+- **Key Sizes**: 1024, 2048, 3072, 4096 bits (2048+ recommended)
+- **Mathematical Foundation**: n = p × q (where p, q are large primes)
+
+**How RSA Works**:
+1. **Key Generation**:
+   - Choose two large primes p and q
+   - Calculate n = p × q (modulus)
+   - Calculate φ(n) = (p-1)(q-1) (Euler's totient)
+   - Choose e (public exponent, commonly 65537)
+   - Calculate d = e^(-1) mod φ(n) (private exponent)
+   - Public key: (n, e), Private key: (n, d)
+2. **Encryption**: c = m^e mod n
+3. **Decryption**: m = c^d mod n
+
+```python
+# RSA implementation
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.primitives import hashes, serialization
+
+# Generate RSA key pair
+private_key = rsa.generate_private_key(
+    public_exponent=65537,
+    key_size=2048,
+    backend=default_backend()
+)
+public_key = private_key.public_key()
+
+# Encrypt with public key
+message = b"Secret message"
+ciphertext = public_key.encrypt(
+    message,
+    padding.OAEP(
+        mgf=padding.MGF1(algorithm=hashes.SHA256()),
+        algorithm=hashes.SHA256(),
+        label=None
+    )
+)
+
+# Decrypt with private key
+plaintext = private_key.decrypt(
+    ciphertext,
+    padding.OAEP(
+        mgf=padding.MGF1(algorithm=hashes.SHA256()),
+        algorithm=hashes.SHA256(),
+        label=None
+    )
+)
+
+# Export keys
+private_pem = private_key.private_bytes(
+    encoding=serialization.Encoding.PEM,
+    format=serialization.PrivateFormat.PKCS8,
+    encryption_algorithm=serialization.NoEncryption()
+)
+
+public_pem = public_key.public_bytes(
+    encoding=serialization.Encoding.PEM,
+    format=serialization.PublicFormat.SubjectPublicKeyInfo
+)
+```
+
 ```bash
-# RSA key generation
+# RSA with OpenSSL
+# Generate RSA key pair
 openssl genrsa -out private.pem 2048
 openssl rsa -in private.pem -pubout -out public.pem
 
-# Encrypt with public key
-openssl rsautl -encrypt -inkey public.pem -pubin -in message.txt -out encrypted.bin
+# Encrypt with public key (OAEP padding)
+openssl pkeyutl -encrypt -inkey public.pem -pubin -in message.txt -out encrypted.bin -pkeyopt rsa_padding_mode:oaep
 
 # Decrypt with private key
-openssl rsautl -decrypt -inkey private.pem -in encrypted.bin -out decrypted.txt
+openssl pkeyutl -decrypt -inkey private.pem -in encrypted.bin -out decrypted.txt -pkeyopt rsa_padding_mode:oaep
 ```
+
+### ECC (Elliptic Curve Cryptography)
+**Technical Mechanism**: Based on discrete logarithm problem over elliptic curves
+- **Advantages**: Smaller key sizes, faster operations, lower power consumption
+- **Common Curves**: P-256, P-384, P-521, secp256k1
+
+**How ECC Works**:
+1. **Mathematical Foundation**: y² = x³ + ax + b (mod p)
+2. **Point Addition**: Geometric operation on curve points
+3. **Scalar Multiplication**: k × P (adding point P to itself k times)
+4. **Key Generation**:
+   - Private key: random integer k
+   - Public key: Q = k × G (where G is generator point)
+
+```python
+# ECC key generation and encryption
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+
+# Generate ECC key pair
+private_key = ec.generate_private_key(ec.SECP256R1(), backend=default_backend())
+public_key = private_key.public_key()
+
+# ECC is typically used for key exchange (ECDH) or digital signatures (ECDSA)
+# For encryption, we use ECC for key agreement, then symmetric encryption
+
+def ecc_encrypt(message, recipient_public_key):
+    # Generate ephemeral key pair
+    ephemeral_private_key = ec.generate_private_key(ec.SECP256R1(), backend=default_backend())
+    ephemeral_public_key = ephemeral_private_key.public_key()
+
+    # Perform ECDH key agreement
+    shared_key = ephemeral_private_key.exchange(ec.ECDH(), recipient_public_key)
+
+    # Derive AES key from shared secret
+    derived_key = HKDF(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=None,
+        info=b'encryption',
+        backend=default_backend()
+    ).derive(shared_key)
+
+    # Encrypt with AES
+    cipher = Cipher(algorithms.AES(derived_key), modes.GCM(os.urandom(12)), backend=default_backend())
+    encryptor = cipher.encryptor()
+    ciphertext = encryptor.update(message) + encryptor.finalize()
+
+    return ephemeral_public_key, ciphertext, encryptor.tag
+```
+
+### DH (Diffie-Hellman Key Exchange)
+**Technical Mechanism**: First practical public key exchange protocol, based on discrete logarithm problem
+- **Purpose**: Allow two parties to establish a shared secret over insecure channel
+- **Security**: Based on difficulty of computing discrete logarithms in finite fields
+- **Key Sizes**: 1024-3072 bits (2048+ recommended)
+
+**How Diffie-Hellman Works**:
+1. Agree on public numbers:
+   * Prime `p` and generator `g`.
+2. Each picks a private key (`a`, `b`) and computes a public key:
+   * Alice: `A = g^a mod p`
+   * Bob: `B = g^b mod p`
+3. Exchange public keys.
+4. Compute shared secret:
+   * Alice: `S = B^a mod p`
+   * Bob: `S = A^b mod p`
+   * Both end up with the same `S = g^(ab) mod p`.
+
+<details>
+<summary><strong>Mathematical Example</strong></summary>
+
+```
+Public parameters: p = 23, g = 5
+
+Alice's keys:
+- Private key a = 6
+- Public key A = 5^6 mod 23 = 15625 mod 23 = 8
+
+Bob's keys:
+- Private key b = 15
+- Public key B = 5^15 mod 23 = 30517578125 mod 23 = 19
+
+Shared secret calculation:
+- Alice: S = 19^6 mod 23 = 47045881 mod 23 = 2
+- Bob: S = 8^15 mod 23 = 35184372088832 mod 23 = 2
+
+Shared secret S = 2
+```
+
+</details>
+
+```python
+# Manual DH implementation for educational purposes
+def manual_dh_example():
+    # Public parameters (RFC 3526 - 2048-bit MODP Group)
+    p = 23
+    g = 2
+
+    # Alice's keys
+    a = random.randint(1, p-2)  # Private key
+    A = pow(g, a, p)            # Public key
+
+    # Bob's keys
+    b = random.randint(1, p-2)  # Private key
+    B = pow(g, b, p)            # Public key
+
+    # Shared secret calculation
+    alice_shared = pow(B, a, p)  # Alice computes shared secret
+    bob_shared = pow(A, b, p)    # Bob computes shared secret
+
+    assert alice_shared == bob_shared
+    return alice_shared
+```
+
+**Security Considerations**:
+- **Small Subgroup Attack**: Ensure generator g has large order
+- **Invalid Curve Attack**: Validate public keys are in valid range
+- **Man-in-the-Middle**: DH provides no authentication (needs signatures)
+- **Forward Secrecy**: Use ephemeral keys (DHE) for perfect forward secrecy
+
+### ECDH (Elliptic Curve Diffie-Hellman)
+**Technical Mechanism**: Key agreement protocol using elliptic curves (elliptic curve version of DH)
+- **Purpose**: Allow two parties to establish a shared secret over insecure channel
+- **Security**: Based on elliptic curve discrete logarithm problem
+
+**How ECDH Works**:
+1. **Setup**: Both parties agree on elliptic curve and generator point G
+2. **Key Generation**:
+   - Alice: private key a, public key A = a × G
+   - Bob: private key b, public key B = b × G
+3. **Key Exchange**: Alice and Bob exchange public keys
+4. **Shared Secret Calculation**:
+   - Alice computes: S = a × B = a × (b × G) = ab × G
+   - Bob computes: S = b × A = b × (a × G) = ab × G
+   - Both arrive at same shared secret S
+
+```python
+# ECDH key exchange
+def ecdh_key_exchange():
+    # Alice generates key pair
+    alice_private_key = ec.generate_private_key(ec.SECP256R1(), backend=default_backend())
+    alice_public_key = alice_private_key.public_key()
+
+    # Bob generates key pair
+    bob_private_key = ec.generate_private_key(ec.SECP256R1(), backend=default_backend())
+    bob_public_key = bob_private_key.public_key()
+
+    # Alice computes shared secret
+    alice_shared_key = alice_private_key.exchange(ec.ECDH(), bob_public_key)
+
+    # Bob computes shared secret
+    bob_shared_key = bob_private_key.exchange(ec.ECDH(), alice_public_key)
+
+    # Both shared keys are identical
+    assert alice_shared_key == bob_shared_key
+
+    # Derive encryption key from shared secret
+    derived_key = HKDF(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=None,
+        info=b'shared encryption key',
+        backend=default_backend()
+    ).derive(alice_shared_key)
+
+    return derived_key
+
+# Use ECDH in practice
+shared_key = ecdh_key_exchange()
+cipher = Cipher(algorithms.AES(shared_key), modes.GCM(os.urandom(12)), backend=default_backend())
+```
+
+### ElGamal
+**Technical Mechanism**: Based on discrete logarithm problem
+- **Properties**: Probabilistic encryption (same plaintext can produce different ciphertexts)
+- **Key Size**: Similar to RSA for equivalent security
+
+### DSA (Digital Signature Algorithm)
+**Technical Mechanism**: Used for digital signatures, not encryption
+- **Based on**: Discrete logarithm problem in finite fields
+- **Key Sizes**: 1024-3072 bits
+- **Modern Alternative**: ECDSA (uses elliptic curves)
 
 ## Digital Signatures
 Digital signatures merge authentication, integrity, and non-repudiation, enabling verification of a message or document's authenticity.
@@ -578,6 +915,86 @@ hashed = bcrypt.hashpw(password.encode(), salt)
 # Verify password
 bcrypt.checkpw(password.encode(), hashed)
 ```
+
+## Cryptographic Algorithms Comprehensive Comparison
+
+### Symmetric Encryption Algorithms
+| Algorithm | Type | Key Size (bits) | Block Size (bits) | Security Level | Speed | Use Cases | Status |
+|-----------|------|-----------------|-------------------|----------------|-------|-----------|---------|
+| **AES** | Block Cipher | 128, 192, 256 | 128 | High | Fast | General encryption, TLS, VPNs | Current Standard |
+| **ChaCha20** | Stream Cipher | 256 | N/A (stream) | High | Very Fast | Mobile, IoT, TLS | Modern Alternative |
+| **DES** | Block Cipher | 56 | 64 | Broken | Fast | Legacy systems | Deprecated |
+| **3DES** | Block Cipher | 112, 168 | 64 | Weak | Slow | Legacy systems | Being phased out |
+| **Blowfish** | Block Cipher | 32-448 | 64 | Moderate | Fast | Password hashing | Legacy |
+| **Twofish** | Block Cipher | 128, 192, 256 | 128 | High | Fast | General encryption | Alternative to AES |
+
+### Asymmetric Encryption Algorithms
+| Algorithm | Type | Key Size (bits) | Mathematical Basis | Security Level | Speed | Primary Use | Status |
+|-----------|------|-----------------|-------------------|----------------|-------|-------------|---------|
+| **RSA** | Public Key | 1024-4096 | Integer factorization | High (2048+) | Slow | Encryption, signatures | Current Standard |
+| **ECC** | Public Key | 160-521 | Elliptic curve discrete log | High | Fast | Mobile, IoT, modern systems | Preferred for new systems |
+| **ElGamal** | Public Key | 1024-3072 | Discrete logarithm | High | Slow | Encryption (probabilistic) | Specialized use |
+| **DSA** | Signature Only | 1024-3072 | Discrete logarithm | High | Medium | Digital signatures | Legacy |
+| **ECDSA** | Signature Only | 160-521 | Elliptic curve discrete log | High | Fast | Digital signatures | Current Standard |
+| **EdDSA** | Signature Only | 255, 448 | Elliptic curves (Edwards) | High | Very Fast | Modern signatures | Cutting-edge |
+
+### Key Exchange Algorithms
+| Algorithm | Type | Key Size (bits) | Perfect Forward Secrecy | Quantum Resistance | Use Cases | Status |
+|-----------|------|-----------------|------------------------|-------------------|-----------|---------|
+| **ECDH** | Key Agreement | 160-521 | Yes (ephemeral) | No | TLS, VPNs, secure messaging | Current Standard |
+| **DH** | Key Agreement | 1024-3072 | Yes (ephemeral) | No | Legacy systems, IPSec | Legacy |
+| **RSA Key Exchange** | Key Transport | 1024-4096 | No | No | Legacy TLS | Deprecated |
+| **X25519** | Key Agreement | 255 | Yes | No | Modern protocols | Preferred |
+| **CRYSTALS-KYBER** | Post-Quantum | Variable | Yes | Yes | Future protocols | NIST Standard |
+
+### Hash Functions
+| Algorithm | Output Size (bits) | Collision Resistance | Speed | Security Level | Use Cases | Status |
+|-----------|-------------------|---------------------|-------|----------------|-----------|---------|
+| **SHA-256** | 256 | High | Fast | High | Digital signatures, blockchain | Current Standard |
+| **SHA-3** | 224-512 | High | Medium | High | Alternative to SHA-2 | NIST Standard |
+| **SHA-1** | 160 | Broken | Fast | Broken | Legacy systems | Deprecated |
+| **MD5** | 128 | Broken | Very Fast | Broken | Checksums only | Deprecated |
+| **BLAKE2** | 256, 512 | High | Very Fast | High | Performance-critical apps | Modern Alternative |
+| **BLAKE3** | 256 | High | Fastest | High | Next-gen applications | Cutting-edge |
+
+### Password Hashing Algorithms
+| Algorithm | Type | Configurable Cost | Memory Hard | Salt | Time to Crack | Use Cases | Status |
+|-----------|------|------------------|-------------|------|---------------|-----------|---------|
+| **Argon2** | Memory-hard | Yes | Yes | Yes | Very High | Modern applications | Current Best Practice |
+| **scrypt** | Memory-hard | Yes | Yes | Yes | High | Cryptocurrency, general use | Good |
+| **bcrypt** | CPU-hard | Yes | No | Yes | High | Web applications | Good |
+| **PBKDF2** | CPU-hard | Yes | No | Yes | Medium | Legacy systems | Acceptable |
+| **SHA-256 (salted)** | Fast hash | No | No | Manual | Low | Not recommended | Avoid |
+
+### Algorithm Selection Guidelines
+
+#### For New Systems:
+- **Symmetric Encryption**: AES-256-GCM or ChaCha20-Poly1305
+- **Asymmetric Encryption**: ECC (P-256, P-384) or Ed25519
+- **Key Exchange**: ECDH with P-256 or X25519
+- **Digital Signatures**: ECDSA with P-256 or Ed25519
+- **Hashing**: SHA-256 or SHA-3
+- **Password Hashing**: Argon2id
+
+#### Security Levels (Equivalent Strength):
+| Symmetric | RSA | ECC | Hash |
+|-----------|-----|-----|------|
+| 80 bits | 1024 bits | 160 bits | 160 bits |
+| 112 bits | 2048 bits | 224 bits | 224 bits |
+| 128 bits | 3072 bits | 256 bits | 256 bits |
+| 192 bits | 7680 bits | 384 bits | 384 bits |
+| 256 bits | 15360 bits | 521 bits | 512 bits |
+
+#### Performance Characteristics:
+- **Fastest**: ChaCha20, BLAKE3, Ed25519
+- **Most Secure**: AES-256, RSA-4096, P-521
+- **Best Balance**: AES-256, ECDSA P-256, SHA-256
+- **Future-Proof**: Post-quantum algorithms (CRYSTALS-KYBER, CRYSTALS-DILITHIUM)
+
+#### Post-Quantum Considerations:
+- **Vulnerable to Quantum**: RSA, ECC, DH
+- **Quantum-Resistant**: AES (with larger keys), SHA-3, Lattice-based algorithms
+- **Recommended Migration**: Start planning transition to post-quantum cryptography
 
 # Penetration Testing
 
