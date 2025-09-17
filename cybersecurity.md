@@ -1172,12 +1172,12 @@ XOR = 00010100 = encrypted
 ```
 
 **XOR Truth Table**:
-| A | B | A⊕B |
-|---|---|-----|
-| 0 | 0 |  0  |
-| 0 | 1 |  1  |
-| 1 | 0 |  1  |
-| 1 | 1 |  0  |
+| A   | B   | A⊕B |
+| --- | --- | --- |
+| 0   | 0   | 0   |
+| 0   | 1   | 1   |
+| 1   | 0   | 1   |
+| 1   | 1   | 0   |
 
 **Key Properties**:
 - **Perfect Security**: If key is truly random, same length as message, and used only once (One-Time Pad)
@@ -1724,6 +1724,29 @@ url_decoded = urllib.parse.unquote(url_encoded)      # hello world
 html_encoded = html.escape("<script>alert('xss')</script>")
 html_decoded = html.unescape(html_encoded)
 ```
+
+<details>
+<summary><strong>Base64 Explained</strong></summary>
+The basic idea behind Base64 encoding is to represent binary data using only ASCII characters. To do this, Base64 converts each 3 bytes of binary data into 4 bytes of ASCII text. The 3 bytes of binary data are divided into 4 groups of 6 bits each, which are then represented by a character from a set of 64 characters. The 64 characters used in Base64 are:
+
+`ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/`
+
+The equals sign (=) is also used as a padding character to ensure that the length of the output is a multiple of 4 characters.
+
+For example, let's say we want to encode the binary data "`011000010110001001100011`", which represents the ASCII characters "`abc`". To encode this data in Base64, we first divide it into 3-byte groups:
+
+`01100001 01100010 01100011`
+
+Then we divide each 3-byte group into 4 groups of 6 bits each:
+
+`011000 010110 001001 100011`
+
+Next, we convert each group of 6 bits to its corresponding Base64 character:
+
+`Y W J j`
+
+So the encoded Base64 string for "`abc`" is "`YWJj`".
+</details>
 
 ## Hashing
 Hashing transforms data into a fixed-size string of characters, which is typically a digest that represents the original data.
@@ -3388,19 +3411,300 @@ Symbolic execution is a program analysis technique that runs programs with **sym
 * Input generation for testing (coverage-guided).
 * Exploit generation by finding feasible, exploitable paths.
 
+## Binary Exploitation
+Analysis and exploitation of compiled binaries to gain unauthorized access or control.
+
+### Registers
+CPU registers are high-speed storage locations within the processor. In x86-64 architecture, understanding registers is crucial for binary exploitation.
+
+**Register Naming Convention:**
+- 64-bit: RAX, RBX, RCX, RDX, RSI, RDI, RBP, RSP
+- 32-bit: EAX, EBX, ECX, EDX, ESI, EDI, EBP, ESP  
+- 16-bit: AX, BX, CX, DX, SI, DI, BP, SP
+- 8-bit: AL/AH, BL/BH, CL/CH, DL/DH
+
+**General Purpose Registers:**
+
+| 64-bit | 32-bit   | 16-bit   | 8-bit    | Purpose                                 |
+| ------ | -------- | -------- | -------- | --------------------------------------- |
+| RAX    | EAX      | AX       | AL       | Accumulator (return values, arithmetic) |
+| RBX    | EBX      | BX       | BL       | Base register (pointer to data)         |
+| RCX    | ECX      | CX       | CL       | Counter (loop operations)               |
+| RDX    | EDX      | DX       | DL       | Data register (I/O operations)          |
+| RSI    | ESI      | SI       | SIL      | Source index (string operations)        |
+| RDI    | EDI      | DI       | DIL      | Destination index (string operations)   |
+| RBP    | EBP      | BP       | -        | Base pointer (stack frame)              |
+| RSP    | ESP      | SP       | -        | Stack pointer (top of stack)            |
+| R8-R15 | R8D-R15D | R8W-R15W | R8B-R15B | Additional 64-bit registers             |
+
+**Special Registers:**
+- **RIP/EIP/IP**: Instruction pointer (current instruction)
+- **RFLAGS/EFLAGS/FLAGS**: Status flags
+
+**Example Usage:**
+```assembly
+mov rax, 0x1234567890abcdef  ; 64-bit
+mov eax, 0x12345678          ; 32-bit (clears upper 32 bits)
+mov ax, 0x1234               ; 16-bit
+mov al, 0x12                 ; 8-bit low
+mov ah, 0x34                 ; 8-bit high
+```
+
+### The Stack
+The stack is a Last-In-First-Out (LIFO) data structure used for function calls, local variables, and return addresses.
+
+**Stack Operations:**
+- PUSH: Add data to top of stack (decreases RSP)
+- POP: Remove data from top of stack (increases RSP)
+
+```
+High Memory
++-----------------+
+| Function Args   |
++-----------------+
+| Return Address  | <- Overwrite this for control
++-----------------+
+| Saved RBP       |
++-----------------+ <- RBP points here
+| Local Variables |
++-----------------+ <- RSP points here
+Low Memory
+```
+**Stack Operations**: PUSH (decrements ESP), POP (increments ESP)
+
+### Stack Overflow
+To see if a stack overflow is possible, run the following command:
+```bash
+checksec --file=<executable>
+```
+If the output contains `Canary found` and `NX enabled`, then a stack overflow is possible.
+
+### Global Offset Table (GOT)
+**Purpose**: Resolves shared library function addresses at runtime.
+- **GOT**: Contains actual addresses of external functions
+- **PLT**: Procedure Linkage Table, jumps to GOT entries
+- **Attack**: Overwrite GOT entries to redirect execution
+
+### Buffers and Buffer Overflows
+**Mechanism**: Writing past buffer boundaries overwrites adjacent memory.
+```c
+// Vulnerable function
+void vulnerable(char *input) {
+    char buffer[64];
+    strcpy(buffer, input);  // No bounds checking
+}
+
+// Stack layout after overflow
+[buffer][saved EBP][return address] ← Overwritten
+```
+**Control Flow Hijacking**: Overwrite return address to redirect execution
+
+### Return Oriented Programming (ROP)
+**Mechanism**: Chain existing code snippets (gadgets) ending in RET instructions.
+```assembly
+# Example ROP chain
+pop eax; ret     # Load value into EAX
+pop ebx; ret     # Load value into EBX
+int 0x80; ret    # System call
+```
+**Purpose**: Bypass DEP/NX bit protections by using existing executable code
+
+### Binary Security
+* **NX:** Prevents execution of code from non-executable memory regions (e.g., no shellcode on the stack).
+* **PIE:** Builds executables so their code base is randomized at load time (makes addresses unpredictable).
+* **ASLR:** Randomizes process memory layout (stack, heap, libs) to frustrate address-dependent exploits.
+* **Stack canaries:** Place a secret value before the return address; if overwritten by a buffer overflow the program aborts.
+* **RELRO:** Marks dynamic linker tables read-only after relocation to stop GOT/PLT overwrites.
+
+
+### The Heap and Exploitation
+**Heap Structure**: Dynamic memory allocation with metadata chunks
+```
+┌──────────────┐
+│ Chunk Header │ ← Size, flags, pointers
+├──────────────┤
+│ User Data    │
+├──────────────┤
+│ Next Chunk   │
+└──────────────┘
+```
+**Attacks**: Use-after-free, double-free, heap overflow, chunk corruption
+
+### Format String Vulnerability
+**Mechanism**: User input directly used as printf format string.
+```c
+// Vulnerable
+printf(user_input);
+
+// Attack payloads
+"%x %x %x %x"        // Read stack values
+"%n"                 // Write to memory
+"%s"                 // Read memory as string
+```
+
+### Integer Overflow
+**Mechanism**: Arithmetic results exceed data type limits.
+
+**BYTE** = 8 bits  
+**WORD** = 16 bits  
+**DWORD** = Double Word (32 bits)  
+**QWORD** = Quad Word (64 bits)
+
+```c
+// Vulnerable
+int size = user_input;
+char *buffer = malloc(size * sizeof(int));  // Overflow if size > MAX_INT/4
+```
+
 ## Reverse Engineering
 Reverse engineering is the process of analyzing a compiled program to understand its design, architecture, and functionality, often to identify vulnerabilities or malicious behavior.
 
-```bash
-# Disassembly
-objdump -d malware.exe          # Disassemble binary
-radare2 malware.exe             # Open in radare2
-gdb malware.exe                 # Debugging with gdb
+### Assembly Language
+Assembly is the low-level programming language that directly corresponds to machine code instructions.
 
-# Decompilation
-retdec-decompiler malware.exe   # Decompile binary 
-ghidra malware.exe              # Open in Ghidra to analyze code structure
+**Common Instructions:**
+- **MOV**: Move data between locations
+- **ADD/SUB**: Arithmetic operations  
+- **CMP**: Compare values
+- **JMP/JE/JNE**: Jump instructions
+- **CALL/RET**: Function calls
+- **PUSH/POP**: Stack operations
+
+**Intel vs AT&T Syntax:**
+```assembly
+# Intel syntax
+mov eax, 5
+add eax, ebx
+
+# AT&T syntax  
+movl $5, %eax
+addl %ebx, %eax
 ```
+
+**x86/x64 Instructions**:
+```assembly
+mov eax, ebx     # Move data between registers
+add eax, 5       # Arithmetic operations
+cmp eax, ebx     # Compare values (sets flags)
+jmp label        # Unconditional jump
+je label         # Jump if equal (conditional)
+call function    # Function call
+ret              # Return from function
+push eax         # Push to stack
+pop ebx          # Pop from stack
+```
+
+### Disassemblers & Debuggers
+A disassembler is a computer program that translates machine language into assembly language—the inverse operation to that of an assembler. A debugger is a computer program that is used to test and debug other programs.
+
+**Static Analysis Tools**:
+- **IDA Pro**: Industry standard disassembler with advanced analysis
+- **Ghidra**: NSA's free reverse engineering suite with decompiler
+- **Radare2**: Open-source reverse engineering framework
+- **objdump**: GNU binary analysis tool
+
+**Dynamic Analysis Tools**:
+- **GDB**: GNU debugger for runtime analysis
+- **WinDbg**: Windows kernel and user-mode debugger
+- **x64dbg**: Windows user-mode debugger
+- **OllyDbg**: Legacy Windows debugger
+
+<!-- Toggle GDB code -->
+<details>
+<summary>GDB Commands</summary>
+
+```bash
+berkankutuk@kali:~$ gdb <binary file> # opens the binary file in gdb
+
+(gdb)> set disassembly-flavor intel # sets the disassembly flavor to intel
+
+(gdb)> break <function_name> # sets a breakpoint at the given function
+(gdb)> break *<addr> # sets a breakpoint at the given address
+(gdb)> si # steps through the program one instruction at a time
+(gdb)> ni # steps over the current instruction
+(gdb)> run # runs the program until it reaches the first breakpoint
+(gdb)> run <input file> # runs the program with the given input file
+(gdb)> disassemble <function_name> | main # disassembles the given function
+(gdb)> x/s <addr> # prints a string from memory address
+(gdb)> continue # continues the execution of the program
+(gdb)> info registers # prints the values of the registers
+(gdb)> info variables # prints the values of the variables
+(gdb)> info functions # prints the functions
+(gdb)> set $eax=0 # sets the value of the eax register to 0
+(gdb)> exploit # runs the exploit
+(gdb)> x # inspect memory locations
+(gdb)> quit # quits gdb
+```	
+
+</details>
+
+<!-- Toggle radare2 code -->
+
+<details>
+<summary>Radare2 Commands</summary>
+
+```bash
+berkankutuk@kali:~$ r2 <binary file>` # opens the binary file in radare2
+berkankutuk@kali:~$ r2 -d <binary file>` # opens the binary file in radare2 in debug mode 
+
+# General
+[0x00400510]> aaa # Analyze the binary
+[0x00400510]> afl # List functions
+[0x00400510]> s main # Go to main function
+[0x00400510]> pdf # Print disassembled function
+[0x00400510]> s/ password # Search for data within the code
+[0x00400510]> V # Hex view
+[0x00400510]> VV # Visual mode
+
+# Debug mode
+[0x00400510]> db <addr> # Set breakpoint at address
+[0x00400510]> dc # Continue execution
+[0x00400510]> dr # Show registers
+[0x00400510]> s # step instruction
+```
+</details>
+
+<!-- Toggle  Ghidra code -->
+<details>
+<summary>Ghidra Commands</summary>
+
+```bash 
+Right click -> Patch Instruction -> Values # Patch the instruction with the given values 
+File -> Export Program -> Export as ELF # Export the binary as an ELF file
+
+Symbol Tree -> Functions # List functions (ex. Main)
+Symbol Tree -> Imports # List imported functions (ex. printf, strcpy)
+```
+</details>
+
+
+### Decompilers
+**Purpose**: Convert assembly back to high-level language (C/C++, Java, etc.)
+- **Ghidra Decompiler**: Integrated with Ghidra, supports multiple architectures
+- **Hex-Rays**: IDA Pro plugin, commercial decompiler
+- **RetDec**: Open-source retargetable decompiler
+- **JD-GUI**: Java decompiler for .class files
+
+**Limitations**:
+- Lost variable names, comments, and original structure
+- Optimized code creates complex control flow
+- Obfuscated binaries resist decompilation
+
+To decompile a jar file, [procyon](https://manpages.ubuntu.com/manpages/jammy/man1/procyon.1.html) can be used. For online [DogBolt](https://www.dogbolt.com/) is a good option.
+
+```bash
+berkankutuk@kali:~$ sudo apt-get install -y procyon-decompiler
+berkankutuk@kali:~$ procyon -jar <jar file> -o <output directory>
+
+# Decompilation examples
+retdec-decompiler binary.exe    # RetDec decompiler
+java -jar jd-gui.jar App.jar    # Java decompiler
+```
+
+**.NET Decompilers**
+* [dotPeek](https://www.jetbrains.com/decompiler/) - Free .NET decompiler and assembly browser
+* [ILSpy](https://github.com/icsharpcode/ILSpy) - .NET Decompiler with support for PDB generation, ReadyToRun, Metadata (&more) - cross-platform!
+
 
 # Cloud Security
 
