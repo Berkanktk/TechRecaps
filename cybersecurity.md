@@ -966,6 +966,97 @@ Referrer-Policy: strict-origin-when-cross-origin
 
 # Cryptography
 
+## Classical Ciphers
+Historical encryption methods that form the foundation of modern cryptography.
+
+### Caesar Cipher
+Shifts each letter by a fixed number of positions in the alphabet.
+```bash
+# Encryption
+"Hello" → "Khoor" (shift 3)
+
+# Decryption
+"Khoor" → "Hello" (shift -3)
+```
+**Weakness**: Only 25 possible keys, easily broken by brute force
+
+### ROT13
+Special case of Caesar cipher with fixed shift of 13.
+```bash
+"Hello" → "Uryyb"
+```
+Self-inverse (applying ROT13 twice returns original text)
+
+### Atbash Cipher
+Substitutes each letter with its mirror position in the alphabet (A↔Z, B↔Y, etc.).
+```bash
+"HELLO" → "SVOOL" # (H→S, E→V, L→O, L→O, O→L)
+```
+Self-inverse like ROT13
+
+### Vigenère Cipher
+Uses a keyword to shift letters by different amounts (polyalphabetic substitution).
+
+```bash
+# Plaintext
+HELLO
+
+# Keyword: 
+KEY (repeated: KEYKE)
+
+# Encryption:
+H+K=R, E+E=I, L+Y=J, L+K=V, O+E=S → "RIJVS"
+
+# 'H+K=R' Explained
+7 (H) + 10 (K) = 17 (R) # A=0, B=1, ..., Z=25
+
+# Result: "RIJVS"
+```
+- **Strength**: More secure than monoalphabetic ciphers
+- **Weakness**: Vulnerable to frequency analysis and Kasiski examination
+
+### Substitution Ciphers
+Each letter is replaced by another letter/symbol according to a fixed mapping.
+
+- **Monoalphabetic**: One-to-one letter mapping (e.g., A→X, B→M, C→Q...)
+```bash
+# Example mapping
+A→X, B→M, C→Q, D→L, E→V, F→T, G→N, H→Y, I→W, J→K, K→J, L→P, M→B, N→G, O→Z, P→R, Q→C, R→S, S→F, T→H, U→E, V→A, W→I, X→D, Y→O, Z→U
+
+"Hello" → "YVPPZ"
+```
+- **Frequency Analysis**: Vulnerable because letter frequencies are preserved
+- **Polyalphabetic**: Uses multiple substitution alphabets (like Vigenère)
+
+### XOR Cipher
+Uses the XOR (exclusive OR) bitwise operation to encrypt data.
+- **Operation**: Each bit of plaintext is XORed with corresponding bit of key
+- **Property**: Self-inverse (XOR with same key decrypts)
+
+**Example**:
+```bash
+# ASCII values
+'A' = 01000001
+Key = 01010101
+XOR = 00010100 = encrypted 
+
+# Decryption (XOR again with same key)
+00010100 XOR 01010101 = 01000001 = 'A'
+```
+
+**XOR Truth Table**:
+| A | B | A⊕B |
+|---|---|-----|
+| 0 | 0 |  0  |
+| 0 | 1 |  1  |
+| 1 | 0 |  1  |
+| 1 | 1 |  0  |
+
+**Key Properties**:
+- **Perfect Security**: If key is truly random, same length as message, and used only once (One-Time Pad)
+- **Stream Cipher**: Can encrypt data of any length with repeating key
+- **Weakness**: Key reuse allows cryptanalysis through frequency analysis
+
 ## Symmetric Encryption
 Symmetric encryption uses the same key for both encryption and decryption.
 
