@@ -18,6 +18,7 @@
     - [How IPS Works](#how-ips-works)
   - [IDS vs IPS Comparison](#ids-vs-ips-comparison)
   - [SIEM Integration](#siem-integration)
+- [Network Segmentation](#network-segmentation)
 - [VPN Technologies](#vpn-technologies)
 ### 2. [Web Application Security](#web-application-security)
 - [OWASP Top 10](#owasp-top-10)
@@ -346,6 +347,28 @@ output {
   }
 }
 ```
+
+## Network Segmentation
+
+**Purpose**: Divide network into smaller, isolated segments to limit attack spread and improve security.
+
+**Types**:
+- **Physical Segmentation**: Separate hardware/switches for each segment
+- **VLAN Segmentation**: Virtual LANs using 802.1Q tagging
+- **Subnet Segmentation**: IP-based network isolation
+- **Micro-segmentation**: Application-level isolation using software-defined networking
+
+**Implementation**:
+- **Perimeter Segmentation**: DMZ, internal, management networks
+- **User Segmentation**: Guest, employee, admin networks
+- **Application Segmentation**: Database, web, application tiers
+- **Zero Trust Segmentation**: Verify every connection, assume breach
+
+**Benefits**:
+- Contain lateral movement during breaches
+- Reduce attack surface and blast radius
+- Improve compliance and monitoring
+- Enhanced performance through traffic isolation
 
 ## VPN Technologies
 - **IPSec**: Network layer VPN, site-to-site
