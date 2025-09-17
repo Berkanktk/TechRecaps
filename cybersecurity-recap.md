@@ -4,7 +4,9 @@
 
 ### 1. [Network Security](#network-security)
 - [TCP/IP Stack](#tcpip-stack)
+- [IP Addressing and Subnetting](#ip-addressing-and-subnetting)
 - [Network Protocols](#network-protocols)
+- [Network Hardware](#network-hardware)
 - [Firewalls & IDS/IPS](#firewalls--idsips)
   - [Firewall Types](#firewall-types)
     - [Packet Filtering Firewalls (Stateless)](#1-packet-filtering-firewalls-stateless)
@@ -164,6 +166,47 @@
 | 2 | Data Link | Network Access | ARP, CDP, STP, VLAN, Switch, Bridge | Frame | MAC and LLC (Physical addressing) |
 | 1 | Physical | Network Access | Ethernet, WI-FI, CAT, DSL, RJ45, 100Base-TX, Hub, Repeater | Bits | Media, signal and binary transmission |
 
+## IP Addressing and Subnetting
+A router assigns IP addresses to devices on a home network using a "pool" of addresses, ensuring no duplicates. This process, called dynamic IP assignment, uses the DHCP protocol.
+
+### IPv4 Addressing
+**Structure**: 32-bit address divided into 4 octets (e.g., 192.168.1.1)
+
+**Address Classes**:
+| Class | Range                       | Default Subnet Mask | Total Networks   | Hosts per Network | Use Case              |
+|-------|-----------------------------|---------------------|------------------|-------------------|-----------------------|
+| A     | 1.0.0.0 – 126.255.255.255   | 255.0.0.0 (/8)      | 128 (126 usable) | 16,777,214        | Very large networks   |
+| B     | 128.0.0.0 – 191.255.255.255 | 255.255.0.0 (/16)   | 16,384           | 65,534            | Medium networks       |
+| C     | 192.0.0.0 – 223.255.255.255 | 255.255.255.0 (/24) | 2,097,152        | 254               | Small networks        |
+| D     | 224.0.0.0 – 239.255.255.255 | N/A                 | N/A              | N/A               | Multicast             |
+| E     | 240.0.0.0 – 255.255.255.255 | N/A                 | N/A              | N/A               | Experimental / R&D    |
+
+**Private IP Ranges** (RFC 1918):
+- **Class A**: 10.0.0.0/8 (10.0.0.0 - 10.255.255.255)
+- **Class B**: 172.16.0.0/12 (172.16.0.0 - 172.31.255.255)
+- **Class C**: 192.168.0.0/16 (192.168.0.0 - 192.168.255.255)
+
+### Subnetting Examples
+```bash
+# Example: 192.168.1.0/24 network
+Network: 192.168.1.0
+Subnet Mask: 255.255.255.0 (/24)
+Broadcast: 192.168.1.255
+Usable IPs: 192.168.1.1 - 192.168.1.254 (254 hosts)
+
+# Subnetting 192.168.1.0/24 into 4 subnets (/26)
+Subnet 1: 192.168.1.0/26   (192.168.1.1-62)
+Subnet 2: 192.168.1.64/26  (192.168.1.65-126)
+Subnet 3: 192.168.1.128/26 (192.168.1.129-190)
+Subnet 4: 192.168.1.192/26 (192.168.1.193-254)
+```
+
+**CIDR Notation**:
+- /24 = 255.255.255.0 (256 IPs, 254 usable)
+- /25 = 255.255.255.128 (128 IPs, 126 usable)
+- /26 = 255.255.255.192 (64 IPs, 62 usable)
+- /27 = 255.255.255.224 (32 IPs, 30 usable)
+
 ## Network Protocols
 ```bash
 # TCP Handshake
@@ -177,6 +220,28 @@ HTTPS: Port 443, TLS encrypted
 dig example.com
 nslookup example.com
 ```
+
+## Network Hardware
+
+| Device | OSI Layer | Function | Use Cases | Security Considerations |
+|--------|-----------|----------|-----------|------------------------|
+| **Hub** | Physical (1) | Repeats signals to all ports | Legacy networks, small setups | No security - broadcasts to all ports |
+| **Switch** | Data Link (2) | Forwards frames based on MAC addresses | LAN segmentation, VLAN creation | MAC flooding attacks, VLAN hopping |
+| **Router** | Network (3) | Routes packets between different networks | Internet connectivity, WAN links | Default route vulnerabilities, routing attacks |
+| **Firewall** | Network (3-7) | Filters traffic based on rules | Perimeter security, access control | Rule misconfiguration, bypass techniques |
+| **Load Balancer** | Transport (4-7) | Distributes traffic across servers | High availability, performance | SSL termination risks, session persistence |
+| **Proxy** | Application (7) | Intermediary for client requests | Content filtering, caching | Man-in-the-middle risks, SSL inspection |
+| **WAF** | Application (7) | Filters web application traffic | Web app protection, DDoS mitigation | False positives, rule evasion |
+| **IDS/IPS** | Network (3-7) | Monitors/blocks malicious traffic | Threat detection, incident response | Signature evasion, performance impact |
+| **Access Point** | Physical/Data (1-2) | Wireless network connectivity | WiFi access, mobility | WPA/WEP vulnerabilities, rogue APs |
+| **Bridge** | Data Link (2) | Connects network segments | Network extension, collision domains | Bridging loops, MAC table exhaustion |
+
+**Network Device Security Best Practices**:
+- Regular firmware updates and patch management
+- Strong authentication and access controls
+- Network segmentation and VLAN isolation
+- Monitoring and logging for anomaly detection
+- Disable unnecessary services and default accounts
 
 ## Firewalls & IDS/IPS
 
@@ -1171,8 +1236,12 @@ bcrypt.checkpw(password.encode(), hashed)
 - **Recommended Migration**: Start planning transition to post-quantum cryptography
 
 # Penetration Testing
+Penetration testing involves simulating cyberattacks to identify vulnerabilities in systems, networks, or applications. 
 
 ## Reconnaissance
+**External Reconnaissance:** Gathers publicly available information about the target (Google, nmap, gobuster).  
+**Internal Reconnaissance:** Involves probing the target system directly (Enumerating AD, identifyng PrivEsc paths).
+
 ```bash
 # Subdomain enumeration
 $ subfinder -d target.com
