@@ -53,6 +53,9 @@
   - [Metasploit](#metasploit)
   - [Burp Suite](#burp-suite)
   - [OWASP ZAP](#owasp-zap)
+- [Post-Exploitation Techniques](#post-exploitation-techniques)
+  - [Lateral Movement](#lateral-movement)
+  - [Privilege Escalation](#privilege-escalation)
 ### 5. [Incident Response](#incident-response)
 - [NIST Framework](#nist-framework)
 - [Digital Forensics](#digital-forensics)
@@ -1315,6 +1318,50 @@ curl "http://localhost:8080/JSON/ascan/action/scan/?url=http://target.com"
 - **Authentication**: Custom login sequences
 - **Session Management**: Handle complex session logic
 - **Input Vectors**: Define custom attack points
+
+## Post-Exploitation Techniques
+
+### Lateral Movement
+Movement from initial compromise to other systems within the network.
+
+**Common Techniques**:
+- **Pass-the-Hash**: Using NTLM hashes without cracking passwords
+- **Golden Ticket**: Forged Kerberos tickets for domain access
+- **WMI/PowerShell**: Remote execution via legitimate tools
+- **RDP/SSH**: Using compromised credentials for remote access
+- **SMB/NetBIOS**: File share exploitation for network traversal
+
+**Detection**:
+- Monitor unusual network connections between internal hosts
+- Track administrative tool usage (PsExec, WMI, PowerShell)
+- Analyze authentication logs for suspicious patterns
+
+### Privilege Escalation
+Gaining higher-level permissions than initially obtained.
+
+**Linux Privilege Escalation**:
+```bash
+# Check sudo permissions
+sudo -l                           # List allowed sudo commands
+sudo -l -U username               # Check specific user's sudo rights
+
+# Common escalation vectors
+find / -perm -4000 2>/dev/null   # Find SUID binaries
+cat /etc/crontab                 # Check scheduled tasks
+ps aux | grep root               # Running processes as root
+```
+
+**Windows Privilege Escalation**:
+- **UAC Bypass**: Exploiting User Account Control weaknesses
+- **Service Exploitation**: Weak service permissions
+- **Token Impersonation**: Stealing access tokens
+- **Registry Manipulation**: Exploiting registry permissions
+
+**Mitigation**:
+- Principle of least privilege
+- Regular patching and updates
+- Monitor for privilege escalation attempts
+- Use application whitelisting and endpoint protection
 
 # Incident Response
 
