@@ -2298,11 +2298,27 @@ spec:
 - **OpenID Connect**: Identity layer on top of OAuth 2.0 for authentication
 - **SAML (Security Assertion Markup Language)**: XML-based framework for exchanging authentication and authorization data
 - **RBAC (Role-Based Access Control)**: Access based on user roles
+- **ABAC (Attribute-Based Access Control)**: Access based on dynamic attributes
 - **IAM (Identity and Access Management)**: Framework for managing digital identities and access rights
+- **Zero Trust**: Never trust, always verify; continuous validation of user/device
 - **Principle of Least Privilege**: Users get the minimum access necessary
 - **Federation**: Trusting identities from external systems (e.g., SAML, OAuth)
 - **Provisioning/Deprovisioning**: Creating/removing user accounts and access
 - **Directory Services**: Centralized user and resource management (e.g., LDAP, Active Directory)
+
+### RBAC vs ABAC
+
+**RBAC (Role-Based Access Control)**:
+- Users assigned to roles, roles have permissions
+- Static, hierarchical structure
+- Example: "Manager" role can access financial reports
+- Suitable for stable organizational structures
+
+**ABAC (Attribute-Based Access Control)**:
+- Access based on user, resource, environment, and action attributes
+- Dynamic, context-aware decisions
+- Example: Access granted if user=employee AND time=business_hours AND location=office
+- Suitable for complex, dynamic environments
   
 ## Active Directory
 An Active Directory (AD) domain is the basic security and administrative unit that groups related objects like users and computers under a single namespace (e.g., example.com), handling authentication and policies.
