@@ -1379,7 +1379,12 @@ TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 - **Authentication**: RSA
 - **Encryption**: AES-128 in GCM mode
 - **MAC**: SHA-256
-  
+
+### Mutual TLS (mTLS)
+- Both client and server authenticate with certificates (two-way authentication).
+- In normal TLS → only the server presents a certificate, so the client knows it’s talking to the right server.
+- In mTLS → both server and client present certificates, so each side verifies the other’s identity before establishing an encrypted connection.
+
 ## Encoding & Data Representation
 Encoding transforms data from one format to another for storage, transmission, or compatibility purposes (reversible without a key).
 
