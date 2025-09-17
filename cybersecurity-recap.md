@@ -133,6 +133,7 @@
 - [Active Directory](#active-directory)
 - [LDAP](#ldap)
 - [Single Sign-On (SSO)](#single-sign-on-sso)
+  - [Federated Identity Concepts](#federated-identity-concepts)
   - [SAML (Security Assertion Markup Language)](#saml-security-assertion-markup-language)
   - [OAuth 2.0](#oauth-20)
 - [OpenID Connect](#openid-connect)
@@ -3173,6 +3174,40 @@ ldapadd -x -H ldap://dc.example.com -D "cn=admin,dc=example,dc=com" -W -f newuse
 
 ## Single Sign-On (SSO)
 SSO allows users to authenticate once and gain access to multiple systems without re-entering credentials.
+
+### Federated Identity Concepts
+
+**Federated Identity**  
+Authentication is delegated to an Identity Provider (IdP), which issues assertions to a Relying Party (RP/SP). Requires trust agreements and secure token exchange.
+
+**Circle of Trust**  
+Set of IdPs and RPs that mutually trust and follow shared standards (e.g., SAML, OIDC), exchange metadata, and align policies.
+
+**Self-Sovereign Identity (SSI)**  
+User-controlled, decentralized, portable identities. Verified via cryptography (DIDs, Verifiable Credentials, Blockchain, Zero-Knowledge Proofs). Enables selective disclosure and privacy.
+
+#### Self-Sovereign Identity (SSI)
+**Purpose**: Users control their identity; identities are portable, decentralized, and cryptographically verifiable.
+
+**Principles**
+* **User Control**: Decide what to share, with whom
+* **Decentralized**: No central authority
+* **Portable**: Works across systems
+* **Privacy**: Selective disclosure
+* **Secure**: Backed by cryptography
+
+**Tech**
+* **Decentralized Identifiers (DIDs)**: User-controlled unique and resolvable IDs
+* **Verifiable Credentials**: Signed digital proofs (e.g., diploma)
+* **Blockchain**: Ledger for trust, not storing data
+* **Zero-Knowledge Proofs***: Prove facts without revealing data
+
+**Traditional vs Federated vs SSI**:
+```
+Traditional → Each app manages its own identities
+Federated → Centralized IdP manages identities for multiple apps
+SSI → Users manage their own identities independently
+```
 
 ### SAML (Security Assertion Markup Language)
 SAML is an XML-based framework for exchanging authentication and authorization data between parties, typically an identity provider (IdP) and a service provider (SP).
