@@ -53,6 +53,7 @@
 - [Digital Certificates](#digital-certificates)
 - [Encoding & Data Representation](#encoding--data-representation)
 - [Hashing](#hashing)
+  - [MAC and HMAC](#mac-message-authentication-code-and-hmac)
 - [Cryptographic Algorithms Comprehensive Comparison](#cryptographic-algorithms-comprehensive-comparison)
 ### 4. [Penetration Testing](#penetration-testing)
 - [Reconnaissance](#reconnaissance)
@@ -1278,6 +1279,83 @@ hashed = bcrypt.hashpw(password.encode(), salt)
 # Verify password
 bcrypt.checkpw(password.encode(), hashed)
 ```
+
+### MAC (Message Authentication Code) and HMAC
+
+#### MAC (Message Authentication Code)
+**Purpose**: Provides both data integrity and authentication by combining a message with a secret key.
+
+**How MAC Works**:
+1. **Input**: Message + Secret Key
+2. **Process**: Apply cryptographic function (hash or cipher)
+3. **Output**: Fixed-size authentication tag
+4. **Verification**: Receiver computes MAC with same key and compares
+
+**Simple MAC Construction**:
+```python
+import hashlib
+
+def simple_mac(key, message):
+    # Vulnerable construction - DO NOT USE
+    return hashlib.sha256(key + message.encode()).hexdigest()
+
+# Example (INSECURE)
+key = b"secret_key"
+message = "Important message"
+mac = simple_mac(key, message)
+```
+
+**MAC Weaknesses**:
+- **Length Extension Attacks**: Attacker can append data and compute valid MAC
+- **Key Recovery**: Possible with certain hash functions
+- **Collision Attacks**: If underlying hash function is vulnerable
+- **Timing Attacks**: Information leakage through computation time
+
+#### HMAC (Hash-based Message Authentication Code)
+**Purpose**: Secure MAC construction that addresses vulnerabilities of simple MAC schemes.
+
+**HMAC Construction** (RFC 2104):
+```
+HMAC(K, m) = H((K ⊕ opad) || H((K ⊕ ipad) || m))
+```
+
+Where:
+- **K**: Secret key (padded to block size)
+- **m**: Message
+- **H**: Cryptographic hash function (SHA-256, SHA-512)
+- **ipad**: Inner padding (0x36 repeated)
+- **opad**: Outer padding (0x5C repeated)
+- **⊕**: XOR operation
+- **||**: Concatenation
+
+**HMAC Implementation**:
+```python
+import hmac
+import hashlib
+
+# Secure HMAC construction
+def generate_hmac(key, message):
+    return hmac.new(
+        key.encode(),
+        message.encode(),
+        hashlib.sha256
+    ).hexdigest()
+
+# Example usage
+key = "secret_key"
+message = "Important message"
+hmac_value = generate_hmac(key, message)
+
+# Verification
+def verify_hmac(key, message, received_hmac):
+    computed_hmac = generate_hmac(key, message)
+    return hmac.compare_digest(computed_hmac, received_hmac)
+
+# Secure comparison to prevent timing attacks
+is_valid = verify_hmac(key, message, hmac_value)
+```
+
+**Length Extension Protection**: Uses a hash function twice with the secret key mixed in both the inner and outer hash.
 
 ## Cryptographic Algorithms Comprehensive Comparison
 
