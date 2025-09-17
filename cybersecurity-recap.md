@@ -53,6 +53,7 @@
 - [Digital Certificates](#digital-certificates)
 - [Encoding & Data Representation](#encoding--data-representation)
 - [Hashing](#hashing)
+  - [Hash Function Security Properties](#hash-function-security-properties)
   - [MAC and HMAC](#mac-message-authentication-code-and-hmac)
 - [Cryptographic Algorithms Comprehensive Comparison](#cryptographic-algorithms-comprehensive-comparison)
 ### 4. [Penetration Testing](#penetration-testing)
@@ -1280,6 +1281,32 @@ hashed = bcrypt.hashpw(password.encode(), salt)
 bcrypt.checkpw(password.encode(), hashed)
 ```
 
+### Hash Function Security Properties
+
+Cryptographic hash functions must satisfy three fundamental resistance properties.
+
+#### 1. Pre-image Resistance (One-way Property)
+**Definition**: Given a hash value `h`, it should be computationally infeasible to find any input `x` such that `hash(x) = h`.    
+**Purpose**: Prevents attackers from working backwards from hash to original data   
+**Example**: Given SHA-256 hash `a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3`, finding the original input should be impossible  
+
+#### 2. Second Pre-image Resistance (Weak Collision Resistance)
+**Definition**: Given an input `x`, it should be computationally infeasible to find a different input `x`' such that `hash(x) = hash(x')`.  
+**Purpose**: Prevents attackers from finding alternative inputs that produce the same hash  
+**Example**: Given message "Hello World", finding another message with the same SHA-256 hash should be impossible  
+
+#### 3. Collision Resistance (Strong Collision Resistance)
+**Definition**: It should be computationally infeasible to find any two distinct inputs `x` and `x`' such that `hash(x) = hash(x')`.  
+**Purpose**: Ensures no two different inputs produce the same hash value  
+**Example**: Finding any two different messages that produce the same SHA-256 hash should be impossible
+
+**Real-world Impact**:
+- **Pre-image**: Password recovery from hash
+- **Second Pre-image**: Document forgery with same hash
+- **Collision**: Digital signature forgery, certificate attacks
+
+---
+
 ### MAC (Message Authentication Code) and HMAC
 
 #### MAC (Message Authentication Code)
@@ -1311,6 +1338,7 @@ mac = simple_mac(key, message)
 - **Collision Attacks**: If underlying hash function is vulnerable
 - **Timing Attacks**: Information leakage through computation time
 
+---
 #### HMAC (Hash-based Message Authentication Code)
 **Purpose**: Secure MAC construction that addresses vulnerabilities of simple MAC schemes.
 
