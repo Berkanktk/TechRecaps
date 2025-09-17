@@ -62,6 +62,7 @@
 - [NIST Framework](#nist-framework)
 - [Attack Lifecycle](#attack-lifecycle)
   - [MITRE ATT&CK Framework](#mitre-attck-framework)
+  - [MITRE Caldera Framework](#mitre-caldera-framework)
   - [MITRE ATLAS](#mitre-atlas-adversarial-threat-landscape-for-ai-systems)
   - [Cyber Kill Chain](#cyber-kill-chain)
 - [Digital Forensics](#digital-forensics)
@@ -1440,22 +1441,9 @@ ps aux | grep root               # Running processes as root
 - Monitor for privilege escalation attempts
 - Use application whitelisting and endpoint protection
 
-# DFIR (Digital Forensics and Incident Response)
-**Purpose**: Investigate and analyze incidents.
-- Identify indicators of compromise (IoCs)
-- Capture and preserve forensic evidence
-- Use findings to improve organizational defense
-## Phases of Incident Response (NIST Framework)
-1. **Preparation**: Policies, procedures, tools
-2. **Detection & Analysis**: Monitoring, investigation
-3. **Containment**: Isolate threat, prevent spread
-4. **Eradication**: Remove threat from environment
-5. **Recovery**: Restore normal operations
-6. **Lessons Learned**: Post-incident review
+## Attack Lifecycle
 
-### Attack Lifecycle
-
-#### MITRE ATT&CK Framework
+### MITRE ATT&CK Framework
 **Purpose**: Knowledge base of adversary tactics, techniques, and procedures (TTPs) based on real-world observations.
 
 **Structure**:
@@ -1477,6 +1465,24 @@ ps aux | grep root               # Running processes as root
 11. **Exfiltration**: Stealing data
 12. **Impact**: Disrupt, corrupt, or destroy systems
 
+### MITRE Caldera Framework
+**Purpose**: Automated, modular platform for adversary emulation based on ATT&CK techniques.
+
+**Core Components**:
+- **Agents**: Deployed on target machines, receive instructions from C2 server
+- **Abilities**: Executable tasks mapped to MITRE ATT&CK techniques (e.g., create user, dump credentials)
+- **Adversary Profiles**: Sets of abilities grouped into coherent attack campaigns
+- **Operations**: Chains of abilities run in sequence, controlled by planners
+- **Planners**: Decision logic for selecting which abilities to run next based on environment and available facts
+- **Facts**: Dynamic variables collected during execution (usernames, IPs, passwords) used in later steps
+- **Plugins**: Extend Caldera's capabilities with new UI elements, custom agents, and TTPs
+
+**Use Cases**:
+- Red team exercises and adversary simulation
+- Security control validation and testing
+- Training and education on ATT&CK techniques
+- Automated penetration testing workflows
+
 #### MITRE ATLAS (Adversarial Threat Landscape for AI Systems)
 **Purpose**: Framework for understanding adversarial tactics against AI/ML systems.
 
@@ -1486,7 +1492,7 @@ ps aux | grep root               # Running processes as root
 - **Evasion**: Adversarial examples, prompt injection
 - **Impact**: Model degradation, bias amplification
 
-#### Cyber Kill Chain
+### Cyber Kill Chain
 **Lockheed Martin Model**: Reconnaissance → Weaponization → Delivery → Exploitation → Installation → Command & Control → Actions on Objectives
 
 **Phases**:
@@ -1497,6 +1503,20 @@ ps aux | grep root               # Running processes as root
 5. **Installation**: Installing persistent access
 6. **Command & Control**: Establishing communication channel
 7. **Actions on Objectives**: Achieving attacker goals
+  
+# DFIR (Digital Forensics and Incident Response)
+**Purpose**: Investigate and analyze incidents.
+- Identify indicators of compromise (IoCs)
+- Capture and preserve forensic evidence
+- Use findings to improve organizational defense
+
+## Phases of Incident Response (NIST Framework)
+1. **Preparation**: Policies, procedures, tools
+2. **Detection & Analysis**: Monitoring, investigation
+3. **Containment**: Isolate threat, prevent spread
+4. **Eradication**: Remove threat from environment
+5. **Recovery**: Restore normal operations
+6. **Lessons Learned**: Post-incident review
 
 ## Digital Forensics
 
@@ -3193,10 +3213,30 @@ SecItemAdd(query as CFDictionary, nil)
 # Compliance & Governance
 
 ## GDPR
-- **Data Protection Principles**: Lawfulness, fairness, transparency
-- **Rights**: Access, rectification, erasure, portability
-- **Data Protection Impact Assessment (DPIA)**
-- **Breach notification**: 72 hours to authorities
+* **Data Protection Principles**
+  * **Lawfulness, fairness, transparency** → data must be processed legally, fairly, and clearly communicated to users.
+  * **Purpose limitation** → collect data only for specific, explicit purposes.
+  * **Data minimization** → only collect what is necessary.
+  * **Accuracy** → keep data up to date.
+  * **Storage limitation** → don’t keep personal data longer than needed.
+  * **Integrity & confidentiality** → protect data with proper security (encryption, access control).
+  * **Accountability** → organizations must prove compliance.
+* **Data Subject Rights**
+  * **Access** → know what data is held about them.
+  * **Rectification** → correct inaccurate data.
+  * **Erasure ("Right to be Forgotten")** → request deletion of personal data.
+  * **Portability** → transfer their data to another provider.
+  * **Restriction & objection** → limit or stop certain processing.
+  * **Not to be subject to automated decisions** → e.g., AI profiling without human review.
+* **Data Protection Impact Assessment (DPIA)**
+  * Required if processing poses **high risk** (e.g., large-scale surveillance, sensitive data).
+  * Identifies risks to individuals and how to mitigate them.
+* **Breach Notification**
+  * Must notify authorities (**Supervisory Authority**) within **72 hours** of becoming aware.
+  * If high risk to individuals, they must also be informed directly.
+* **Penalties**
+  * For non-compliance, fines up to **€20 million** or **4% of global turnover**, whichever is higher.
+  * For less severe breaches, fines up to **€10 million** or **2% of global turnover**.
 
 ## PCI DSS
 **Requirements**
