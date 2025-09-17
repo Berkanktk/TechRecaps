@@ -3124,6 +3124,7 @@ An XACML policy document contains one Policy or PolicySet root element.
 
 * **Definition:** Confidence level that a user is who they claim to be.
 * **Factors:** Enrolment (how ID is verified), ID management security, authentication strength.
+* **eIDAS 2.0:** Legal framework for Self-Sovereign Identity (SSI) in Europe, enabling EU Digital Identity Wallets.
 
 **Levels:**
 
