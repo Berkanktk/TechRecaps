@@ -935,6 +935,35 @@ Referrer-Policy: strict-origin-when-cross-origin
 * **same-origin:** only for same-origin requests
 * **no-referrer:** never send referrer
 
+# Secure Programming
+
+## Secure C Programming
+**Why C is Insecure**: Low-level memory access, manual memory management, no automatic bounds checking, compiler optimizations can worsen exploits
+
+**Common C Vulnerabilities**:
+- **Buffer Overflows**: `gets(buf)` → use `fgets()`, `strncpy()`
+- **Format String**: `printf(user_input)` → use `printf("%s", user_input)`
+- **Integer Overflow**: Sign errors, use bounds checking
+- **Use-After-Free**: Access memory after it has been deallocated → validate pointers
+- **Double Free/Memory Leaks**: Freeing already-freed memory or failing to release heap memory
+
+**Mitigation Techniques**:
+- **Safe functions**: `strncpy`, `snprintf`, `fgets`
+- **Compiler protections**: Stack canaries, `-fstack-protector`, `-D_FORTIFY_SOURCE=2`
+- **Runtime protections**: ASLR, DEP/NX, AddressSanitizer (ASan)
+- **CERT C Standards**: INT32-C (no overflow), STR31-C (no strcpy), MEM30-C (no freed access)
+
+## Secure Java Programming
+**Java Security Model**: Type safety, automatic memory management, bytecode verification, sandboxing (deprecated SecurityManager), managed class loading
+
+**Common Java Vulnerabilities**:
+- **Race Conditions**: Concurrent access to shared resources → use platform APIs for temp files
+- **Input Validation**: Environment variables, user input → validate, canonicalize paths, whitelist
+- **Public Mutable Fields**: External modification → encapsulate, restrict access
+- **Weak Randomness**: `java.util.Random` for secrets → use `SecureRandom`
+- **Overridable Methods**: Security bypass → declare `final` or `private`
+- **Null Dereference**: Crashes → validate instead of catching `NullPointerException`
+
 # Cryptography
 
 ## Symmetric Encryption
