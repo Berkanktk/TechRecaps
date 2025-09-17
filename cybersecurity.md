@@ -1,4 +1,4 @@
-# Cybersecurity Comprehensive Guide
+# Cybersecurity Recap
 
 ## Table of Contents
 
