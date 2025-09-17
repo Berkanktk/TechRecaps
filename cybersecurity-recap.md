@@ -3228,7 +3228,9 @@ User-controlled, decentralized, portable identities. Verified via cryptography (
 
 **Tech**
 * **Decentralized Identifiers (DIDs)**: User-controlled unique and resolvable IDs
+* **DID Documents**: Metadata about DIDs (public keys, service endpoints)
 * **Verifiable Credentials**: Signed digital proofs (e.g., diploma)
+* **Verifiable Presentations**: Selectively share parts of credentials
 * **Blockchain**: Ledger for trust, not storing data
 * **Zero-Knowledge Proofs***: Prove facts without revealing data
 
@@ -3381,12 +3383,12 @@ Inside `id_token`:
 - `exp`: Expiration time
 - `name`, `email`: User profile claims
 
-Client uses `id_token` to authenticate user and `access_token` to access user info.
+Client uses `id_token` to authenticate user and `access_token` to access user info. Also the endpoint `/userinfo` can be called with the `access_token` to get more user details.
 
 # JSON Web Tokens (JWT) Security
 
 ## JWT Structure and Components
-JWT is a compact, URL-safe token format for securely transmitting information between parties as a JSON object.
+JWT is a compact, stateless, URL-safe token format for securely transmitting information between parties as a JSON object.
 
 **Structure**: `header.payload.signature`
 
@@ -3709,6 +3711,30 @@ class SecureJWT:
         # Check against revocation list (implement according to your needs)
         return jti in self.revoked_tokens
 ```
+
+# Session Management
+
+## Stateful Session Management
+A Session ID (random string) uniquely identifies each session.
+Server-side: Stores session data in a database or in-memory cache (e.g., user data, preferences).
+Client-side: Tracks session via:
+- **Session Cookies**: Sent with each request; common and preferred.
+- **URL Rewriting**: Embeds session ID in the URL (less secure, vulnerable to leakage).
+
+**Session Expiration**: Triggered after inactivity or logout; invalidates session data and tokens.
+
+### Problems with Session IDs
+- **Shared cache systems** like Redis let multiple servers access the same session data, but they can be tricky to manage and may cause data to get out of sync.
+- **Sticky sessions** keep a user connected to the same server, but this can cause problems if that server goes down or if load balancing changes.
+
+### How JWT Solves These Problems
+- **Stateless**: No server-side session storage needed; all info in the token.
+- **Scalable**: Easy to distribute across servers; no session sync issues.
+- **Decentralized**: Any server can validate the token without shared storage.
+- **Reduced Overhead**: Less server memory and database load.
+- **Security**: Can include expiration and claims; but must handle revocation carefully.
+- **Performance**: Faster validation without DB lookups.
+- **Flexibility**: Works well with microservices and APIs.
 
 
 # Mobile Security
