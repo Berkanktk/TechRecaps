@@ -2308,6 +2308,66 @@ frontend web_frontend
 
 These comprehensive mitigation strategies provide multiple layers of protection against various types of DDoS attacks, from network-level filtering to application-layer protection and cloud-based solutions.
 
+## Botnets 
+### Architectures 
+
+Different botnets adopt various communication topologies based on goals and resilience:
+
+* **Star:** Single central C2 server. Simple, low-latency, but single point of failure.
+* **Multi-server:** Multiple redundant C2s with fast-flux domains to stay online.
+* **Peer-to-Peer (P2P):** Decentralized, bots talk directly. Highly resilient.
+* **Hybrid:** Mix of centralized and P2P, often using proxy layers for stealth.
+
+### Command & Control (C2) Channels
+
+C2 channels enable communication between botmaster and bots:
+
+* **Standard protocols:** IRC, HTTP/HTTPS, DNS.
+* **Covert methods:** DNS tunneling, social media, steganography, domain/IP fluxing.
+
+### Lifecycle Phases
+
+Typical botnet lifecycle:
+
+1. **Propagation:** Infection via phishing, exploits, USBs, etc.
+2. **C2 Contact:** Bot locates and connects to C2.
+3. **Attack:** Flooding, data theft, fraud, or spam as instructed.
+
+### C2 Resilience Techniques
+
+Botnets use methods to avoid detection and takedown:
+
+* **Encryption:** TLS or custom crypto to hide payloads.
+* **Proxy Chaining:** Traffic routed via proxies for obfuscation.
+* **DNS-based:**
+  * *Single-Flux:* Rotate A records only.
+  * *Double-Flux:* Rotate A and NS records.
+  * *Domain Flux:* Many domains map to one IP.
+  * *Wildcards:* Subdomains encode commands.
+  * *DGAs:* Generate large pools of potential domains.
+  * *DNS Tunneling:* Commands/data sent in DNS queries and TXT responses.
+* **ICMP Tunneling:** Encode commands in ping packets.
+* **Social Media C2:** Commands hidden in tweets, comments, or images.
+* **Obfuscated Protocols:** Commands hidden in headers, comments, or scripts.
+* **Covert Channels:** Abuse unused protocol fields, packet timing, or steganography.
+
+### Detection Techniques
+
+Defenders counter botnets using:
+
+* **Behavioral analytics:** Spot repetitive or automated activity.
+* **Anomaly detection:** Identify deviations from baselines.
+* **DNS monitoring:** Detect DGAs or failed resolutions.
+* **Honeypots:** Trap and analyze bots safely.
+
+### Notable Botnets
+
+* **Mirai:** IoT-focused, launched massive DDoS attacks by exploiting weak/default credentials.
+* **Kelihos:** Large spam-sending botnet with modular malware capabilities, taken down in 2017.
+* **Waledac:** Email spam and credential-stealing botnet, disrupted in 2010.
+
+
+
 # Malware Analysis
 
 ## Static Analysis
@@ -3332,3 +3392,119 @@ Process:
 - **Tempest**: Financially motivated  
 - **Tsunami**: Private sector threats vs. corporations  
 - **Nation-State Actors**: APT, cyberwarfare  
+
+# Hardware & Physical Security
+## Hardware Security Modules (HSM)
+- **Definition**: Physical devices that manage digital keys, perform cryptographic operations, and provide secure key storage.
+- **Functions**: Key generation, encryption/decryption, digital signatures, secure key storage
+- **Types**: Network-attached, PCIe cards, USB tokens
+- **Use Cases**: SSL/TLS offloading, code signing, database encryption, PKI
+## Trusted Platform Module (TPM)
+- **Definition**: A specialized chip on a computer's motherboard that provides hardware-based security functions.
+- **Functions**: Secure generation/storage of cryptographic keys, platform integrity measurement, device authentication
+- **Versions**: TPM 1.2 (older), TPM 2.0 (more features, algorithms)
+- **Use Cases**: Disk encryption (BitLocker), secure boot, platform attestation
+## Physical Security Controls
+
+### Access Control Systems (ACS)
+* Control entry via **cards, readers, controllers, locks**.
+* Weakest link = usually **legacy protocols** (Wiegand), cheap cards (125 kHz, MIFARE Classic), or insecure reader firmware.
+* Core principle: **card + reader + controller + backend** must all be secured.
+
+### Interfaces & Protocols
+**Wiegand (legacy)**
+
+* Pulse interface (DATA0/DATA1). Common 26-bit format.
+* Weakness: cleartext, no auth → sniff/replay/spoof.
+* Tools: **ESPKey** can passively tap Wiegand lines and log/replay credentials.
+* Mitigation: migrate away, protect cabling, detect tamper, monitor traffic.
+
+**OSDP v2 (modern)**
+
+* RS-485 based, bi-directional.
+* Supports **Secure Channel (AES-128)** → encryption, mutual auth, anti-replay.
+* Recommended replacement for Wiegand.
+
+### RFID / NFC Cards
+**125 kHz (LF)**
+
+* UID-only proximity (EM4100, HID Prox). Very easy to clone/skimmable.
+* Not suitable for secure use.
+
+**13.56 MHz (HF)**
+
+* *MIFARE Classic*: broken (Crypto-1 cracked) → cloneable.
+* *DESFire EV2/EV3, iCLASS SE, modern NFC secure elements*: AES-based, strong crypto, mutual auth.
+
+### Typical Attacks
+* **Card cloning / skimming** (Proxmark3).
+* **Relay attacks** (extend comms between card & reader).
+* **Wiegand sniff + replay** (ESPKey, microcontrollers).
+* **Firmware implants / Evil Maid** on readers.
+* **Cable tapping / RS-485/Wiegand splice**.
+* **Default creds / debug ports** on readers.
+
+### Card Security
+* Use **AES-based secure cards** (DESFire EVx, iCLASS SE, FIDO2).
+* Require **mutual auth** (card ↔ reader).
+* Add **anti-replay** (nonces, rolling keys).
+* Bind cards to backend accounts, not just UID.
+* Enforce lifecycle: unique per-card keys, rapid revocation, expiry.
+* Avoid 125 kHz / MIFARE Classic in secure environments.
+
+### Reader Security
+* Use **OSDP v2 Secure Channel** (AES). No cleartext reader-controller traffic.
+* **Firmware integrity**: signed firmware, secure boot, block unsigned updates.
+* **Physical hardening**: tamper switches, sealed housings, shielded cabling, potting.
+* **Network isolation**: VLANs, firewalls, least privilege access.
+* **Tamper detection & logging**: heartbeat, cable-cut alarms, central SIEM logging.
+* **Supply chain security**: vetted vendors, no backdoored low-cost readers.
+
+
+# Emerging Technologies
+## Blockchain
+Blockchain is a decentralized, distributed ledger technology that records transactions across multiple computers in a way that ensures security, transparency, and immutability.
+
+**Components:**
+- **Blocks**: Containers for transaction data, linked in a chain
+- **Nodes**: Computers participating in the network, maintaining copies of the blockchain
+- **Consensus Mechanisms**: Protocols to agree on the state of the blockchain (e.g., Proof of Work, Proof of Stake)
+- **Cryptographic Hashing**: Ensures data integrity and links blocks
+- **Smart Contracts**: Self-executing contracts with terms directly written into code
+
+**Core flow:**
+1. **Make a transaction**
+   * Example: *Alice wants to send 1 coin to Bob.*
+   * Alice signs the transaction with her digital key (like an electronic signature).
+2. **Send it to the network**
+   * The transaction is shared with many computers (nodes) in the blockchain network.
+3. **Check it’s valid**
+   * The network checks:
+     * Does Alice really have 1 coin?
+     * Is her digital signature correct?
+   * If yes → transaction is accepted and kept waiting in a “pool” of unconfirmed transactions.
+4. **Build a block**
+   * A miner/validator picks a bunch of valid transactions and groups them together into a block.
+   * The block also contains a “fingerprint” (hash) of the previous block to link them.
+5. **Agree on the block (consensus)**
+   * Network must agree the block is valid:
+     * *Proof of Work:* miners solve a hard math puzzle.
+     * *Proof of Stake:* validators are randomly chosen depending on how much they staked.
+6. **Add the block**
+   * Once agreed, the new block is attached to the end of the chain.
+   * Now the transaction is officially recorded forever.
+7. **Update everywhere**
+   * Every computer in the network updates its copy of the blockchain.
+   * The more blocks added after Alice’s, the harder it is to undo her transaction (stronger confirmation).
+
+### Blockchain Security
+- **Decentralization**: No single point of failure, reduces risk of centralized attacks
+- **Immutability**: Once data is recorded, it cannot be altered, ensuring integrity
+- **Consensus Mechanisms**: Proof of Work (PoW), Proof of Stake (PoS) to validate transactions
+- **Smart Contract Security**: Code vulnerabilities can lead to exploits (e.g., DAO hack)
+- **Use Cases**: Cryptocurrencies, supply chain, identity management
+## AI & Machine Learning Security
+- **Adversarial Attacks**: Manipulating input data to deceive models (e.g., image recognition)
+- **Data Poisoning**: Injecting malicious data into training sets to corrupt model behavior
+- **Model Theft**: Extracting proprietary models through API queries
+- **Bias & Fairness**: Ensuring models do not perpetuate or amplify biases
