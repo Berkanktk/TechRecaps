@@ -202,6 +202,22 @@ Core principles of information security.
   - *Implementation*: Comprehensive logging, identity tracking
   - *Requirement*: Supports compliance and forensic investigations
 
+## Threat Modeling
+
+**Purpose**: Systematic approach to identify and assess security threats in systems and applications.
+
+**Process**:
+1. **Identify Assets**: Data, systems, and resources that need protection
+2. **Identify Adversaries**: Who might attack the system (threat actors)
+3. **Identify Vulnerabilities**: Weaknesses that could be exploited
+
+### Risk Management
+**Asset-based vs Threat-based Approaches**:
+- **Asset-based**: Focus on protecting valuable assets
+- **Threat-based**: Focus on defending against specific threats
+
+**Risk Calculation**: Risk = Likelihood × Impact
+
 ## STRIDE Threat Model
 **Purpose**: Microsoft's framework for identifying security threats in system design.
 
