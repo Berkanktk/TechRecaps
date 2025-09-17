@@ -2594,19 +2594,20 @@ spec:
   - Egress
 ```
 
-# Identity & Access Management
+# Identity & Access Management (IAM)
+IAM is a framework of policies and technologies to ensure that the right individuals access the right resources at the right times for the right reasons.
+
 ## General Concepts
 - **Authentication**: Verifying identity (e.g., passwords, biometrics)
 - **Authorization**: Granting access to resources based on permissions
 - **Accounting**: Tracking user activities (logs, audits)
 - **MFA (Multi-Factor Authentication)**: Using multiple methods to verify identity (e.g., password + OTP)
-- **SSO (Single Sign-On)**: One set of credentials for multiple applications
-- **OAuth**: Authorization framework for third-party access
-- **OpenID Connect**: Identity layer on top of OAuth 2.0 for authentication
-- **SAML (Security Assertion Markup Language)**: XML-based framework for exchanging authentication and authorization data
-- **RBAC (Role-Based Access Control)**: Access based on user roles
-- **ABAC (Attribute-Based Access Control)**: Access based on dynamic attributes
-- **IAM (Identity and Access Management)**: Framework for managing digital identities and access rights
+- **Identification:** Selecting a unique entity based on identifying information within a context.
+- **Identifier:** Any attribute (or set) that uniquely identifies an entity.
+- **Linkability:** Ability to associate different data sets with the same identity.
+- **Unlinkability:** Inability to correlate identity fragments across contexts.
+- **Identity proofing:** Process of binding a digital identity to a real-world individual.
+- **Personal Identifiable Information (PII):** Any data that can identify an individual (e.g., name, SSN, email)
 - **Zero Trust**: Never trust, always verify; continuous validation of user/device
 - **Principle of Least Privilege**: Users get the minimum access necessary
 - **Federation**: Trusting identities from external systems (e.g., SAML, OAuth)
@@ -2614,18 +2615,31 @@ spec:
 - **Directory Services**: Centralized user and resource management (e.g., LDAP, Active Directory)
 
 ### RBAC vs ABAC
-
 **RBAC (Role-Based Access Control)**:
+- Access based on user roles
 - Users assigned to roles, roles have permissions
 - Static, hierarchical structure
 - Example: "Manager" role can access financial reports
 - Suitable for stable organizational structures
 
 **ABAC (Attribute-Based Access Control)**:
-- Access based on user, resource, environment, and action attributes
+- Access based on dynamic attributes (user, resource, environment, and action attributes)
 - Dynamic, context-aware decisions
 - Example: Access granted if user=employee AND time=business_hours AND location=office
 - Suitable for complex, dynamic environments
+
+### eIDAS Levels of Assurance (LoA)
+
+* **Definition:** Confidence level that a user is who they claim to be.
+* **Factors:** Enrolment (how ID is verified), ID management security, authentication strength.
+
+**Levels:**
+
+* **Low:** Self-registration, no real ID check, password only → low-risk services.
+* **Substantial:** Verified ID info, username + password + OTP → medium-risk (e.g., banking).
+* **High:** In-person enrolment, smartcard/national ID/biometrics → high-risk (e.g., tax, health).
+
+**Rule:** Higher LoA can be used at lower levels, not the other way around.
   
 ## Active Directory
 An Active Directory (AD) domain is the basic security and administrative unit that groups related objects like users and computers under a single namespace (e.g., example.com), handling authentication and policies.
