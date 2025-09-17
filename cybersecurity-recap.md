@@ -4394,10 +4394,45 @@ Process:
 - **Types**: Network-attached, PCIe cards, USB tokens
 - **Use Cases**: SSL/TLS offloading, code signing, database encryption, PKI
 ## Trusted Platform Module (TPM)
-- **Definition**: A specialized chip on a computer's motherboard that provides hardware-based security functions.
-- **Functions**: Secure generation/storage of cryptographic keys, platform integrity measurement, device authentication
-- **Versions**: TPM 1.2 (older), TPM 2.0 (more features, algorithms)
-- **Use Cases**: Disk encryption (BitLocker), secure boot, platform attestation
+Hardware chip providing secure cryptographic operations and key storage.
+
+### TPM Keys
+- **Endorsement Key (EK)**: Verifies TPM identity, root of trust for reporting
+- **Storage Root Key (SRK)**: Encrypts keys/data stored outside TPM, creates key hierarchy
+
+### TPM 1.2 vs 2.0
+| Feature                      | TPM 1.2              | TPM 2.0                                |
+| ---------------------------- | -------------------- | -------------------------------------- |
+| **Cryptographic Algorithms** | Limited (RSA, SHA-1) | Extended (ECC, SHA-2, AES)             |
+| **Key Management**           | Basic                | Hierarchical, advanced encryption keys |
+| **Remote Attestation**       | Basic                | Robust, easier verification            |
+
+### Attestation Methods
+
+**TPM-Based Attestation**: Platform provides evidence of software state via TPM-signed measurements
+
+**Remote Attestation (RA)**: Two-party protocol verifying remote device integrity
+- **Challenge**: Verifier sends nonce/timestamp
+- **Attest**: Prover computes attestation response based on internal state
+- **Verify**: Verifier validates response against expected state
+
+| Aspect                   | TPM-Based Attestation             | Remote Attestation                         |
+| ------------------------ | --------------------------------- | ------------------------------------------ |
+| **Scope**                | Single device.                    | Remote device over a network.              |
+| **Verifier Interaction** | Local or direct communication.    | Network-based communication.               |
+| **Use Case**             | Single platform integrity.        | Distributed or IoT device trust.           |
+| **Mechanism**            | Uses TPM for signing and logging. | May involve TPM, SGX, or other mechanisms. |
+
+**Software-Based Attestation**: No hardware support, relies on tight timing constraints and limited storage
+- **Attacks**: Compression, ROP rootkits
+- **Limitations**: Hardware-specific, single-hop networks
+
+**Hybrid Attestation**: Minimal hardware changes with secure execution and key storage
+
+**Swarm Attestation**: Efficiently verifies large device groups using spanning tree algorithm where nodes attest neighbors
+
+### Hardware Security Technologies
+**SGX (Software Guard Extensions)**: Memory encryption isolating sensitive data in protected enclaves, reducing attack surface from OS/hypervisor threats
 ## Physical Security Controls
 
 ### Access Control Systems (ACS)
@@ -4474,12 +4509,12 @@ Process:
 **Structure**: Blocks connected by cryptographic hash references. Each block contains transactions, timestamp, and previous block hash.
 
 ### Blockchain Types
-| Type | Who Can View? | Who Can Participate? | Examples |
-|------|---------------|---------------------|----------|
-| **Public Permissionless** | Everyone | Everyone | Bitcoin, Ethereum |
-| **Public Permissioned** | Everyone | Selected Participants | Ripple |
-| **Private Permissioned** | Selected Members | Selected Members | Hyperledger |
-| **Private Permissionless** | Selected Members | Anyone | Partially Exonum |
+| Type                       | Who Can View?    | Who Can Participate?  | Examples          |
+| -------------------------- | ---------------- | --------------------- | ----------------- |
+| **Public Permissionless**  | Everyone         | Everyone              | Bitcoin, Ethereum |
+| **Public Permissioned**    | Everyone         | Selected Participants | Ripple            |
+| **Private Permissioned**   | Selected Members | Selected Members      | Hyperledger       |
+| **Private Permissionless** | Selected Members | Anyone                | Partially Exonum  |
 
 ### Consensus Mechanisms
 - **Proof of Work (PoW)**: Miners solve computational puzzles to validate blocks
