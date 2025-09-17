@@ -2818,8 +2818,6 @@ Defenders counter botnets using:
 * **Kelihos:** Large spam-sending botnet with modular malware capabilities, taken down in 2017.
 * **Waledac:** Email spam and credential-stealing botnet, disrupted in 2010.
 
-
-
 # Malware Analysis
 
 ## Static Analysis
@@ -2878,6 +2876,21 @@ ghidra malware.exe              # Open in Ghidra to analyze code structure
 ```
 
 # Cloud Security
+
+## Cloud Security Alliance (CSA)
+Promotes best practices for secure cloud computing and operates the CSA STAR certification framework:
+- **Level 1**: Self-assessment
+- **Level 2**: Third-party certification
+- **Level 3**: Continuous auditing
+
+### Common Cloud Vulnerabilities
+- Data breaches, misconfiguration, insufficient identity/key management, insecure APIs
+
+### Cloud Security Principles
+**Data in Transit**: Encryption, SSL/TLS protocols, authentication mechanisms  
+**Asset Protection**: Encrypted storage (at rest), geographical controls, redundancy, strict access control  
+**User Separation**: Logical partitioning, isolation controls, multi-tenancy security  
+**Governance**: Continuous monitoring, auditability, structured incident response
 
 ## AWS Security
 ```bash
