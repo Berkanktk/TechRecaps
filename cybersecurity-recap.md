@@ -129,6 +129,7 @@
   - [Types of Authenticators](#types-of-authenticators)
   - [NIST Digital Identity Guidelines](#nist-digital-identity-guidelines-sp-800-63)
   - [PBAC (Policy-Based Access Control)](#pbac-policy-based-access-control)
+  - [XACML 3.0](#xacml-30-extensible-access-control-markup-language)
 - [Active Directory](#active-directory)
 - [LDAP](#ldap)
 - [Single Sign-On (SSO)](#single-sign-on-sso)
@@ -3032,6 +3033,62 @@ Policy Example:
 If User.Role == 'Manager' AND Resource.Type == 'Financial Report' AND Time == 'Business Hours' THEN Allow Access
 ```
 
+### XACML 3.0 (eXtensible Access Control Markup Language)
+**Purpose**: XML-based language for defining access control policies in distributed systems.
+
+#### XACML Policy Set Structure
+An XACML policy document contains one Policy or PolicySet root element.
+
+**PolicySet Components**:
+- **Target**: Defines applicability scope (subjects, resources, actions)
+- **Policy-combining Algorithm**: Rules for combining multiple policy decisions
+- **Set of Policies**: Collection of individual access control policies
+- **Obligation Expressions**: Actions that must be performed with decisions
+- **Advice Expressions**: Supplemental information with authorization decisions
+
+#### XACML Architecture Components
+
+**PEP (Policy Enforcement Point)**:
+- Performs access control by making decision requests
+- Enforces authorization decisions from PDP
+- Entry point for access control in applications
+
+**PDP (Policy Decision Point)**:
+- Evaluates applicable policies
+- Renders authorization decisions (Permit/Deny/Indeterminate/NotApplicable)
+- Core decision-making component
+
+**PIP (Policy Information Point)**:
+- Source of attribute values during policy evaluation
+- Provides identity, runtime, and resource attributes
+- External data sources for policy decisions
+
+**PAP (Policy Administration Point)**:
+- Creates and manages policies or policy sets
+- Policy repository and management interface
+- Administrative control point
+
+#### Typical XACML Authorization Flow
+
+1. **User Request**: User wants to perform an action on a resource
+2. **PEP Intercept**: User sends request to Policy Enforcement Point (PEP)
+3. **Request Formation**: PEP forms standardized request with:
+   - **Subject**: User identity and attributes
+   - **Resource**: Target resource and properties
+   - **Action**: Requested operation
+   - **Environment**: Context information (time, location, etc.)
+4. **PDP Query**: PEP sends request to Policy Decision Point (PDP)
+5. **Policy Retrieval**: PDP looks for suitable policies at Policy Administration Point (PAP)
+6. **Attribute Gathering**: Additional attributes retrieved via Policy Information Point (PIP)
+7. **Decision Rendering**: PDP evaluates policies and returns decision
+8. **Enforcement**: PEP enforces the authorization decision
+
+**XACML Decision Types**:
+- **Permit**: Access granted
+- **Deny**: Access denied
+- **Indeterminate**: Cannot determine (error/missing info)
+- **NotApplicable**: No applicable policy found
+  
 ### eIDAS Levels of Assurance (LoA)
 
 * **Definition:** Confidence level that a user is who they claim to be.
