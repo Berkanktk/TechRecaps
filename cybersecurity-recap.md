@@ -219,15 +219,15 @@ Core principles of information security.
 ## TCP/IP Stack
 **Purpose**: Foundation of internet communication
 
-| Layer | OSI Model | TCP/IP Model | Protocols | Protocol Data Unit | Description |
-|---|---|---|---|---|---|
-| 7 | Application | Application | FTP, HTTP, Telnet, SMTP, DNS, SSH | Data | Network Process to application |
-| 6 | Presentation | Application | JPEG, PNG, MPEG, Sockets, HTML, IMAP | Data | Data representation and encryption |
-| 5 | Session | Application | NFS, SQL, PAP, RPC, RTP, API's | Data | Interhost communication |
-| 4 | Transport | Transport | TCP, UDP, SSL, TLS | Segment (TCP) / Datagram (UDP) | End-to-end connection and reliability |
-| 3 | Network | Internet | IPv4, IPv6, ICMP | Packet | Path determination (Logical addressing) |
-| 2 | Data Link | Network Access | ARP, CDP, STP, VLAN, Switch, Bridge | Frame | MAC and LLC (Physical addressing) |
-| 1 | Physical | Network Access | Ethernet, WI-FI, CAT, DSL, RJ45, 100Base-TX, Hub, Repeater | Bits | Media, signal and binary transmission |
+| Layer | OSI Model    | TCP/IP Model   | Protocols                                                  | Protocol Data Unit             | Description                             |
+| ----- | ------------ | -------------- | ---------------------------------------------------------- | ------------------------------ | --------------------------------------- |
+| 7     | Application  | Application    | FTP, HTTP, Telnet, SMTP, DNS, SSH                          | Data                           | Network Process to application          |
+| 6     | Presentation | Application    | JPEG, PNG, MPEG, Sockets, HTML, IMAP                       | Data                           | Data representation and encryption      |
+| 5     | Session      | Application    | NFS, SQL, PAP, RPC, RTP, API's                             | Data                           | Interhost communication                 |
+| 4     | Transport    | Transport      | TCP, UDP, SSL, TLS                                         | Segment (TCP) / Datagram (UDP) | End-to-end connection and reliability   |
+| 3     | Network      | Internet       | IPv4, IPv6, ICMP                                           | Packet                         | Path determination (Logical addressing) |
+| 2     | Data Link    | Network Access | ARP, CDP, STP, VLAN, Switch, Bridge                        | Frame                          | MAC and LLC (Physical addressing)       |
+| 1     | Physical     | Network Access | Ethernet, WI-FI, CAT, DSL, RJ45, 100Base-TX, Hub, Repeater | Bits                           | Media, signal and binary transmission   |
 
 ## IP Addressing and Subnetting
 A router assigns IP addresses to devices on a home network using a "pool" of addresses, ensuring no duplicates. This process, called dynamic IP assignment, uses the DHCP protocol.
@@ -236,13 +236,13 @@ A router assigns IP addresses to devices on a home network using a "pool" of add
 **Structure**: 32-bit address divided into 4 octets (e.g., 192.168.1.1)
 
 **Address Classes**:
-| Class | Range                       | Default Subnet Mask | Total Networks   | Hosts per Network | Use Case              |
-|-------|-----------------------------|---------------------|------------------|-------------------|-----------------------|
-| A     | 1.0.0.0 – 126.255.255.255   | 255.0.0.0 (/8)      | 128 (126 usable) | 16,777,214        | Very large networks   |
-| B     | 128.0.0.0 – 191.255.255.255 | 255.255.0.0 (/16)   | 16,384           | 65,534            | Medium networks       |
-| C     | 192.0.0.0 – 223.255.255.255 | 255.255.255.0 (/24) | 2,097,152        | 254               | Small networks        |
-| D     | 224.0.0.0 – 239.255.255.255 | N/A                 | N/A              | N/A               | Multicast             |
-| E     | 240.0.0.0 – 255.255.255.255 | N/A                 | N/A              | N/A               | Experimental / R&D    |
+| Class | Range                       | Default Subnet Mask | Total Networks   | Hosts per Network | Use Case            |
+| ----- | --------------------------- | ------------------- | ---------------- | ----------------- | ------------------- |
+| A     | 1.0.0.0 – 126.255.255.255   | 255.0.0.0 (/8)      | 128 (126 usable) | 16,777,214        | Very large networks |
+| B     | 128.0.0.0 – 191.255.255.255 | 255.255.0.0 (/16)   | 16,384           | 65,534            | Medium networks     |
+| C     | 192.0.0.0 – 223.255.255.255 | 255.255.255.0 (/24) | 2,097,152        | 254               | Small networks      |
+| D     | 224.0.0.0 – 239.255.255.255 | N/A                 | N/A              | N/A               | Multicast           |
+| E     | 240.0.0.0 – 255.255.255.255 | N/A                 | N/A              | N/A               | Experimental / R&D  |
 
 **Private IP Ranges** (RFC 1918):
 - **Class A**: 10.0.0.0/8 (10.0.0.0 - 10.255.255.255)
@@ -286,18 +286,18 @@ nslookup example.com
 
 ## Network Hardware
 
-| Device | OSI Layer | Function | Use Cases | Security Considerations |
-|--------|-----------|----------|-----------|------------------------|
-| **Hub** | Physical (1) | Repeats signals to all ports | Legacy networks, small setups | No security - broadcasts to all ports |
-| **Switch** | Data Link (2) | Forwards frames based on MAC addresses | LAN segmentation, VLAN creation | MAC flooding attacks, VLAN hopping |
-| **Router** | Network (3) | Routes packets between different networks | Internet connectivity, WAN links | Default route vulnerabilities, routing attacks |
-| **Firewall** | Network (3-7) | Filters traffic based on rules | Perimeter security, access control | Rule misconfiguration, bypass techniques |
-| **Load Balancer** | Transport (4-7) | Distributes traffic across servers | High availability, performance | SSL termination risks, session persistence |
-| **Proxy** | Application (7) | Intermediary for client requests | Content filtering, caching | Man-in-the-middle risks, SSL inspection |
-| **WAF** | Application (7) | Filters web application traffic | Web app protection, DDoS mitigation | False positives, rule evasion |
-| **IDS/IPS** | Network (3-7) | Monitors/blocks malicious traffic | Threat detection, incident response | Signature evasion, performance impact |
-| **Access Point** | Physical/Data (1-2) | Wireless network connectivity | WiFi access, mobility | WPA/WEP vulnerabilities, rogue APs |
-| **Bridge** | Data Link (2) | Connects network segments | Network extension, collision domains | Bridging loops, MAC table exhaustion |
+| Device            | OSI Layer           | Function                                  | Use Cases                            | Security Considerations                        |
+| ----------------- | ------------------- | ----------------------------------------- | ------------------------------------ | ---------------------------------------------- |
+| **Hub**           | Physical (1)        | Repeats signals to all ports              | Legacy networks, small setups        | No security - broadcasts to all ports          |
+| **Switch**        | Data Link (2)       | Forwards frames based on MAC addresses    | LAN segmentation, VLAN creation      | MAC flooding attacks, VLAN hopping             |
+| **Router**        | Network (3)         | Routes packets between different networks | Internet connectivity, WAN links     | Default route vulnerabilities, routing attacks |
+| **Firewall**      | Network (3-7)       | Filters traffic based on rules            | Perimeter security, access control   | Rule misconfiguration, bypass techniques       |
+| **Load Balancer** | Transport (4-7)     | Distributes traffic across servers        | High availability, performance       | SSL termination risks, session persistence     |
+| **Proxy**         | Application (7)     | Intermediary for client requests          | Content filtering, caching           | Man-in-the-middle risks, SSL inspection        |
+| **WAF**           | Application (7)     | Filters web application traffic           | Web app protection, DDoS mitigation  | False positives, rule evasion                  |
+| **IDS/IPS**       | Network (3-7)       | Monitors/blocks malicious traffic         | Threat detection, incident response  | Signature evasion, performance impact          |
+| **Access Point**  | Physical/Data (1-2) | Wireless network connectivity             | WiFi access, mobility                | WPA/WEP vulnerabilities, rogue APs             |
+| **Bridge**        | Data Link (2)       | Connects network segments                 | Network extension, collision domains | Bridging loops, MAC table exhaustion           |
 
 **Network Device Security Best Practices**:
 - Regular firmware updates and patch management
@@ -433,14 +433,14 @@ suricata -c /etc/suricata/suricata.yaml -i eth0 --runmode autofp
 ```
 
 ### IDS vs IPS Comparison
-| Feature | IDS | IPS |
-|---------|-----|-----|
-| **Deployment** | Out-of-band (passive) | Inline (active) |
-| **Response** | Alerts only | Blocks + alerts |
-| **Performance Impact** | Minimal | Can introduce latency |
-| **Detection** | After-the-fact | Real-time prevention |
-| **False Positives** | Less critical | Can block legitimate traffic |
-| **Network Impact** | None if fails | Single point of failure |
+| Feature                | IDS                   | IPS                          |
+| ---------------------- | --------------------- | ---------------------------- |
+| **Deployment**         | Out-of-band (passive) | Inline (active)              |
+| **Response**           | Alerts only           | Blocks + alerts              |
+| **Performance Impact** | Minimal               | Can introduce latency        |
+| **Detection**          | After-the-fact        | Real-time prevention         |
+| **False Positives**    | Less critical         | Can block legitimate traffic |
+| **Network Impact**     | None if fails         | Single point of failure      |
 
 ### SIEM Integration
 ```bash
@@ -1392,52 +1392,52 @@ is_valid = verify_hmac(key, message, hmac_value)
 ## Cryptographic Algorithms Comprehensive Comparison
 
 ### Symmetric Encryption Algorithms
-| Algorithm | Type | Key Size (bits) | Block Size (bits) | Security Level | Speed | Use Cases | Status |
-|-----------|------|-----------------|-------------------|----------------|-------|-----------|---------|
-| **AES** | Block Cipher | 128, 192, 256 | 128 | High | Fast | General encryption, TLS, VPNs | Current Standard |
-| **ChaCha20** | Stream Cipher | 256 | N/A (stream) | High | Very Fast | Mobile, IoT, TLS | Modern Alternative |
-| **DES** | Block Cipher | 56 | 64 | Broken | Fast | Legacy systems | Deprecated |
-| **3DES** | Block Cipher | 112, 168 | 64 | Weak | Slow | Legacy systems | Being phased out |
-| **Blowfish** | Block Cipher | 32-448 | 64 | Moderate | Fast | Password hashing | Legacy |
-| **Twofish** | Block Cipher | 128, 192, 256 | 128 | High | Fast | General encryption | Alternative to AES |
+| Algorithm    | Type          | Key Size (bits) | Block Size (bits) | Security Level | Speed     | Use Cases                     | Status             |
+| ------------ | ------------- | --------------- | ----------------- | -------------- | --------- | ----------------------------- | ------------------ |
+| **AES**      | Block Cipher  | 128, 192, 256   | 128               | High           | Fast      | General encryption, TLS, VPNs | Current Standard   |
+| **ChaCha20** | Stream Cipher | 256             | N/A (stream)      | High           | Very Fast | Mobile, IoT, TLS              | Modern Alternative |
+| **DES**      | Block Cipher  | 56              | 64                | Broken         | Fast      | Legacy systems                | Deprecated         |
+| **3DES**     | Block Cipher  | 112, 168        | 64                | Weak           | Slow      | Legacy systems                | Being phased out   |
+| **Blowfish** | Block Cipher  | 32-448          | 64                | Moderate       | Fast      | Password hashing              | Legacy             |
+| **Twofish**  | Block Cipher  | 128, 192, 256   | 128               | High           | Fast      | General encryption            | Alternative to AES |
 
 ### Asymmetric Encryption Algorithms
-| Algorithm | Type | Key Size (bits) | Mathematical Basis | Security Level | Speed | Primary Use | Status |
-|-----------|------|-----------------|-------------------|----------------|-------|-------------|---------|
-| **RSA** | Public Key | 1024-4096 | Integer factorization | High (2048+) | Slow | Encryption, signatures | Current Standard |
-| **ECC** | Public Key | 160-521 | Elliptic curve discrete log | High | Fast | Mobile, IoT, modern systems | Preferred for new systems |
-| **ElGamal** | Public Key | 1024-3072 | Discrete logarithm | High | Slow | Encryption (probabilistic) | Specialized use |
-| **DSA** | Signature Only | 1024-3072 | Discrete logarithm | High | Medium | Digital signatures | Legacy |
-| **ECDSA** | Signature Only | 160-521 | Elliptic curve discrete log | High | Fast | Digital signatures | Current Standard |
-| **EdDSA** | Signature Only | 255, 448 | Elliptic curves (Edwards) | High | Very Fast | Modern signatures | Cutting-edge |
+| Algorithm   | Type           | Key Size (bits) | Mathematical Basis          | Security Level | Speed     | Primary Use                 | Status                    |
+| ----------- | -------------- | --------------- | --------------------------- | -------------- | --------- | --------------------------- | ------------------------- |
+| **RSA**     | Public Key     | 1024-4096       | Integer factorization       | High (2048+)   | Slow      | Encryption, signatures      | Current Standard          |
+| **ECC**     | Public Key     | 160-521         | Elliptic curve discrete log | High           | Fast      | Mobile, IoT, modern systems | Preferred for new systems |
+| **ElGamal** | Public Key     | 1024-3072       | Discrete logarithm          | High           | Slow      | Encryption (probabilistic)  | Specialized use           |
+| **DSA**     | Signature Only | 1024-3072       | Discrete logarithm          | High           | Medium    | Digital signatures          | Legacy                    |
+| **ECDSA**   | Signature Only | 160-521         | Elliptic curve discrete log | High           | Fast      | Digital signatures          | Current Standard          |
+| **EdDSA**   | Signature Only | 255, 448        | Elliptic curves (Edwards)   | High           | Very Fast | Modern signatures           | Cutting-edge              |
 
 ### Key Exchange Algorithms
-| Algorithm | Type | Key Size (bits) | Perfect Forward Secrecy | Quantum Resistance | Use Cases | Status |
-|-----------|------|-----------------|------------------------|-------------------|-----------|---------|
-| **ECDH** | Key Agreement | 160-521 | Yes (ephemeral) | No | TLS, VPNs, secure messaging | Current Standard |
-| **DH** | Key Agreement | 1024-3072 | Yes (ephemeral) | No | Legacy systems, IPSec | Legacy |
-| **RSA Key Exchange** | Key Transport | 1024-4096 | No | No | Legacy TLS | Deprecated |
-| **X25519** | Key Agreement | 255 | Yes | No | Modern protocols | Preferred |
-| **CRYSTALS-KYBER** | Post-Quantum | Variable | Yes | Yes | Future protocols | NIST Standard |
+| Algorithm            | Type          | Key Size (bits) | Perfect Forward Secrecy | Quantum Resistance | Use Cases                   | Status           |
+| -------------------- | ------------- | --------------- | ----------------------- | ------------------ | --------------------------- | ---------------- |
+| **ECDH**             | Key Agreement | 160-521         | Yes (ephemeral)         | No                 | TLS, VPNs, secure messaging | Current Standard |
+| **DH**               | Key Agreement | 1024-3072       | Yes (ephemeral)         | No                 | Legacy systems, IPSec       | Legacy           |
+| **RSA Key Exchange** | Key Transport | 1024-4096       | No                      | No                 | Legacy TLS                  | Deprecated       |
+| **X25519**           | Key Agreement | 255             | Yes                     | No                 | Modern protocols            | Preferred        |
+| **CRYSTALS-KYBER**   | Post-Quantum  | Variable        | Yes                     | Yes                | Future protocols            | NIST Standard    |
 
 ### Hash Functions
-| Algorithm | Output Size (bits) | Collision Resistance | Speed | Security Level | Use Cases | Status |
-|-----------|-------------------|---------------------|-------|----------------|-----------|---------|
-| **SHA-256** | 256 | High | Fast | High | Digital signatures, blockchain | Current Standard |
-| **SHA-3** | 224-512 | High | Medium | High | Alternative to SHA-2 | NIST Standard |
-| **SHA-1** | 160 | Broken | Fast | Broken | Legacy systems | Deprecated |
-| **MD5** | 128 | Broken | Very Fast | Broken | Checksums only | Deprecated |
-| **BLAKE2** | 256, 512 | High | Very Fast | High | Performance-critical apps | Modern Alternative |
-| **BLAKE3** | 256 | High | Fastest | High | Next-gen applications | Cutting-edge |
+| Algorithm   | Output Size (bits) | Collision Resistance | Speed     | Security Level | Use Cases                      | Status             |
+| ----------- | ------------------ | -------------------- | --------- | -------------- | ------------------------------ | ------------------ |
+| **SHA-256** | 256                | High                 | Fast      | High           | Digital signatures, blockchain | Current Standard   |
+| **SHA-3**   | 224-512            | High                 | Medium    | High           | Alternative to SHA-2           | NIST Standard      |
+| **SHA-1**   | 160                | Broken               | Fast      | Broken         | Legacy systems                 | Deprecated         |
+| **MD5**     | 128                | Broken               | Very Fast | Broken         | Checksums only                 | Deprecated         |
+| **BLAKE2**  | 256, 512           | High                 | Very Fast | High           | Performance-critical apps      | Modern Alternative |
+| **BLAKE3**  | 256                | High                 | Fastest   | High           | Next-gen applications          | Cutting-edge       |
 
 ### Password Hashing Algorithms
-| Algorithm | Type | Configurable Cost | Memory Hard | Salt | Time to Crack | Use Cases | Status |
-|-----------|------|------------------|-------------|------|---------------|-----------|---------|
-| **Argon2** | Memory-hard | Yes | Yes | Yes | Very High | Modern applications | Current Best Practice |
-| **scrypt** | Memory-hard | Yes | Yes | Yes | High | Cryptocurrency, general use | Good |
-| **bcrypt** | CPU-hard | Yes | No | Yes | High | Web applications | Good |
-| **PBKDF2** | CPU-hard | Yes | No | Yes | Medium | Legacy systems | Acceptable |
-| **SHA-256 (salted)** | Fast hash | No | No | Manual | Low | Not recommended | Avoid |
+| Algorithm            | Type        | Configurable Cost | Memory Hard | Salt   | Time to Crack | Use Cases                   | Status                |
+| -------------------- | ----------- | ----------------- | ----------- | ------ | ------------- | --------------------------- | --------------------- |
+| **Argon2**           | Memory-hard | Yes               | Yes         | Yes    | Very High     | Modern applications         | Current Best Practice |
+| **scrypt**           | Memory-hard | Yes               | Yes         | Yes    | High          | Cryptocurrency, general use | Good                  |
+| **bcrypt**           | CPU-hard    | Yes               | No          | Yes    | High          | Web applications            | Good                  |
+| **PBKDF2**           | CPU-hard    | Yes               | No          | Yes    | Medium        | Legacy systems              | Acceptable            |
+| **SHA-256 (salted)** | Fast hash   | No                | No          | Manual | Low           | Not recommended             | Avoid                 |
 
 ### Algorithm Selection Guidelines
 
@@ -1450,13 +1450,13 @@ is_valid = verify_hmac(key, message, hmac_value)
 - **Password Hashing**: Argon2id
 
 #### Security Levels (Equivalent Strength):
-| Symmetric | RSA | ECC | Hash |
-|-----------|-----|-----|------|
-| 80 bits | 1024 bits | 160 bits | 160 bits |
-| 112 bits | 2048 bits | 224 bits | 224 bits |
-| 128 bits | 3072 bits | 256 bits | 256 bits |
-| 192 bits | 7680 bits | 384 bits | 384 bits |
-| 256 bits | 15360 bits | 521 bits | 512 bits |
+| Symmetric | RSA        | ECC      | Hash     |
+| --------- | ---------- | -------- | -------- |
+| 80 bits   | 1024 bits  | 160 bits | 160 bits |
+| 112 bits  | 2048 bits  | 224 bits | 224 bits |
+| 128 bits  | 3072 bits  | 256 bits | 256 bits |
+| 192 bits  | 7680 bits  | 384 bits | 384 bits |
+| 256 bits  | 15360 bits | 521 bits | 512 bits |
 
 #### Performance Characteristics:
 - **Fastest**: ChaCha20, BLAKE3, Ed25519
@@ -1558,13 +1558,13 @@ Standardized method for rating vulnerability severity (0.0-10.0 scale) to help p
 - **Environmental Metrics:** Specific to an organization’s context (asset value, mitigations).
 
 #### CVSS Score Ranges
-| Score Range | Severity Level | Risk Level |
-|-------------|---------------|------------|
-| 0.0 | None | Informational |
-| 0.1-3.9 | Low | Low Priority |
-| 4.0-6.9 | Medium | Medium Priority |
-| 7.0-8.9 | High | High Priority |
-| 9.0-10.0 | Critical | Emergency |
+| Score Range | Severity Level | Risk Level      |
+| ----------- | -------------- | --------------- |
+| 0.0         | None           | Informational   |
+| 0.1-3.9     | Low            | Low Priority    |
+| 4.0-6.9     | Medium         | Medium Priority |
+| 7.0-8.9     | High           | High Priority   |
+| 9.0-10.0    | Critical       | Emergency       |
 
 #### Example CVSS Calculation
 **CVE-2021-44228 (Log4Shell)**:
@@ -1774,14 +1774,16 @@ ps aux | grep root               # Running processes as root
 ### Cyber Kill Chain
 **Lockheed Martin Model**: Reconnaissance → Weaponization → Delivery → Exploitation → Installation → Command & Control → Actions on Objectives
 
-**Phases**:
-1. **Reconnaissance**: Target identification and research
-2. **Weaponization**: Creating attack tools/payloads
-3. **Delivery**: Transmitting payload to target
-4. **Exploitation**: Executing code on target system
-5. **Installation**: Installing persistent access
-6. **Command & Control**: Establishing communication channel
-7. **Actions on Objectives**: Achieving attacker goals
+| Phases                | Description                                      | Mitigation Techniques                                                    | Action Type        |
+| --------------------- | ------------------------------------------------ | ------------------------------------------------------------------------ | ------------------ |
+| Reconnaissance        | Target identification and research               | Network segmentation and honeypots                                       | Prevention         |
+| Weaponization         | Creating attack tools/payloads                   | Cannot be directly prevented by organizations                            | Prevention         |
+| Delivery              | Transmitting payload to target                   | Email security, web filtering, firewalls                                 | Prevention         |
+| Exploitation          | Executing code on target system                  | Keeping software patched and up to date                                  | Prevention         |
+| Installation          | Installing persistent access (backdoor, rootkit) | Endpoint Detection and Response (EDR) systems                            | Detect and Respond |
+| Command and Control   | Establishing communication channel               | Network monitoring, anomaly detection, intrusion detection systems (IDS) | Detect and Respond |
+| Actions on Objectives | Achieving attacker goals                         | Incident response teams and data loss prevention tools                   | Detect and Respond |
+
   
 # DFIR (Digital Forensics and Incident Response)
 **Purpose**: Investigate and analyze incidents.
@@ -2383,15 +2385,15 @@ netstat -su | grep -E "(packets received|packets sent)"
 ```
 
 **Common Reflection Services and Amplification Factors**:
-| Service | Port | Protocol | Amplification Factor | Request Size | Response Size |
-|---------|------|----------|---------------------|--------------|---------------|
-| DNS | 53 | UDP | 28-54x | 60 bytes | 1700-3200 bytes |
-| NTP | 123 | UDP | 200x | 8 bytes | 1600 bytes |
-| SNMP | 161 | UDP | 6.3x | 87 bytes | 550 bytes |
-| NetBIOS | 137 | UDP | 3.8x | 50 bytes | 190 bytes |
-| SSDP | 1900 | UDP | 30.8x | 65 bytes | 2000 bytes |
-| Memcached | 11211 | UDP | 10,000-51,000x | 15 bytes | 750KB+ |
-| CharGen | 19 | UDP | 358x | 1 byte | 358 bytes |
+| Service   | Port  | Protocol | Amplification Factor | Request Size | Response Size   |
+| --------- | ----- | -------- | -------------------- | ------------ | --------------- |
+| DNS       | 53    | UDP      | 28-54x               | 60 bytes     | 1700-3200 bytes |
+| NTP       | 123   | UDP      | 200x                 | 8 bytes      | 1600 bytes      |
+| SNMP      | 161   | UDP      | 6.3x                 | 87 bytes     | 550 bytes       |
+| NetBIOS   | 137   | UDP      | 3.8x                 | 50 bytes     | 190 bytes       |
+| SSDP      | 1900  | UDP      | 30.8x                | 65 bytes     | 2000 bytes      |
+| Memcached | 11211 | UDP      | 10,000-51,000x       | 15 bytes     | 750KB+          |
+| CharGen   | 19    | UDP      | 358x                 | 1 byte       | 358 bytes       |
 
 
 ### Amplification Attacks
@@ -3028,10 +3030,10 @@ Higher FAL = Stronger Federation Security
 
 ```txt
 Access Control Matrix:
-| User   | Role     | Resource          | Permission  |
-|--------|----------|-------------------|-------------|
-| Alice  | Manager  | Financial Report  | Read, Write |
-| Bob    | Employee | Financial Report  | Read        |
+| User  | Role     | Resource         | Permission  |
+| ----- | -------- | ---------------- | ----------- |
+| Alice | Manager  | Financial Report | Read, Write |
+| Bob   | Employee | Financial Report | Read        |
 ```
 
 **ABAC (Attribute-Based Access Control)**:
@@ -3042,12 +3044,12 @@ Access Control Matrix:
 
 ```txt
 Attribute Rules:
-| Attribute        | Value               | Condition                |
-|------------------|---------------------|--------------------------|
-| User Role        | Employee            | Must be 'Employee'       |
-| Time             | Business Hours      | Must be within 9am-5pm   |
-| Location         | Office              | Must be accessing from office |
-| Resource Type    | Financial Document  | Must be 'Financial Document' |
+| Attribute     | Value              | Condition                     |
+| ------------- | ------------------ | ----------------------------- |
+| User Role     | Employee           | Must be 'Employee'            |
+| Time          | Business Hours     | Must be within 9am-5pm        |
+| Location      | Office             | Must be accessing from office |
+| Resource Type | Financial Document | Must be 'Financial Document'  |
 ```
 
 **PBAC (Policy-Based Access Control)**:
@@ -3553,14 +3555,14 @@ def logout(token):
 ## JWT vs Other Token Formats
 
 ### JWT vs Opaque Tokens
-| Feature | JWT | Opaque Tokens |
-|---------|-----|---------------|
-| **Structure** | Self-contained JSON | Random string |
-| **Validation** | Local signature check | Database lookup |
-| **Revocation** | Complex (blacklist needed) | Simple (delete from DB) |
-| **Size** | Larger (contains data) | Smaller |
-| **Performance** | Faster validation | Slower (DB query) |
-| **Security** | Information disclosure risk | No data exposure |
+| Feature         | JWT                         | Opaque Tokens           |
+| --------------- | --------------------------- | ----------------------- |
+| **Structure**   | Self-contained JSON         | Random string           |
+| **Validation**  | Local signature check       | Database lookup         |
+| **Revocation**  | Complex (blacklist needed)  | Simple (delete from DB) |
+| **Size**        | Larger (contains data)      | Smaller                 |
+| **Performance** | Faster validation           | Slower (DB query)       |
+| **Security**    | Information disclosure risk | No data exposure        |
 
 ### JWT-VC (Verifiable Credentials) vs JSON-LD VC
 
@@ -3640,16 +3642,16 @@ def logout(token):
 - Requires understanding of RDF and linked data concepts
 
 ### Comparison Table: JWT-VC vs JSON-LD VC
-| Feature | JWT-VC | JSON-LD VC |
-|---------|--------|------------|
-| **Format** | Compact JWT | Expanded JSON-LD |
-| **Size** | Smaller | Larger |
-| **Semantics** | Limited | Rich (linked data) |
-| **Signatures** | JWT algorithms (RS256, ES256) | Multiple (Ed25519, BBS+, etc.) |
-| **Privacy** | Limited | Advanced (ZKP, selective disclosure) |
-| **Complexity** | Lower | Higher |
-| **Interoperability** | JWT ecosystem | W3C standards |
-| **Revocation** | JWT-based mechanisms | Status list, bitstring status |
+| Feature              | JWT-VC                        | JSON-LD VC                           |
+| -------------------- | ----------------------------- | ------------------------------------ |
+| **Format**           | Compact JWT                   | Expanded JSON-LD                     |
+| **Size**             | Smaller                       | Larger                               |
+| **Semantics**        | Limited                       | Rich (linked data)                   |
+| **Signatures**       | JWT algorithms (RS256, ES256) | Multiple (Ed25519, BBS+, etc.)       |
+| **Privacy**          | Limited                       | Advanced (ZKP, selective disclosure) |
+| **Complexity**       | Lower                         | Higher                               |
+| **Interoperability** | JWT ecosystem                 | W3C standards                        |
+| **Revocation**       | JWT-based mechanisms          | Status list, bitstring status        |
 
 ### Security Best Practices for JWT
 ```python
