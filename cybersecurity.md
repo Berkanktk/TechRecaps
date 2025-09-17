@@ -2,203 +2,295 @@
 
 ## Table of Contents
 
-### 1. [Security Fundamentals](#security-fundamentals)
-- [CIA Triad](#cia-triad)
-- [Extended Security Properties](#extended-security-properties)
-- [Threat Modeling](#threat-modeling)
-  - [Risk Management](#risk-management)
-  - [Trust Models in Organizations](#trust-models-in-organizations)
-- [STRIDE Threat Model](#stride-threat-model)
-
-### 2. [Network Security](#network-security)
-- [TCP/IP Stack](#tcpip-stack)
-- [IP Addressing and Subnetting](#ip-addressing-and-subnetting)
-  - [IPv4 Addressing](#ipv4-addressing)
-  - [Subnetting Examples](#subnetting-examples)
-- [Network Protocols](#network-protocols)
-- [Network Hardware](#network-hardware)
-- [Firewalls & IDS/IPS](#firewalls--idsips)
-  - [Firewall Types](#firewall-types)
-  - [Intrusion Detection Systems (IDS)](#intrusion-detection-systems-ids)
-  - [Intrusion Prevention Systems (IPS)](#intrusion-prevention-systems-ips)
-  - [IDS vs IPS Comparison](#ids-vs-ips-comparison)
-  - [SIEM Integration](#siem-integration)
-- [Network Segmentation](#network-segmentation)
-- [VPN Technologies](#vpn-technologies)
-
-### 3. [Web Application Security](#web-application-security)
-- [OWASP Top 10 (2021)](#owasp-top-10-2021)
-- [SQL Injection](#sql-injection)
-- [Cross-Site Scripting (XSS)](#cross-site-scripting-xss)
-- [Cross-Site Request Forgery (CSRF)](#cross-site-request-forgery-csrf)
-- [Content Security Policy (CSP)](#content-security-policy-csp)
-- [Strict-Transport-Security (HSTS)](#strict-transport-security-hsts)
-- [X-Content-Type-Options](#x-content-type-options)
-- [Referrer-Policy](#referrer-policy)
-
-### 4. [Cryptography](#cryptography)
-- [Symmetric Encryption](#symmetric-encryption)
-  - [AES (Advanced Encryption Standard)](#aes-advanced-encryption-standard)
-  - [DES (Data Encryption Standard) - Legacy](#des-data-encryption-standard---legacy)
-  - [3DES (Triple DES)](#3des-triple-des)
-  - [ChaCha20](#chacha20)
-- [Asymmetric Encryption](#asymmetric-encryption)
-  - [RSA (Rivest-Shamir-Adleman)](#rsa-rivest-shamir-adleman)
-  - [ECC (Elliptic Curve Cryptography)](#ecc-elliptic-curve-cryptography)
-  - [DH (Diffie-Hellman Key Exchange)](#dh-diffie-hellman-key-exchange)
-  - [ECDH (Elliptic Curve Diffie-Hellman)](#ecdh-elliptic-curve-diffie-hellman)
-  - [ElGamal](#elgamal)
-  - [DSA (Digital Signature Algorithm)](#dsa-digital-signature-algorithm)
-- [Digital Signatures](#digital-signatures)
-- [Digital Certificates](#digital-certificates)
-  - [X.509 Certificate Standard](#x509-certificate-standard)
-- [Encoding & Data Representation](#encoding--data-representation)
-- [Hashing](#hashing)
-  - [Hash Function Security Properties](#hash-function-security-properties)
-  - [MAC (Message Authentication Code) and HMAC](#mac-message-authentication-code-and-hmac)
-- [Cryptographic Algorithms Comprehensive Comparison](#cryptographic-algorithms-comprehensive-comparison)
-
-### 5. [Penetration Testing](#penetration-testing)
-- [Reconnaissance](#reconnaissance)
-- [Vulnerability Scanning](#vulnerability-scanning)
-- [CVE and CVSS](#cve-and-cvss)
-  - [CVE (Common Vulnerabilities and Exposures)](#cve-common-vulnerabilities-and-exposures)
-  - [CVSS (Common Vulnerability Scoring System)](#cvss-common-vulnerability-scoring-system)
-- [Exploitation Frameworks](#exploitation-frameworks)
-  - [Metasploit](#metasploit)
-  - [Burp Suite](#burp-suite)
-  - [OWASP ZAP](#owasp-zap)
-- [Post-Exploitation Techniques](#post-exploitation-techniques)
-  - [Lateral Movement](#lateral-movement)
-  - [Privilege Escalation](#privilege-escalation)
-- [Attack Lifecycle](#attack-lifecycle)
-  - [MITRE ATT&CK Framework](#mitre-attck-framework)
-  - [MITRE Caldera Framework](#mitre-caldera-framework)
-  - [MITRE ATLAS (Adversarial Threat Landscape for AI Systems)](#mitre-atlas-adversarial-threat-landscape-for-ai-systems)
-  - [Cyber Kill Chain](#cyber-kill-chain)
-
-### 6. [DFIR (Digital Forensics and Incident Response)](#dfir-digital-forensics-and-incident-response)
-- [Phases of Incident Response (NIST Framework)](#phases-of-incident-response-nist-framework)
-- [Digital Forensics](#digital-forensics)
-  - [Forensic Artifacts](#forensic-artifacts)
-  - [Forensic Tooling](#forensic-tooling)
-- [Log Analysis](#log-analysis)
-- [SIEM Tools](#siem-tools)
-  - [Splunk](#splunk)
-  - [ELK Stack (Elasticsearch, Logstash, Kibana)](#elk-stack-elasticsearch-logstash-kibana)
-
-### 7. [Types of Cyber Attacks](#types-of-cyber-attacks)
-- [Malware Types](#malware-types)
-- [Attack Vectors](#attack-vectors)
-  - [Phishing](#phishing)
-  - [Social Engineering](#social-engineering)
-  - [Man-in-the-Middle (MITM) Attacks](#man-in-the-middle-mitm-attacks)
-  - [Advanced Persistent Threats (APT)](#advanced-persistent-threats-apt)
-- [DDoS (Distributed Denial of Service) Attacks](#ddos-distributed-denial-of-service-attacks)
-  - [Volume-Based Attacks (Volumetric)](#volume-based-attacks-volumetric)
-  - [Protocol Attacks](#protocol-attacks)
-  - [Application Layer Attacks (Layer 7)](#application-layer-attacks-layer-7)
-  - [Reflection Attacks](#reflection-attacks)
-  - [Amplification Attacks](#amplification-attacks)
-- [DDoS Mitigation Strategies](#ddos-mitigation-strategies)
-- [Botnets](#botnets)
-  - [Architectures](#architectures)
-  - [Command & Control (C2) Channels](#command--control-c2-channels)
-  - [Lifecycle Phases](#lifecycle-phases)
-  - [C2 Resilience Techniques](#c2-resilience-techniques)
-  - [Detection Techniques](#detection-techniques)
-  - [Notable Botnets](#notable-botnets)
-
-### 8. [Malware Analysis](#malware-analysis)
-
-### 9. [Cloud Security](#cloud-security)
-- [AWS Security](#aws-security)
-- [Container Security](#container-security)
-
-### 10. [Identity & Access Management](#identity--access-management)
-- [General Concepts](#general-concepts)
-  - [Authentication Factors](#authentication-factors)
-  - [Types of Authenticators](#types-of-authenticators)
-  - [FIDO Alliance & Protocols](#fido-alliance--protocols)
-  - [NIST Digital Identity Guidelines (SP 800-63)](#nist-digital-identity-guidelines-sp-800-63)
-  - [RBAC vs ABAC VS PBAC](#rbac-vs-abac-vs-pbac)
-  - [XACML 3.0 (eXtensible Access Control Markup Language)](#xacml-30-extensible-access-control-markup-language)
-  - [eIDAS Levels of Assurance (LoA)](#eidas-levels-of-assurance-loa)
-- [Active Directory](#active-directory)
-  - [Logical Structure](#logical-structure)
-  - [AD Components](#ad-components)
-  - [Objects in AD](#objects-in-ad)
-  - [Authentication & Access](#authentication--access)
-- [LDAP](#ldap)
-- [Single Sign-On (SSO)](#single-sign-on-sso)
-  - [Federated Identity Concepts](#federated-identity-concepts)
-  - [SAML (Security Assertion Markup Language)](#saml-security-assertion-markup-language)
-  - [OAuth 2.0](#oauth-20)
-- [OpenID Connect](#openid-connect)
-
-### 11. [JSON Web Tokens (JWT) Security](#json-web-tokens-jwt-security)
-- [JWT Structure and Components](#jwt-structure-and-components)
-  - [JWT Creation and Verification](#jwt-creation-and-verification)
-- [JWT Security Vulnerabilities and Attacks](#jwt-security-vulnerabilities-and-attacks)
-  - [Algorithm Confusion Attacks](#1-algorithm-confusion-attacks)
-  - [None Algorithm Attack](#2-none-algorithm-attack)
-  - [Weak Secret/Key Attacks](#3-weak-secretkey-attacks)
-  - [Token Replay Attacks](#4-token-replay-attacks)
-  - [Information Disclosure](#5-information-disclosure)
-- [JWT vs Other Token Formats](#jwt-vs-other-token-formats)
-  - [JWT vs Opaque Tokens](#jwt-vs-opaque-tokens)
-  - [JWT-VC (Verifiable Credentials) vs JSON-LD VC](#jwt-vc-verifiable-credentials-vs-json-ld-vc)
-- [Security Best Practices for JWT](#security-best-practices-for-jwt)
-
-### 12. [Session Management](#session-management)
-- [Stateful Session Management](#stateful-session-management)
-
-### 13. [Mobile Security](#mobile-security)
-- [Android Security](#android-security)
-- [iOS Security](#ios-security)
-
-### 14. [Compliance & Governance](#compliance--governance)
-- [GDPR](#gdpr)
-- [PCI DSS](#pci-dss)
-- [ISO 27001](#iso-27001)
-- [NIST Framework](#nist-framework)
-- [NIS2 Directive](#nis2-directive)
-- [ISO/IEC 27005](#isoiec-27005)
-- [FAIR Model (Factor Analysis of Information Risk)](#fair-model-factor-analysis-of-information-risk)
-
-### 15. [Password Attacks](#password-attacks)
-
-### 16. [Common Interview Questions](#common-interview-questions)
-- [Network Security](#network-security-1)
-- [Web Security](#web-security)
-- [Cryptography](#cryptography-1)
-- [Incident Response](#incident-response-1)
-- [Risk Management](#risk-management-1)
-- [Access Control](#access-control)
-- [Malware Analysis](#malware-analysis-1)
-
-### 17. [Bug Bounty Hunting](#bug-bounty-hunting)
-- [Types of Disclosures](#types-of-disclosures)
-- [Bug Bounty Actors](#bug-bounty-actors)
-- [Bug Bounty Types & Approaches](#bug-bounty-types--approaches)
-- [Vulnerability Reports & Triaging](#vulnerability-reports--triaging)
-- [Threat Actor Naming (Microsoft)](#threat-actor-naming-microsoft)
-
-### 18. [Hardware & Physical Security](#hardware--physical-security)
-- [Hardware Security Modules (HSM)](#hardware-security-modules-hsm)
-- [Trusted Platform Module (TPM)](#trusted-platform-module-tpm)
-- [Physical Security Controls](#physical-security-controls)
-  - [Access Control Systems (ACS)](#access-control-systems-acs)
-  - [Interfaces & Protocols](#interfaces--protocols)
-  - [RFID / NFC Cards](#rfid--nfc-cards)
-  - [Typical Attacks](#typical-attacks)
-  - [Card Security](#card-security)
-  - [Reader Security](#reader-security)
-
-### 19. [Emerging Technologies](#emerging-technologies)
-- [Blockchain](#blockchain)
-  - [Blockchain Security](#blockchain-security)
-- [AI & Machine Learning Security](#ai--machine-learning-security)
+1. [Security Fundamentals](#security-fundamentals)
+   1. [CIA Triad](#cia-triad)
+   2. [Threat Modeling](#threat-modeling)
+      1. [Risk Management](#risk-management)
+   3. [STRIDE Threat Model](#stride-threat-model)
+2. [Network Security](#network-security)
+   1. [TCP/IP Stack](#tcpip-stack)
+   2. [IP Addressing and Subnetting](#ip-addressing-and-subnetting)
+      1. [IPv4 Addressing](#ipv4-addressing)
+      2. [Subnetting Examples](#subnetting-examples)
+   3. [Network Protocols](#network-protocols)
+      1. [HTTP Protocol Details](#http-protocol-details)
+      2. [Spanning Tree Protocol (STP)](#spanning-tree-protocol-stp)
+      3. [Communication & Connectivity Protocols](#communication--connectivity-protocols)
+      4. [Address Resolution Protocol (ARP)](#address-resolution-protocol-arp)
+   4. [Network Hardware](#network-hardware)
+   5. [Firewalls & IDS/IPS](#firewalls--idsips)
+      1. [Firewall Types](#firewall-types)
+      2. [Intrusion Detection Systems (IDS)](#intrusion-detection-systems-ids)
+      3. [Intrusion Prevention Systems (IPS)](#intrusion-prevention-systems-ips)
+      4. [IDS vs IPS Comparison](#ids-vs-ips-comparison)
+      5. [SIEM Integration](#siem-integration)
+   6. [Network Segmentation](#network-segmentation)
+   7. [VPN Technologies](#vpn-technologies)
+      1. [VPN Types](#vpn-types)
+      2. [IPsec VPN Setup](#ipsec-vpn-setup)
+      3. [IPsec Protocols & Modes](#ipsec-protocols--modes)
+1. [Web Application Security](#web-application-security)
+   1. [OWASP Standards](#owasp-standards)
+   2. [1) Broken Access Control](#1-broken-access-control)
+      1. [2) Cryptographic Failures](#2-cryptographic-failures)
+      2. [3) Injection](#3-injection)
+      3. [4) Insecure Design](#4-insecure-design)
+      4. [5) Security Misconfiguration](#5-security-misconfiguration)
+      5. [6) Vulnerable and Outdated Components](#6-vulnerable-and-outdated-components)
+      6. [7) Identification and Authentication Failures](#7-identification-and-authentication-failures)
+      7. [8) Software and Data Integrity Failures](#8-software-and-data-integrity-failures)
+      8. [9) Security Logging and Monitoring Failures](#9-security-logging-and-monitoring-failures)
+      9. [10) Server-Side Request Forgery (SSRF)](#10-server-side-request-forgery-ssrf)
+   3. [SQL Injection](#sql-injection)
+   4. [Buffer Overflow](#buffer-overflow)
+   5. [Cross-Site Scripting (XSS)](#cross-site-scripting-xss)
+   6. [Cross-Site Request Forgery (CSRF)](#cross-site-request-forgery-csrf)
+   7. [Content Security Policy (CSP)](#content-security-policy-csp)
+   8. [Strict-Transport-Security (HSTS)](#strict-transport-security-hsts)
+   9. [X-Content-Type-Options](#x-content-type-options)
+   10. [Referrer-Policy](#referrer-policy)
+   11. [Common Web Attacks](#common-web-attacks)
+      1. [Directory Traversal](#directory-traversal)
+      2. [Authentication Bypass](#authentication-bypass)
+      3. [Insecure Direct Object Reference (IDOR)](#insecure-direct-object-reference-idor)
+      4. [File Inclusion (LFI/RFI)](#file-inclusion-lfirfi)
+      5. [Cross Site Request Forgery (CSRF)](#cross-site-request-forgery-csrf)
+      6. [Cross Site Scripting (XSS)](#cross-site-scripting-xss)
+      7. [Server Side Request Forgery (SSRF)](#server-side-request-forgery-ssrf)
+      8. [Server Side Template Injection (SSTI)](#server-side-template-injection-ssti)
+      9. [Server Side Includes (SSI)](#server-side-includes-ssi)
+2. [Secure Programming](#secure-programming)
+   1. [Secure C Programming](#secure-c-programming)
+   2. [Secure Java Programming](#secure-java-programming)
+3. [Cryptography](#cryptography)
+   1. [Classical Ciphers](#classical-ciphers)
+      1. [Caesar Cipher](#caesar-cipher)
+      2. [ROT13](#rot13)
+      3. [Atbash Cipher](#atbash-cipher)
+      4. [Vigenère Cipher](#vigenère-cipher)
+      5. [Substitution Ciphers](#substitution-ciphers)
+      6. [XOR Cipher](#xor-cipher)
+   2. [Symmetric Encryption](#symmetric-encryption)
+      1. [AES (Advanced Encryption Standard)](#aes-advanced-encryption-standard)
+      2. [DES (Data Encryption Standard) - Legacy](#des-data-encryption-standard---legacy)
+      3. [3DES (Triple DES)](#3des-triple-des)
+      4. [ChaCha20](#chacha20)
+   3. [Asymmetric Encryption](#asymmetric-encryption)
+      1. [RSA (Rivest-Shamir-Adleman)](#rsa-rivest-shamir-adleman)
+      2. [ECC (Elliptic Curve Cryptography)](#ecc-elliptic-curve-cryptography)
+      3. [DH (Diffie-Hellman Key Exchange)](#dh-diffie-hellman-key-exchange)
+      4. [ECDH (Elliptic Curve Diffie-Hellman)](#ecdh-elliptic-curve-diffie-hellman)
+      5. [ElGamal](#elgamal)
+      6. [DSA (Digital Signature Algorithm)](#dsa-digital-signature-algorithm)
+   4. [Digital Signatures](#digital-signatures)
+      1. [Attacks on Digital Signatures](#attacks-on-digital-signatures)
+   5. [Digital Certificates](#digital-certificates)
+      1. [X.509 Certificate Standard](#x509-certificate-standard)
+      2. [TLS Protocol Stack](#tls-protocol-stack)
+      3. [Mutual TLS (mTLS)](#mutual-tls-mtls)
+   6. [Encoding & Data Representation](#encoding--data-representation)
+   7. [Hashing](#hashing)
+      1. [Hash Function Security Properties](#hash-function-security-properties)
+      2. [MAC (Message Authentication Code) and HMAC](#mac-message-authentication-code-and-hmac)
+   8. [Cryptographic Algorithms Comprehensive Comparison](#cryptographic-algorithms-comprehensive-comparison)
+      1. [Symmetric Encryption Algorithms](#symmetric-encryption-algorithms)
+      2. [Asymmetric Encryption Algorithms](#asymmetric-encryption-algorithms)
+      3. [Key Exchange Algorithms](#key-exchange-algorithms)
+      4. [Hash Functions](#hash-functions)
+      5. [Password Hashing Algorithms](#password-hashing-algorithms)
+      6. [Algorithm Selection Guidelines](#algorithm-selection-guidelines)
+4. [Penetration Testing](#penetration-testing)
+   1. [Reconnaissance](#reconnaissance)
+   2. [Vulnerability Scanning](#vulnerability-scanning)
+      1. [Nessus](#nessus)
+      2. [OpenVAS](#openvas)
+      3. [Nikto](#nikto)
+   3. [CVE and CVSS](#cve-and-cvss)
+      1. [CVE (Common Vulnerabilities and Exposures)](#cve-common-vulnerabilities-and-exposures)
+      2. [CVSS (Common Vulnerability Scoring System)](#cvss-common-vulnerability-scoring-system)
+   4. [Exploitation Frameworks](#exploitation-frameworks)
+      1. [Metasploit](#metasploit)
+      2. [Burp Suite](#burp-suite)
+      3. [OWASP ZAP](#owasp-zap)
+   5. [Post-Exploitation Techniques](#post-exploitation-techniques)
+      1. [Lateral Movement](#lateral-movement)
+      2. [Shells](#shells)
+      3. [Privilege Escalation](#privilege-escalation)
+   6. [Attack Lifecycle](#attack-lifecycle)
+      1. [MITRE ATT&CK Framework](#mitre-attck-framework)
+      2. [MITRE Caldera Framework](#mitre-caldera-framework)
+      3. [MITRE ATLAS (Adversarial Threat Landscape for AI Systems)](#mitre-atlas-adversarial-threat-landscape-for-ai-systems)
+      4. [Cyber Kill Chain](#cyber-kill-chain)
+5. [DFIR (Digital Forensics and Incident Response)](#dfir-digital-forensics-and-incident-response)
+   1. [Incident Management](#incident-management)
+   2. [Phases of Incident Response (NIST Framework)](#phases-of-incident-response-nist-framework)
+   3. [Digital Forensics](#digital-forensics)
+      1. [Forensic Artifacts](#forensic-artifacts)
+      2. [Triage Collection](#triage-collection)
+      3. [Memory Forensics](#memory-forensics)
+      4. [Disk Imaging](#disk-imaging)
+      5. [File Analysis](#file-analysis)
+      6. [Network Forensics](#network-forensics)
+      7. [PCAP Analysis](#pcap-analysis)
+      8. [Steganography](#steganography)
+      9. [Sleuth Kit (TSK)](#sleuth-kit-tsk)
+      10. [Autopsy (GUI)](#autopsy-gui)
+   4. [Log Analysis](#log-analysis)
+   5. [SIEM Tools](#siem-tools)
+      1. [Splunk](#splunk)
+      2. [ELK Stack (Elasticsearch, Logstash, Kibana)](#elk-stack-elasticsearch-logstash-kibana)
+      3. [Zeek (Network Security Monitor)](#zeek-network-security-monitor)
+6. [Types of Cyber Attacks](#types-of-cyber-attacks)
+   1. [Malware Types](#malware-types)
+      1. [Virus](#virus)
+      2. [Worm](#worm)
+      3. [Trojan Horse](#trojan-horse)
+      4. [Ransomware](#ransomware)
+      5. [Spyware](#spyware)
+      6. [Adware](#adware)
+      7. [Rootkit](#rootkit)
+      8. [Botnet](#botnet)
+   2. [Attack Vectors](#attack-vectors)
+      1. [Phishing](#phishing)
+      2. [Social Engineering](#social-engineering)
+      3. [Man-in-the-Middle (MITM) Attacks](#man-in-the-middle-mitm-attacks)
+      4. [Advanced Persistent Threats (APT)](#advanced-persistent-threats-apt)
+   3. [DDoS (Distributed Denial of Service) Attacks](#ddos-distributed-denial-of-service-attacks)
+      1. [Volume-Based Attacks (Volumetric)](#volume-based-attacks-volumetric)
+      2. [Protocol Attacks](#protocol-attacks)
+      3. [Application Layer Attacks (Layer 7)](#application-layer-attacks-layer-7)
+      4. [Reflection Attacks](#reflection-attacks)
+      5. [Amplification Attacks](#amplification-attacks)
+   4. [DDoS Mitigation Strategies](#ddos-mitigation-strategies)
+      1. [1. Rate Limiting & Traffic Filtering](#1-rate-limiting--traffic-filtering)
+      2. [2. SYN Flood Protection (SYN Cookies, SYN Proxy)](#2-syn-flood-protection-syn-cookies-syn-proxy)
+      3. [3. Firewalls & IDS/IPS Integration](#3-firewalls--idsips-integration)
+      4. [4. Web Application Firewall (WAF)](#4-web-application-firewall-waf)
+      5. [5. BCP 38 (Ingress Filtering)](#5-bcp-38-ingress-filtering)
+      6. [6. Reflection & Amplification Controls](#6-reflection--amplification-controls)
+      7. [7. Advanced Monitoring and Response](#7-advanced-monitoring-and-response)
+      8. [8. Cloud-Based DDoS Protection](#8-cloud-based-ddos-protection)
+   5. [Botnets](#botnets)
+      1. [Architectures](#architectures)
+      2. [Command & Control (C2) Channels](#command--control-c2-channels)
+      3. [Lifecycle Phases](#lifecycle-phases)
+      4. [C2 Resilience Techniques](#c2-resilience-techniques)
+      5. [Detection Techniques](#detection-techniques)
+      6. [Notable Botnets](#notable-botnets)
+7. [Malware Analysis](#malware-analysis)
+   1. [Static Analysis](#static-analysis)
+   2. [Dynamic Analysis](#dynamic-analysis)
+   3. [Symbolic Execution](#symbolic-execution)
+      1. [Key Challenges & Techniques](#key-challenges--techniques)
+      2. [Use Cases](#use-cases)
+   4. [Binary Exploitation](#binary-exploitation)
+      1. [Registers](#registers)
+      2. [The Stack](#the-stack)
+      3. [Stack Overflow](#stack-overflow)
+      4. [Global Offset Table (GOT)](#global-offset-table-got)
+      5. [Buffers and Buffer Overflows](#buffers-and-buffer-overflows)
+      6. [Return Oriented Programming (ROP)](#return-oriented-programming-rop)
+      7. [Binary Security](#binary-security)
+      8. [The Heap and Exploitation](#the-heap-and-exploitation)
+      9. [Format String Vulnerability](#format-string-vulnerability)
+      10. [Integer Overflow](#integer-overflow)
+   5. [Reverse Engineering](#reverse-engineering)
+      1. [Assembly Language](#assembly-language)
+      2. [Disassemblers & Debuggers](#disassemblers--debuggers)
+      3. [Decompilers](#decompilers)
+8. [Cloud Security](#cloud-security)
+   1. [Cloud Security Alliance (CSA)](#cloud-security-alliance-csa)
+      1. [Common Cloud Vulnerabilities](#common-cloud-vulnerabilities)
+      2. [Cloud Security Principles](#cloud-security-principles)
+   2. [AWS Security](#aws-security)
+   3. [Container Security](#container-security)
+   4. [Cloud Architecture & Deployment Models](#cloud-architecture--deployment-models)
+      1. [Service Models](#service-models)
+      2. [Deployment Models](#deployment-models)
+      3. [Computing Models](#computing-models)
+      4. [Virtualization & Containerization](#virtualization--containerization)
+      5. [Architecture Patterns](#architecture-patterns)
+9. [Identity & Access Management (IAM)](#identity--access-management-iam)
+   1. [General Concepts](#general-concepts)
+      1. [Authentication Factors](#authentication-factors)
+      2. [Types of Authenticators](#types-of-authenticators)
+      3. [FIDO Alliance & Protocols](#fido-alliance--protocols)
+      4. [NIST Digital Identity Guidelines (SP 800-63)](#nist-digital-identity-guidelines-sp-800-63)
+      5. [RBAC vs ABAC VS PBAC](#rbac-vs-abac-vs-pbac)
+      6. [XACML 3.0 (eXtensible Access Control Markup Language)](#xacml-30-extensible-access-control-markup-language)
+      7. [eIDAS Levels of Assurance (LoA)](#eidas-levels-of-assurance-loa)
+   2. [Active Directory](#active-directory)
+      1. [Logical Structure](#logical-structure)
+      2. [AD Components](#ad-components)
+      3. [Objects in AD](#objects-in-ad)
+      4. [Authentication & Access](#authentication--access)
+   3. [LDAP](#ldap)
+   4. [Single Sign-On (SSO)](#single-sign-on-sso)
+      1. [Federated Identity Concepts](#federated-identity-concepts)
+      2. [SAML (Security Assertion Markup Language)](#saml-security-assertion-markup-language)
+      3. [OAuth 2.0](#oauth-20)
+      4. [OpenID Connect](#openid-connect)
+10. [JSON Web Tokens (JWT) Security](#json-web-tokens-jwt-security)
+   1. [JWT Structure and Components](#jwt-structure-and-components)
+      1. [JWT Creation and Verification](#jwt-creation-and-verification)
+   2. [JWT Security Vulnerabilities and Attacks](#jwt-security-vulnerabilities-and-attacks)
+      1. [1. Algorithm Confusion Attacks](#1-algorithm-confusion-attacks)
+      2. [2. None Algorithm Attack](#2-none-algorithm-attack)
+      3. [3. Weak Secret/Key Attacks](#3-weak-secretkey-attacks)
+      4. [4. Token Replay Attacks](#4-token-replay-attacks)
+      5. [5. Information Disclosure](#5-information-disclosure)
+   3. [JWT vs Other Token Formats](#jwt-vs-other-token-formats)
+      1. [JWT vs Opaque Tokens](#jwt-vs-opaque-tokens)
+      2. [JWT-VC (Verifiable Credentials) vs JSON-LD VC](#jwt-vc-verifiable-credentials-vs-json-ld-vc)
+      3. [Comparison Table: JWT-VC vs JSON-LD VC](#comparison-table-jwt-vc-vs-json-ld-vc)
+   4. [Security Best Practices for JWT](#security-best-practices-for-jwt)
+11. [Session Management](#session-management)
+   1. [Stateful Session Management](#stateful-session-management)
+      1. [Problems with Session IDs](#problems-with-session-ids)
+      2. [How JWT Solves These Problems](#how-jwt-solves-these-problems)
+12. [Mobile Security](#mobile-security)
+   1. [Android Security](#android-security)
+   2. [iOS Security](#ios-security)
+13. [Compliance & Governance](#compliance--governance)
+   1. [GDPR](#gdpr)
+   2. [PCI DSS](#pci-dss)
+   3. [ISO 27001](#iso-27001)
+   4. [NIST Framework](#nist-framework)
+   5. [NIS2 Directive](#nis2-directive)
+   6. [ISO/IEC 27005](#isoiec-27005)
+   7. [FAIR Model (Factor Analysis of Information Risk)](#fair-model-factor-analysis-of-information-risk)
+14. [Password Attacks](#password-attacks)
+   1. [Forensics Tools](#forensics-tools)
+15. [Bug Bounty Hunting](#bug-bounty-hunting)
+   1. [Types of Disclosures](#types-of-disclosures)
+   2. [Bug Bounty Actors](#bug-bounty-actors)
+   3. [Bug Bounty Types & Approaches](#bug-bounty-types--approaches)
+   4. [Vulnerability Reports & Triaging](#vulnerability-reports--triaging)
+   5. [Threat Actor Naming (Microsoft)](#threat-actor-naming-microsoft)
+16. [Hardware & Physical Security](#hardware--physical-security)
+   1. [Hardware Security Modules (HSM)](#hardware-security-modules-hsm)
+   2. [Trusted Platform Module (TPM)](#trusted-platform-module-tpm)
+      1. [TPM Keys](#tpm-keys)
+      2. [TPM 1.2 vs 2.0](#tpm-12-vs-20)
+      3. [Attestation Methods](#attestation-methods)
+      4. [Hardware Security Technologies](#hardware-security-technologies)
+   3. [Physical Security Controls](#physical-security-controls)
+      1. [Access Control Systems (ACS)](#access-control-systems-acs)
+      2. [Interfaces & Protocols](#interfaces--protocols)
+      3. [RFID / NFC Cards](#rfid--nfc-cards)
+      4. [Typical Attacks](#typical-attacks)
+      5. [Card Security](#card-security)
+      6. [Reader Security](#reader-security)
+17. [Emerging Technologies](#emerging-technologies)
+   1. [Blockchain](#blockchain)
+      1. [Traditional vs Distributed Ledgers](#traditional-vs-distributed-ledgers)
+      2. [Blockchain Basics](#blockchain-basics)
+      3. [Blockchain Types](#blockchain-types)
+      4. [Consensus Mechanisms](#consensus-mechanisms)
+      5. [Bitcoin Mining & Security](#bitcoin-mining--security)
+      6. [Blockchain Security](#blockchain-security)
+   2. [AI & Machine Learning Security](#ai--machine-learning-security)
+18. [Common Interview Questions](#common-interview-questions)
 
 # Security Fundamentals
 
@@ -4404,7 +4496,7 @@ Authorization: Bearer ya29.a0Af...
   - Sends `code_verifier` during token exchange to prove possession.
 
 
-## OpenID Connect
+### OpenID Connect
 OpenID Connect (OIDC) is an identity layer built on top of OAuth 2.0 that enables authentication and provides user profile information.
 
 **Difference**: Response types include `id_token` for authentication (includes user identity through JWT).
@@ -4987,195 +5079,6 @@ volatility -f memory.dump --profile=Win7SP1x64 connections
 volatility -f memory.dump --profile=Win7SP1x64 malfind
 ```
 
-# Common Interview Questions
-
-## Network Security
-
-### Q: Explain the difference between TCP and UDP protocols.
-**TCP (Transmission Control Protocol)**:
-- Connection-oriented: Establishes connection before data transfer (3-way handshake)
-- Reliable: Guarantees packet delivery and order
-- Flow control: Manages data transmission rate
-- Error checking: Detects and retransmits lost packets
-- Higher overhead: More processing and bandwidth
-- Examples: HTTP, HTTPS, FTP, SSH
-
-**UDP (User Datagram Protocol)**:
-- Connectionless: No connection establishment required
-- Unreliable: No guarantee of delivery or order
-- No flow control: Sends data at maximum rate
-- Minimal error checking: Basic checksum only
-- Lower overhead: Faster and more efficient
-- Examples: DNS, DHCP, VoIP, gaming
-
-### Q: Walk me through the SSL/TLS handshake process.
-1. **Client Hello**: Client sends supported cipher suites, TLS version, random number
-2. **Server Hello**: Server responds with chosen cipher suite, certificate, random number
-3. **Certificate Verification**: Client validates server certificate against trusted CAs
-4. **Key Exchange**: Client generates pre-master secret, encrypts with server's public key
-5. **Session Key Generation**: Both sides derive symmetric session keys from pre-master secret
-6. **Finished Messages**: Both sides send encrypted "finished" messages to confirm handshake
-7. **Secure Communication**: All subsequent data encrypted with session keys
-
-### Q: What are the different types of firewalls?
-- **Packet Filtering**: Examines packet headers (IP, port, protocol) - stateless
-- **Stateful Inspection**: Tracks connection state and context - knows TCP session state
-- **Application Layer/Proxy**: Deep packet inspection, understands application protocols
-- **Next-Generation Firewall (NGFW)**: Combines traditional firewall with IPS, application awareness, threat intelligence
-
-## Web Security
-
-### Q: Explain the OWASP Top 10 and how to prevent each vulnerability.
-1. **Injection**: Use parameterized queries, input validation, ORM frameworks
-2. **Broken Authentication**: Implement MFA, secure session management, password policies
-3. **Sensitive Data Exposure**: Encrypt data at rest/transit, use HTTPS, proper key management
-4. **XML External Entities (XXE)**: Disable external entity processing, use JSON instead of XML
-5. **Broken Access Control**: Implement proper authorization, principle of least privilege
-6. **Security Misconfiguration**: Secure defaults, regular updates, configuration management
-7. **Cross-Site Scripting (XSS)**: Input validation, output encoding, CSP headers
-8. **Insecure Deserialization**: Avoid untrusted serialized data, integrity checks
-9. **Known Vulnerabilities**: Regular patching, dependency scanning, vulnerability management
-10. **Insufficient Logging**: Comprehensive logging, monitoring, alerting, SIEM integration
-
-### Q: What's the difference between stored, reflected, and DOM-based XSS?
-**Stored XSS**: Malicious script stored on server (database, file), executed when content viewed
-**Reflected XSS**: Script reflected off web application (URL parameter), not stored
-**DOM-based XSS**: Vulnerability in client-side JavaScript that modifies DOM unsafely
-
-## Cryptography
-
-### Q: When would you use symmetric vs asymmetric encryption?
-**Symmetric Encryption**:
-- Fast encryption/decryption of large amounts of data
-- Bulk data encryption (file encryption, disk encryption)
-- Stream ciphers for real-time communication
-- Challenge: Key distribution and management
-
-**Asymmetric Encryption**:
-- Key exchange and digital signatures
-- Small amounts of data (encrypting symmetric keys)
-- Public key infrastructure (PKI)
-- Slower but solves key distribution problem
-
-**Hybrid Approach**: Use asymmetric encryption to exchange symmetric keys, then use symmetric encryption for data
-
-### Q: Explain digital signatures and their purpose.
-Digital signatures provide:
-- **Authentication**: Verifies sender identity
-- **Integrity**: Ensures message hasn't been tampered with
-- **Non-repudiation**: Sender cannot deny sending the message
-
-Process:
-1. Hash the message using cryptographic hash function
-2. Encrypt hash with sender's private key (creates signature)
-3. Recipient decrypts signature with sender's public key
-4. Recipient hashes received message and compares with decrypted hash
-
-## Incident Response
-
-### Q: Walk me through the NIST Incident Response Framework.
-1. **Preparation**:
-   - Develop IR plan, procedures, and team
-   - Implement monitoring and detection tools
-   - Conduct training and exercises
-
-2. **Detection & Analysis**:
-   - Monitor for security events
-   - Analyze and validate incidents
-   - Determine scope and impact
-   - Document findings
-
-3. **Containment, Eradication & Recovery**:
-   - **Containment**: Isolate affected systems to prevent spread
-   - **Eradication**: Remove threat from environment
-   - **Recovery**: Restore systems to normal operation
-
-4. **Post-Incident Activity**:
-   - Lessons learned review
-   - Update procedures and controls
-   - Report to stakeholders
-
-### Q: How do you maintain chain of custody in digital forensics?
-- **Documentation**: Record who, what, when, where, why for every action
-- **Secure Storage**: Locked, climate-controlled, access-logged storage
-- **Hash Verification**: Calculate and verify file hashes at each transfer
-- **Access Logs**: Track everyone who accesses evidence
-- **Legal Admissibility**: Follow legal requirements for evidence handling
-
-## Risk Management
-
-### Q: Explain the risk assessment process.
-1. **Asset Identification**: Catalog critical assets (data, systems, processes)
-2. **Threat Identification**: Identify potential threats (natural, human, technical)
-3. **Vulnerability Assessment**: Find weaknesses that threats could exploit
-4. **Risk Analysis**: Calculate risk = Threat × Vulnerability × Impact
-5. **Risk Evaluation**: Compare risks against risk tolerance/appetite
-6. **Risk Treatment**: Accept, avoid, mitigate, or transfer risks
-
-### Q: What's the difference between quantitative and qualitative risk assessment?
-**Quantitative**: Uses numerical values (ALE = ARO × SLE)
-- Annual Rate of Occurrence (ARO)
-- Single Loss Expectancy (SLE)
-- Annual Loss Expectancy (ALE)
-- More precise but requires extensive data
-
-**Qualitative**: Uses descriptive categories (High/Medium/Low)
-- Easier to implement
-- More subjective
-- Good for initial assessments
-
-## Access Control
-
-### Q: Explain the AAA security model.
-**Authentication**: "Who are you?"
-- Verifying user identity (passwords, biometrics, certificates)
-- Something you know, have, or are
-
-**Authorization**: "What can you do?"
-- Granting access to resources based on identity
-- Role-based (RBAC), attribute-based (ABAC), mandatory (MAC)
-
-**Accounting**: "What did you do?"
-- Logging and auditing user activities
-- Compliance, forensics, billing
-
-### Q: What is Zero Trust architecture?
-**Principle**: "Never trust, always verify"
-- Assume breach mentality
-- Verify every user and device
-- Least privilege access
-- Micro-segmentation
-- Continuous monitoring and validation
-
-**Components**:
-- Identity and access management
-- Device security and compliance
-- Network segmentation
-- Data protection
-- Monitoring and analytics
-
-## Malware Analysis
-
-### Q: Difference between static and dynamic malware analysis?
-**Static Analysis**:
-- Examining malware without execution
-- File properties, strings, disassembly
-- Safe but limited information
-- Tools: file, strings, objdump, IDA Pro
-
-**Dynamic Analysis**:
-- Executing malware in controlled environment
-- Runtime behavior, network traffic, system changes
-- More information but requires sandboxing
-- Tools: Process Monitor, Wireshark, sandbox environments
-
-### Q: What are Indicators of Compromise (IOCs)?
-- **File-based**: MD5/SHA hashes, file names, paths
-- **Network-based**: IP addresses, domains, URLs, protocols
-- **Registry-based**: Registry keys, values (Windows)
-- **Behavioral**: Process names, command lines, user accounts
-- **Usage**: Threat hunting, detection rules, incident response
-
 # Bug Bounty Hunting
 
 ## Types of Disclosures
@@ -5395,3 +5298,192 @@ Hardware chip providing secure cryptographic operations and key storage.
 - **Data Poisoning**: Injecting malicious data into training sets to corrupt model behavior
 - **Model Theft**: Extracting proprietary models through API queries
 - **Bias & Fairness**: Ensuring models do not perpetuate or amplify biases
+
+# Common Interview Questions
+
+## Network Security
+
+### Q: Explain the difference between TCP and UDP protocols.
+**TCP (Transmission Control Protocol)**:
+- Connection-oriented: Establishes connection before data transfer (3-way handshake)
+- Reliable: Guarantees packet delivery and order
+- Flow control: Manages data transmission rate
+- Error checking: Detects and retransmits lost packets
+- Higher overhead: More processing and bandwidth
+- Examples: HTTP, HTTPS, FTP, SSH
+
+**UDP (User Datagram Protocol)**:
+- Connectionless: No connection establishment required
+- Unreliable: No guarantee of delivery or order
+- No flow control: Sends data at maximum rate
+- Minimal error checking: Basic checksum only
+- Lower overhead: Faster and more efficient
+- Examples: DNS, DHCP, VoIP, gaming
+
+### Q: Walk me through the SSL/TLS handshake process.
+1. **Client Hello**: Client sends supported cipher suites, TLS version, random number
+2. **Server Hello**: Server responds with chosen cipher suite, certificate, random number
+3. **Certificate Verification**: Client validates server certificate against trusted CAs
+4. **Key Exchange**: Client generates pre-master secret, encrypts with server's public key
+5. **Session Key Generation**: Both sides derive symmetric session keys from pre-master secret
+6. **Finished Messages**: Both sides send encrypted "finished" messages to confirm handshake
+7. **Secure Communication**: All subsequent data encrypted with session keys
+
+### Q: What are the different types of firewalls?
+- **Packet Filtering**: Examines packet headers (IP, port, protocol) - stateless
+- **Stateful Inspection**: Tracks connection state and context - knows TCP session state
+- **Application Layer/Proxy**: Deep packet inspection, understands application protocols
+- **Next-Generation Firewall (NGFW)**: Combines traditional firewall with IPS, application awareness, threat intelligence
+
+## Web Security
+
+### Q: Explain the OWASP Top 10 and how to prevent each vulnerability.
+1. **Injection**: Use parameterized queries, input validation, ORM frameworks
+2. **Broken Authentication**: Implement MFA, secure session management, password policies
+3. **Sensitive Data Exposure**: Encrypt data at rest/transit, use HTTPS, proper key management
+4. **XML External Entities (XXE)**: Disable external entity processing, use JSON instead of XML
+5. **Broken Access Control**: Implement proper authorization, principle of least privilege
+6. **Security Misconfiguration**: Secure defaults, regular updates, configuration management
+7. **Cross-Site Scripting (XSS)**: Input validation, output encoding, CSP headers
+8. **Insecure Deserialization**: Avoid untrusted serialized data, integrity checks
+9. **Known Vulnerabilities**: Regular patching, dependency scanning, vulnerability management
+10. **Insufficient Logging**: Comprehensive logging, monitoring, alerting, SIEM integration
+
+### Q: What's the difference between stored, reflected, and DOM-based XSS?
+**Stored XSS**: Malicious script stored on server (database, file), executed when content viewed
+**Reflected XSS**: Script reflected off web application (URL parameter), not stored
+**DOM-based XSS**: Vulnerability in client-side JavaScript that modifies DOM unsafely
+
+## Cryptography
+
+### Q: When would you use symmetric vs asymmetric encryption?
+**Symmetric Encryption**:
+- Fast encryption/decryption of large amounts of data
+- Bulk data encryption (file encryption, disk encryption)
+- Stream ciphers for real-time communication
+- Challenge: Key distribution and management
+
+**Asymmetric Encryption**:
+- Key exchange and digital signatures
+- Small amounts of data (encrypting symmetric keys)
+- Public key infrastructure (PKI)
+- Slower but solves key distribution problem
+
+**Hybrid Approach**: Use asymmetric encryption to exchange symmetric keys, then use symmetric encryption for data
+
+### Q: Explain digital signatures and their purpose.
+Digital signatures provide:
+- **Authentication**: Verifies sender identity
+- **Integrity**: Ensures message hasn't been tampered with
+- **Non-repudiation**: Sender cannot deny sending the message
+
+Process:
+1. Hash the message using cryptographic hash function
+2. Encrypt hash with sender's private key (creates signature)
+3. Recipient decrypts signature with sender's public key
+4. Recipient hashes received message and compares with decrypted hash
+
+## Incident Response
+
+### Q: Walk me through the NIST Incident Response Framework.
+1. **Preparation**:
+   - Develop IR plan, procedures, and team
+   - Implement monitoring and detection tools
+   - Conduct training and exercises
+
+2. **Detection & Analysis**:
+   - Monitor for security events
+   - Analyze and validate incidents
+   - Determine scope and impact
+   - Document findings
+
+3. **Containment, Eradication & Recovery**:
+   - **Containment**: Isolate affected systems to prevent spread
+   - **Eradication**: Remove threat from environment
+   - **Recovery**: Restore systems to normal operation
+
+4. **Post-Incident Activity**:
+   - Lessons learned review
+   - Update procedures and controls
+   - Report to stakeholders
+
+### Q: How do you maintain chain of custody in digital forensics?
+- **Documentation**: Record who, what, when, where, why for every action
+- **Secure Storage**: Locked, climate-controlled, access-logged storage
+- **Hash Verification**: Calculate and verify file hashes at each transfer
+- **Access Logs**: Track everyone who accesses evidence
+- **Legal Admissibility**: Follow legal requirements for evidence handling
+
+## Risk Management
+
+### Q: Explain the risk assessment process.
+1. **Asset Identification**: Catalog critical assets (data, systems, processes)
+2. **Threat Identification**: Identify potential threats (natural, human, technical)
+3. **Vulnerability Assessment**: Find weaknesses that threats could exploit
+4. **Risk Analysis**: Calculate risk = Threat × Vulnerability × Impact
+5. **Risk Evaluation**: Compare risks against risk tolerance/appetite
+6. **Risk Treatment**: Accept, avoid, mitigate, or transfer risks
+
+### Q: What's the difference between quantitative and qualitative risk assessment?
+**Quantitative**: Uses numerical values (ALE = ARO × SLE)
+- Annual Rate of Occurrence (ARO)
+- Single Loss Expectancy (SLE)
+- Annual Loss Expectancy (ALE)
+- More precise but requires extensive data
+
+**Qualitative**: Uses descriptive categories (High/Medium/Low)
+- Easier to implement
+- More subjective
+- Good for initial assessments
+
+## Access Control
+
+### Q: Explain the AAA security model.
+**Authentication**: "Who are you?"
+- Verifying user identity (passwords, biometrics, certificates)
+- Something you know, have, or are
+
+**Authorization**: "What can you do?"
+- Granting access to resources based on identity
+- Role-based (RBAC), attribute-based (ABAC), mandatory (MAC)
+
+**Accounting**: "What did you do?"
+- Logging and auditing user activities
+- Compliance, forensics, billing
+
+### Q: What is Zero Trust architecture?
+**Principle**: "Never trust, always verify"
+- Assume breach mentality
+- Verify every user and device
+- Least privilege access
+- Micro-segmentation
+- Continuous monitoring and validation
+
+**Components**:
+- Identity and access management
+- Device security and compliance
+- Network segmentation
+- Data protection
+- Monitoring and analytics
+
+## Malware Analysis
+
+### Q: Difference between static and dynamic malware analysis?
+**Static Analysis**:
+- Examining malware without execution
+- File properties, strings, disassembly
+- Safe but limited information
+- Tools: file, strings, objdump, IDA Pro
+
+**Dynamic Analysis**:
+- Executing malware in controlled environment
+- Runtime behavior, network traffic, system changes
+- More information but requires sandboxing
+- Tools: Process Monitor, Wireshark, sandbox environments
+
+### Q: What are Indicators of Compromise (IOCs)?
+- **File-based**: MD5/SHA hashes, file names, paths
+- **Network-based**: IP addresses, domains, URLs, protocols
+- **Registry-based**: Registry keys, values (Windows)
+- **Behavioral**: Process names, command lines, user accounts
+- **Usage**: Threat hunting, detection rules, incident response
