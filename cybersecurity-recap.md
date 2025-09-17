@@ -504,7 +504,6 @@ set rulebase security rules "Block-Malware" log-setting "default"
 
 ### Intrusion Detection Systems (IDS)
 
-#### How IDS Works
 **Detection Methods**:
 1. **Signature-based**: Matches known attack patterns (like antivirus signatures)
 2. **Anomaly-based**: Detects deviations from normal behavior using statistical analysis
@@ -512,7 +511,7 @@ set rulebase security rules "Block-Malware" log-setting "default"
 
 **Types**:
 - **NIDS (Network IDS)**: Monitors network traffic
-- **HIDS (Host IDS)**: Monitors individual host activities
+- **HIDS (Host IDS)**: Monitors individual host activities within a network segment 
 
 ```bash
 # Snort IDS configuration and rules
@@ -1334,6 +1333,13 @@ public_key.verify(
     hashes.SHA256()
 )
 ```
+
+### Attacks on Digital Signatures
+* **Key-Only Attack**: Attacker knows only the user's public key
+* **Known Message Attack**: Attacker has access to messages and their corresponding valid signatures
+* **Generic Chosen Message Attack**: Attacker selects messages independently of public key, goal is obtaining many signed messages
+* **Directed Chosen Message Attack**: More targeted approach after knowing public key, messages carefully chosen by attacker
+* **Adaptive Chosen Message Attack**: Attacker requests signatures for messages based on previously obtained message-signature pairs
 
 ## Digital Certificates
 * Issued by **Certificate Authorities (CAs)**.
@@ -4520,6 +4526,14 @@ Hardware chip providing secure cryptographic operations and key storage.
 - **Proof of Work (PoW)**: Miners solve computational puzzles to validate blocks
 - **Proof of Stake (PoS)**: Validators chosen based on stake ownership
 
+### Bitcoin Mining & Security
+**Mining Process**: Miners solve complex puzzles to validate blocks, ensuring network security
+- **Genesis Block**: First block (Block 0) created by Satoshi Nakamoto in 2009, hardcodes initial parameters
+- **Block Mining Time**: ~10 minutes per block
+- **Difficulty Adjustment**: Every 2016 blocks (~2 weeks) to maintain steady block creation rate
+
+<img src="Assets/bitcoin.png" alt="Bitcoin" width="75%">
+
 **Core flow:**
 1. **Make a transaction**
    * Example: *Alice wants to send 1 coin to Bob.*
@@ -4547,10 +4561,12 @@ Hardware chip providing secure cryptographic operations and key storage.
 
 ### Blockchain Security
 - **Decentralization**: No single point of failure, reduces risk of centralized attacks
-- **Immutability**: Once data is recorded, it cannot be altered, ensuring integrity
+- **Immutability**: Once data is recorded, it cannot be altered, ensuring integrity (Deeper blocks is more secure - altering requires recomputing all subsequent blocks)
 - **Consensus Mechanisms**: Proof of Work (PoW), Proof of Stake (PoS) to validate transactions
+- **51% Attack**: Theoretical attack requiring majority network control, impractical for Bitcoin due to massive mining network, but smaller blockchains more vulnerable
 - **Smart Contract Security**: Code vulnerabilities can lead to exploits (e.g., DAO hack)
 - **Use Cases**: Cryptocurrencies, supply chain, identity management
+
 ## AI & Machine Learning Security
 - **Adversarial Attacks**: Manipulating input data to deceive models (e.g., image recognition)
 - **Data Poisoning**: Injecting malicious data into training sets to corrupt model behavior
