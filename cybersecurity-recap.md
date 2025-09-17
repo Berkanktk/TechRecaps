@@ -60,6 +60,10 @@
   - [Privilege Escalation](#privilege-escalation)
 ### 5. [Incident Response](#incident-response)
 - [NIST Framework](#nist-framework)
+- [Attack Lifecycle](#attack-lifecycle)
+  - [MITRE ATT&CK Framework](#mitre-attck-framework)
+  - [MITRE ATLAS](#mitre-atlas-adversarial-threat-landscape-for-ai-systems)
+  - [Cyber Kill Chain](#cyber-kill-chain)
 - [Digital Forensics](#digital-forensics)
 - [Log Analysis](#log-analysis)
 - [SIEM Tools](#siem-tools)
@@ -135,6 +139,10 @@
 - [GDPR](#gdpr)
 - [PCI DSS](#pci-dss)
 - [ISO 27001](#iso-27001)
+- [NIST Framework](#nist-framework-1)
+- [NIS2 Directive](#nis2-directive)
+- [ISO/IEC 27005](#isoiec-27005)
+- [FAIR Model](#fair-model-factor-analysis-of-information-risk)
 ### 13. [Password Attacks](#password-attacks)
 - [Forensics Tools](#forensics-tools)
 ### 14. [Common Interview Questions](#common-interview-questions)
@@ -1446,7 +1454,49 @@ ps aux | grep root               # Running processes as root
 6. **Lessons Learned**: Post-incident review
 
 ### Attack Lifecycle
-**Cyber Kill Chain**: Initial Access → Persistence → Defense Evasion → Credential Access → Discovery → Lateral Movement → Impact
+
+#### MITRE ATT&CK Framework
+**Purpose**: Knowledge base of adversary tactics, techniques, and procedures (TTPs) based on real-world observations.
+
+**Structure**:
+- **Tactics**: High-level goals (e.g., Initial Access, Persistence)
+- **Techniques**: Methods to achieve tactics (e.g., Spearphishing)
+- **Sub-techniques**: Specific implementations (e.g., Spearphishing Link)
+
+**ATT&CK Matrix Tactics**:
+1. **Initial Access**: Entry into network
+2. **Execution**: Running malicious code
+3. **Persistence**: Maintaining presence
+4. **Privilege Escalation**: Higher-level permissions
+5. **Defense Evasion**: Avoiding detection
+6. **Credential Access**: Stealing credentials
+7. **Discovery**: System and network reconnaissance
+8. **Lateral Movement**: Moving through environment
+9. **Collection**: Gathering target data
+10. **Command and Control**: Communication with compromised systems
+11. **Exfiltration**: Stealing data
+12. **Impact**: Disrupt, corrupt, or destroy systems
+
+#### MITRE ATLAS (Adversarial Threat Landscape for AI Systems)
+**Purpose**: Framework for understanding adversarial tactics against AI/ML systems.
+
+**Key Areas**:
+- **ML Attack Staging**: Data poisoning, model theft
+- **ML Model Access**: Inference attacks, membership inference
+- **Evasion**: Adversarial examples, prompt injection
+- **Impact**: Model degradation, bias amplification
+
+#### Cyber Kill Chain
+**Lockheed Martin Model**: Reconnaissance → Weaponization → Delivery → Exploitation → Installation → Command & Control → Actions on Objectives
+
+**Phases**:
+1. **Reconnaissance**: Target identification and research
+2. **Weaponization**: Creating attack tools/payloads
+3. **Delivery**: Transmitting payload to target
+4. **Exploitation**: Executing code on target system
+5. **Installation**: Installing persistent access
+6. **Command & Control**: Establishing communication channel
+7. **Actions on Objectives**: Achieving attacker goals
 
 ## Digital Forensics
 
@@ -3167,6 +3217,45 @@ SecItemAdd(query as CFDictionary, nil)
 - **ISMS**: Information Security Management System
 - **Risk Assessment**: Identify, analyze, evaluate risks
 - **Controls**: Technical, organizational, physical
+
+## NIST Framework
+**Purpose**: Cybersecurity framework for improving critical infrastructure cybersecurity
+
+**Core Functions**:
+1. **Identify**: Asset management, risk assessment, governance
+2. **Protect**: Access control, data security, protective technology
+3. **Detect**: Anomaly detection, security monitoring
+4. **Respond**: Response planning, communications, mitigation
+5. **Recover**: Recovery planning, improvements, communications
+
+## NIS2 Directive
+**Purpose**: EU cybersecurity directive for network and information systems security
+
+**Key Requirements**:
+- Risk management measures and incident reporting
+- Supply chain security and vulnerability handling
+- Crisis management and business continuity
+- Cybersecurity training and awareness programs
+
+## ISO/IEC 27005
+**Purpose**: Risk management standard complementing ISO 27001
+- Risk assessment and treatment methodologies
+- Risk communication and monitoring processes
+- Integration with overall risk management framework
+
+## FAIR Model (Factor Analysis of Information Risk)
+**Purpose**: Quantifies cyber risk in financial terms for business decision-making
+
+**Components**:
+- **Threat Event Frequency**: How often attacks occur
+- **Vulnerability**: Probability of successful exploitation
+- **Loss Event Frequency**: Combination of threat and vulnerability
+- **Loss Magnitude**: Financial impact of successful attacks
+
+**Benefits**:
+- Translate technical risks to business language
+- Prioritize security investments based on financial impact
+- Improve risk communication with executives and stakeholders
 
 # Password Attacks
 Password attacks aim to compromise user credentials through various techniques.
