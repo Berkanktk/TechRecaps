@@ -357,17 +357,160 @@ key client.key
 
 # Web Application Security
 
-## OWASP Top 10
-1. **Injection**: SQL, NoSQL, LDAP, OS command injection
-2. **Broken Authentication**: Session management flaws
-3. **Sensitive Data Exposure**: Weak encryption, plaintext storage
-4. **XML External Entities (XXE)**: XML parser vulnerabilities
-5. **Broken Access Control**: Unauthorized resource access
-6. **Security Misconfiguration**: Default settings, verbose errors
-7. **Cross-Site Scripting (XSS)**: Client-side code injection
-8. **Insecure Deserialization**: Object injection attacks
-9. **Known Vulnerabilities**: Outdated components
-10. **Insufficient Logging**: Poor monitoring and response
+## OWASP Top 10 (2021)
+OWASP Top 10 is a standard awareness document for developers and web application security. It represents a broad consensus about the most critical security risks to web applications.
+
+### 1) Broken Access Control
+
+```python
+# VULNERABLE: IDOR (no ownership check)
+@app.route("/user/<id>")
+def get_user(id):
+    return jsonify(db.users.find_one({"id": id}))
+
+# SECURE: Enforce auth and ownership
+@app.route("/user/<id>")
+def get_user(id):
+    if not current_user.is_authenticated:
+        abort(401)
+    if current_user.id != id and not current_user.is_admin:
+        abort(403)
+    return jsonify(db.users.find_one({"id": id}))
+```
+
+
+### 2) Cryptographic Failures
+
+```python
+# VULNERABLE: Storing plaintext password
+db.users.insert_one({"user": user, "pwd": password})
+
+# SECURE: Hash with bcrypt
+from bcrypt import hashpw, gensalt
+pwd_hash = hashpw(password.encode(), gensalt())
+db.users.insert_one({"user": user, "pwd_hash": pwd_hash})
+```
+
+
+### 3) Injection
+
+```python
+# VULNERABLE: SQL injection
+cursor.execute("SELECT * FROM users WHERE name = '" + user_input + "';")
+
+# SECURE: Parameterized query
+cursor.execute("SELECT * FROM users WHERE name = %s;", (user_input,))
+```
+
+### 4) Insecure Design
+
+```js
+// VULNERABLE: Client controls admin flag
+if (req.query.isAdmin == "true") {
+  grantAdminAccess();
+}
+
+// SECURE: Server enforces role
+if (!req.user || !req.user.roles.includes("admin")) {
+  return res.sendStatus(403);
+}
+grantAdminAccess();
+```
+
+### 5) Security Misconfiguration
+
+```nginx
+# VULNERABLE: Directory listing enabled
+location / {
+    autoindex on;
+}
+
+# SECURE: Disable listing + add headers
+location / {
+    autoindex off;
+    add_header X-Content-Type-Options nosniff;
+    add_header X-Frame-Options DENY;
+}
+```
+
+### 6) Vulnerable and Outdated Components
+
+```json
+// VULNERABLE: Old package with CVEs
+"dependencies": {
+  "lodash": "4.17.4"
+}
+
+// SECURE: Updated + audit
+"dependencies": {
+  "lodash": "^4.17.21"
+}
+// Run: npm audit && npm audit fix
+```
+
+### 7) Identification and Authentication Failures
+
+```python
+# VULNERABLE: Weak password check, no lockout
+if stored_pwd == request.form["password"]:
+    login(user)
+
+# SECURE: Hashed password + MFA + lockout
+if bcrypt.checkpw(password.encode(), user.pwd_hash):
+    if not verify_mfa(user, request.form["mfa_code"]):
+        abort(401)
+    create_session(user.id, expires_in=3600)  # short expiry
+else:
+    record_failed_login(user, request.ip)
+```
+
+### 8) Software and Data Integrity Failures
+
+```python
+# VULNERABLE: Unsigned/unverified plugin
+plugin = __import__(request.args["plugin"])
+plugin.run()
+
+# SECURE: Allowlist + signature verification
+if plugin_name not in ALLOWED_PLUGINS:
+    abort(403)
+if not verify_signature(plugin_file, plugin_signature):
+    abort(403)
+load_plugin(plugin_file).run()
+```
+
+### 9) Security Logging and Monitoring Failures
+
+```python
+# VULNERABLE: No logging on failed login
+if not check_password(user, password):
+    return "Invalid login"
+
+# SECURE: Log + alert + counter
+if not check_password(user, password):
+    logger.warning("failed_login", extra={"user": user, "ip": request.ip})
+    increment_failed_counter(user, request.ip)
+    if get_failed_counter(user) > 5:
+        alert_security_team(user)
+    return "Invalid login"
+```
+
+### 10) Server-Side Request Forgery (SSRF)
+
+```python
+# VULNERABLE: Fetch arbitrary URL
+url = request.args.get("url")
+data = requests.get(url).text
+
+# SECURE: Allowlist + block internal IPs
+from urllib.parse import urlparse
+u = urlparse(url)
+if u.scheme not in ("http", "https"):
+    abort(400)
+if not is_allowed_hostname(u.hostname) or is_private_ip(resolve_ip(u.hostname)):
+    abort(403)
+data = requests.get(url, timeout=5).text
+```
 
 ## SQL Injection
 ```sql
