@@ -345,6 +345,23 @@ nslookup example.com
 - Implement port security on switch ports
 - Disable unused ports
 
+### Communication & Connectivity Protocols
+
+**Event-Driven Architecture (EDA)**:  
+- **Components**: Producer (sends events) → Channel (distributes) → Consumer (processes)   
+- **Benefits**: Asynchronous communication, scalability, loose coupling
+- **When Not to Use:** Small/synchronous systems
+
+**Communication Paradigms**:
+- **Request-Reply**: Synchronous interaction (REST, CoAP)
+- **Publish-Subscribe**: Asynchronous via broker (MQTT, AMQP, DDS)
+- **Direct vs Indirect:** Direct = coupled, Indirect = decoupled (space/time)
+
+**MQTT Protocol**: Lightweight pub-sub for IoT over TCP
+- **Topics**: Message filtering mechanism
+- **Wildcards**: Single-level (+), Multi-level (#)
+- **Features**: Lightweight, scalable, flexible QoS levels
+
 ## Network Hardware
 
 | Device            | OSI Layer           | Function                                  | Use Cases                            | Security Considerations                        |
