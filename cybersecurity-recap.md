@@ -674,8 +674,14 @@ IPsec (Internet Protocol Security) is a suite of protocols used to secure commun
 
 # Web Application Security
 
-## OWASP Top 10 (2021)
-OWASP Top 10 is a standard awareness document for developers and web application security. It represents a broad consensus about the most critical security risks to web applications.
+## OWASP Standards
+
+**OWASP Top 10 (2021)**: Standard awareness document for developers and web application security. Represents broad consensus about the most critical security risks to web applications.
+
+**Application Security Verification Standard (ASVS)**: Guide for secure app development to align developers, vendors, and tools
+- **L1**: Basic security requirements for all applications
+- **L2**: Standard for apps handling sensitive data
+- **L3**: Highest assurance for critical applications
 
 ### 1) Broken Access Control
 
