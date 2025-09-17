@@ -2381,40 +2381,158 @@ ps aux | grep root               # Running processes as root
   - **4625**: Failed logon attempt
   - **4648**: Explicit credential use
 
-### Forensic Tooling
-- **Triage Collection**: Fast collection of key artifacts
-- **Full Disk Imaging**: Complete bit-by-bit disk copy
+### Triage Collection 
 
 ```bash
-# KAPE Examples
-kape.exe --tsource C: --tdest D:\Collection --target !BasicCollection
-kape.exe --msource D:\Collection --mdest D:\Analysis --module !EZParser
-
-# Memory dump
-volatility -f memory.dump imageinfo
-volatility -f memory.dump --profile=Win7SP1x64 pslist
-volatility -f memory.dump --profile=Win7SP1x64 netscan
-
-# Disk imaging
-dd if=/dev/sda of=disk_image.dd bs=4K
-ewfacquire /dev/sda -t evidence_file
-
-# File analysis
-file suspicious_file
-strings suspicious_file
-hexdump -C suspicious_file | head -20
-
-# Network analysis
-tcpdump -i eth0 -w capture.pcap                         # Capture all traffic
-tcpdump -r capture.pcap 'port 80'                       # Read HTTP traffic
-tcpdump -i eth0 'src host 192.168.1.1 and dst port 22'  # Filter SSH traffic
-
-nc -l -p 4444                                            # Listen on port 4444
-nc target.com 80                                        # Connect to target on port 80
-
-wireshark capture.pcap                                  # Open capture in Wireshark
-tshark -r capture.pcap -Y "http.request.method==POST"   # Filter POST requests
+kape.exe --tsource C: --tdest D:\Collection --target !BasicCollection   # Collect basic triage artifacts (registry, logs, browser, etc.)
+kape.exe --msource D:\Collection --mdest D:\Analysis --module !EZParser # Run EZParser modules to process collected data
 ```
+
+### Memory Forensics
+
+**Goal:** Identify processes, sockets, injections, CLI history.
+
+```bash
+# Volatility 2
+volatility -f memory.dump imageinfo                    # Identify OS profile (Win version, SP, arch)
+volatility -f memory.dump --profile=Win7SP1x64 pslist  # List running processes
+volatility -f memory.dump --profile=Win7SP1x64 netscan # List network connections
+volatility -f memory.dump --profile=Win7SP1x64 malfind # Detect injected/malicious code
+volatility -f memory.dump --profile=Win7SP1x64 cmdline # Show command-line args of processes
+
+# Volatility 3
+vol -f memory.dump windows.info                       # Identify OS details
+vol -f memory.dump windows.pslist                     # List running processes
+vol -f memory.dump windows.netscan                    # List network connections
+vol -f memory.dump windows.malfind                    # Detect injected/malicious code
+vol -f memory.dump windows.cmdline                    # Show command-line args of processes
+```
+
+### Disk Imaging
+
+**Goal:** Forensically sound disk copy + integrity verification.
+
+```bash
+lsblk -f                                                 # List block devices & filesystems
+fdisk -l /dev/sda                                        # Show partition layout
+
+dd if=/dev/sda of=/evidence/disk_image.dd bs=4M conv=sync,noerror status=progress     # Raw bitstream copy with error handling
+dc3dd if=/dev/sda of=/evidence/disk_image.dd hash=sha256 log=/evidence/dc3dd.log      # Forensic copy with live hashing + log
+dcfldd if=/dev/sda of=/evidence/disk_image.dd hash=sha256 hashlog=/evidence/hash.txt  # Forensic copy with hash output file
+ewfacquire /dev/sda -t /evidence/case001 -C "Case 001" -S 2048 -u -P                  # Acquire image in E01 format with compression, metadata, segmentation
+
+sha256sum /evidence/disk_image.dd > /evidence/disk_image.dd.sha256 # Generate hash for verification
+ewfverify /evidence/case001.E01                                    # Verify EWF acquisition
+```
+
+### File Analysis
+
+```bash
+file suspicious.bin                           # Identify file type from magic bytes
+strings -a suspicious.bin | grep -i http      # Extract readable strings (e.g., URLs, creds, flags)
+hexdump -C suspicious.bin | head -50          # View hex content for header analysis
+binwalk -e suspicious.bin                     # Extract embedded/packed files
+exiftool image.jpg                            # Extract metadata (timestamps, GPS, camera info, etc.)
+```
+
+### Network Forensics
+
+```bash
+tcpdump -i eth0 -w capture.pcap                              # Capture all packets to file
+tcpdump -r capture.pcap 'port 80'                            # Show only HTTP traffic from capture
+tcpdump -i eth0 'src host 192.168.1.1 and dst port 22'       # Filter SSH traffic from specific host
+
+nc -l -p 4444                                                # Listen for inbound connections on port 4444
+nc target.com 80                                             # Connect to target host on port 80
+```
+
+### PCAP Analysis
+
+```bash
+tshark -r capture.pcap -T fields -e ip.src -e ip.dst -e tcp.port              # Extract source/dest IPs and ports
+tshark -r capture.pcap -Y "dns" -T fields -e frame.time -e dns.qry.name       # List DNS queries with timestamps
+tshark -r capture.pcap -Y "http.request" -T fields -e http.host -e http.request.uri # Show HTTP hosts + URIs
+
+tshark -r capture.pcap -z io,phs                                              # Protocol hierarchy stats
+tshark -r capture.pcap -z conv,tcp                                            # TCP conversations
+tshark -r capture.pcap -z endpoints,ip                                        # IP endpoint statistics
+
+tshark -r capture.pcap -Y "http.request.method==POST"                         # Detect POST requests (possible exfil)
+tshark -r capture.pcap -Y "tcp.flags.syn==1 and tcp.flags.ack==0"             # Detect port scans (lots of SYNs)
+
+tshark -r capture.pcap --export-objects http,/tmp/http_objs                   # Extract HTTP objects from capture
+```
+
+### Steganography
+**Purpose**: Hide data within other files (images, audio, text) or detect hidden content.
+
+**Detection Tools**:
+```bash
+# Image steganography detection
+steghide extract -sf image.jpg          # Extract hidden data (if password known)
+stegsolve image.jpg                     # Visual steganalysis tool
+binwalk image.jpg                       # Check for embedded files
+strings image.jpg | grep -i flag        # Search for hidden text
+zsteg image.png                         # PNG/BMP steganography detection
+
+# Audio steganography
+sonic-visualiser audio.wav              # Visual audio analysis
+audacity audio.wav                      # Manual audio inspection
+```
+
+**Common Techniques**:
+- **LSB (Least Significant Bit)**: Modify least significant bits in image pixels
+- **DCT (Discrete Cosine Transform)**: Hide data in JPEG compression coefficients
+- **Spread Spectrum**: Distribute data across multiple frequency bands
+- **Text Steganography**: Use whitespace, invisible characters, or word patterns
+
+### Sleuth Kit (TSK)
+
+**Purpose:** Command-line forensic suite for file system and disk analysis. Often used underneath Autopsy.
+
+```bash
+mmls disk.flag.img # see partitions
+fsstat -o 2048 disk.flag.img # determine file system
+fls -o 2048 dds2-alpine.flag.img # list files
+fls -o 2048 dds2-alpine.flag.img 18290 # list files in a directory
+icat -o 2048 dds2-alpine.flag.img 18291 # extract a file
+fls -i raw -f ext4 -o 360448 -r disk.flag.img | grep flag # search for files with flag in the name
+icat -i raw -f ext4 -o 360448 -r disk.flag.img 2371 # extract a file by inode
+
+-i is the image type, 
+-f is the file system type
+-r is to recursively display directories
+```
+* Provides **file-level access, metadata inspection, and recovery**.
+* Strong for timeline analysis and deleted file carving.
+
+### Autopsy (GUI)
+
+**Purpose:** Graphical front-end for Sleuth Kit, easier workflow for large cases.
+
+* Provides **case management, timelines, keyword search, hash matching, file carving**.
+* Built-in modules for web history, email parsing, EXIF, and more.
+* Good for **collaborative investigations**.
+
+```bash
+autopsy /path/to/case/   # Launch or open a forensic case in Autopsy
+```
+
+**Key Features:**
+- File system analysis (NTFS, FAT, Ext2/3/4, HFS+)
+- Deleted file recovery
+- Timeline analysis
+- Keyword searching
+- Hash analysis (MD5, SHA1, SHA256)
+- Email analysis
+- Registry analysis (Windows)
+
+**Common Workflow:**
+1. Create new case
+2. Add data source (disk image, drive, logical files)
+3. Configure ingest modules (hash lookup, keyword search, etc.)
+4. Analyze results in various views
+5. Generate reports
 
 ## Log Analysis
 Log analysis is the process of reviewing and interpreting log files to identify security incidents, system errors, or performance issues.
