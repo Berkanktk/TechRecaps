@@ -90,6 +90,7 @@
 - [Attack Vectors](#attack-vectors)
   - [Phishing](#phishing)
   - [Social Engineering](#social-engineering)
+  - [Man-in-the-Middle (MITM) Attacks](#man-in-the-middle-mitm-attacks)
   - [Advanced Persistent Threats (APT)](#advanced-persistent-threats-apt)
 - [DDoS (Distributed Denial of Service) Attacks](#ddos-distributed-denial-of-service-attacks)
   - [Volume-Based Attacks (Volumetric)](#volume-based-attacks-volumetric)
@@ -1976,6 +1977,29 @@ unhide proc                              # Find hidden processes
 - **Baiting**: Offering something enticing (USB drops)
 - **Tailgating**: Following authorized personnel into secure areas
 - **Quid pro quo**: Offering services in exchange for information
+
+### Man-in-the-Middle (MITM) Attacks
+**Purpose**: Intercepting and potentially altering communications between two parties without their knowledge.
+
+**Common MITM Techniques**:
+- **ARP Spoofing**: Poisoning ARP tables to redirect traffic
+- **DNS Spoofing**: Redirecting DNS queries to malicious servers
+- **Wi-Fi Eavesdropping**: Creating fake hotspots or compromising legitimate ones
+- **SSL Stripping**: Downgrading HTTPS connections to HTTP
+- **BGP Hijacking**: Manipulating routing protocols to intercept traffic
+
+**MITM Attack Scenarios**:
+- **Public Wi-Fi**: Attacker controls network infrastructure
+- **Certificate Attacks**: Using fraudulent or compromised certificates
+- **Session Hijacking**: Stealing session tokens or cookies
+- **Email Interception**: Compromising email servers or clients
+
+**Prevention Measures**:
+- **End-to-End Encryption**: Encrypt data before transmission
+- **Certificate Pinning**: Validate specific certificates
+- **VPN Usage**: Secure tunnel for all communications
+- **HTTPS Everywhere**: Force encrypted connections
+- **Network Monitoring**: Detect suspicious traffic patterns
 
 ### Advanced Persistent Threats (APT)
 - **Definition**: Long-term, stealthy attacks by skilled adversaries
