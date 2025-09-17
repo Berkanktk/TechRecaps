@@ -324,6 +324,27 @@ dig example.com
 nslookup example.com
 ```
 
+### Spanning Tree Protocol (STP)
+**Purpose**: Prevents loops in Ethernet networks by creating loop-free topology at Layer 2.
+
+**Functions**: Blocks redundant paths, ensures single path between devices, prevents broadcast storms.
+
+**BPDU (Bridge Protocol Data Unit)**: A control message exchanged between switches in Spanning Tree Protocol (STP) that carries information (bridge IDs, priorities, path costs) used to elect the root bridge and determine port roles and states.
+
+**Improved Versions**: RSTP (Rapid STP), MSTP (Multiple STP), SPB (Shortest Path Bridging)
+
+**STP Attacks**:
+- **Root Bridge Attack**: Attacker claims to be root bridge
+- **BPDU Flooding**: Excessive BPDU packets cause instability
+- **Topology Change Attack**: False topology change notifications force MAC table clearing
+- **Information Disclosure**: Exploiting STP for network reconnaissance
+
+**Prevention**:
+- Enable BPDU Guard on edge ports
+- Regularly monitor STP topology
+- Implement port security on switch ports
+- Disable unused ports
+
 ## Network Hardware
 
 | Device            | OSI Layer           | Function                                  | Use Cases                            | Security Considerations                        |
