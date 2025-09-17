@@ -3403,9 +3403,9 @@ Inside `id_token`:
 Client uses `id_token` to authenticate user and `access_token` to access user info. Also the endpoint `/userinfo` can be called with the `access_token` to get more user details.
 
 # JSON Web Tokens (JWT) Security
+JWT is a compact, stateless, URL-safe token format for securely transmitting information between parties as a JSON object.
 
 ## JWT Structure and Components
-JWT is a compact, stateless, URL-safe token format for securely transmitting information between parties as a JSON object.
 
 **Structure**: `header.payload.signature`
 
@@ -3458,6 +3458,11 @@ except jwt.ExpiredSignatureError:
     print("Token has expired")
 except jwt.InvalidTokenError:
     print("Invalid token")
+```
+
+JWT's are sent in HTTP authorization headers to authenticate API requests:
+```http
+Authorization: Bearer <jwt_token>
 ```
 
 ## JWT Security Vulnerabilities and Attacks
@@ -3582,6 +3587,8 @@ def logout(token):
 | **Size**        | Larger (contains data)      | Smaller                 |
 | **Performance** | Faster validation           | Slower (DB query)       |
 | **Security**    | Information disclosure risk | No data exposure        |
+
+> For JWT Revocation it is also possible to use short-lived tokens combined with refresh tokens. 
 
 ### JWT-VC (Verifiable Credentials) vs JSON-LD VC
 
