@@ -4457,14 +4457,33 @@ Process:
 
 # Emerging Technologies
 ## Blockchain
-Blockchain is a decentralized, distributed ledger technology that records transactions across multiple computers in a way that ensures security, transparency, and immutability.
 
-**Components:**
-- **Blocks**: Containers for transaction data, linked in a chain
-- **Nodes**: Computers participating in the network, maintaining copies of the blockchain
-- **Consensus Mechanisms**: Protocols to agree on the state of the blockchain (e.g., Proof of Work, Proof of Stake)
-- **Cryptographic Hashing**: Ensures data integrity and links blocks
-- **Smart Contracts**: Self-executing contracts with terms directly written into code
+### Traditional vs Distributed Ledgers
+**Traditional Ledgers**: Require trusted third party (banks) to validate/maintain records. Drawback: centralized trust dependency.  
+**Distributed Ledgers (DLT)**: Decentralized system where multiple nodes validate/store records. Benefit: removes third-party dependency via consensus.
+
+### Blockchain Basics
+**Key Components:**
+- **Digital Signatures**: Authenticate sender/receiver identities
+- **Hash Functions**: Secure and link data via unique fixed-size outputs
+- **Consensus Protocols**: Ensure transaction validation (PoW, PoS)
+- **Private/Public Key Cryptography**: Secure communication using asymmetric keys
+- **Distributed P2P Network**: Nodes maintain blockchain copies for security/redundancy
+- **Merkle Tree**: A binary tree where each parent node is the hash of its children, allowing quick verification of any data block by checking only the hashes up to the root.
+
+**Structure**: Blocks connected by cryptographic hash references. Each block contains transactions, timestamp, and previous block hash.
+
+### Blockchain Types
+| Type | Who Can View? | Who Can Participate? | Examples |
+|------|---------------|---------------------|----------|
+| **Public Permissionless** | Everyone | Everyone | Bitcoin, Ethereum |
+| **Public Permissioned** | Everyone | Selected Participants | Ripple |
+| **Private Permissioned** | Selected Members | Selected Members | Hyperledger |
+| **Private Permissionless** | Selected Members | Anyone | Partially Exonum |
+
+### Consensus Mechanisms
+- **Proof of Work (PoW)**: Miners solve computational puzzles to validate blocks
+- **Proof of Stake (PoS)**: Validators chosen based on stake ownership
 
 **Core flow:**
 1. **Make a transaction**
