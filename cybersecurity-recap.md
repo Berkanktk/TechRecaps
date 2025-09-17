@@ -1726,9 +1726,9 @@ ps aux | grep root               # Running processes as root
 **Purpose**: Knowledge base of adversary tactics, techniques, and procedures (TTPs) based on real-world observations.
 
 **Structure**:
-- **Tactics**: High-level goals (e.g., Initial Access, Persistence)
-- **Techniques**: Methods to achieve tactics (e.g., Spearphishing)
-- **Sub-techniques**: Specific implementations (e.g., Spearphishing Link)
+- **Tactics**: High-level goals (e.g., Initial Access, Persistence) → the "why"
+- **Techniques**: Methods to achieve tactics (e.g., Spearphishing) → the "how"
+- **Sub-techniques**: Specific implementations (e.g., Spearphishing Link) → the "details"
 
 **ATT&CK Matrix Tactics**:
 1. **Initial Access**: Entry into network
@@ -1762,7 +1762,7 @@ ps aux | grep root               # Running processes as root
 - Training and education on ATT&CK techniques
 - Automated penetration testing workflows
 
-#### MITRE ATLAS (Adversarial Threat Landscape for AI Systems)
+### MITRE ATLAS (Adversarial Threat Landscape for AI Systems)
 **Purpose**: Framework for understanding adversarial tactics against AI/ML systems.
 
 **Key Areas**:
