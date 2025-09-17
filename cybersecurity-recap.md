@@ -2916,7 +2916,6 @@ IAM is a framework of policies and technologies to ensure that the right individ
 - **Directory Services**: Centralized user and resource management (e.g., LDAP, Active Directory)
 
 ### Authentication Factors
-
 **Three Primary Factors**:
 1. **Something You Know (Knowledge Factor)**:
    - **Passwords**: Secret phrases or character combinations
@@ -2933,6 +2932,8 @@ IAM is a framework of policies and technologies to ensure that the right individ
    - **Facial Recognition**: Analyzing facial features and geometry
    - **Voice Recognition**: Vocal pattern and speech analysis
    - **Iris/Retina Scans**: Eye-based biometric identification
+
+> **One-Time Passwords (OTPs)**: Unique codes valid for only one login session or transaction. Commonly used but vulnerable to phishing attacks.
 
 **Additional Authentication Factors**:
 1. **Somewhere You Are (Location Factor)**:
