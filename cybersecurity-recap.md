@@ -324,6 +324,49 @@ dig example.com
 nslookup example.com
 ```
 
+### HTTP Protocol Details
+
+**URL Structure**: `protocol://host:port/path?query_parameters#fragment`
+
+**HTTP Methods**:
+```http
+GET /index.html HTTP/1.1          # Retrieve resource
+POST /api/users HTTP/1.1          # Create/submit data
+PUT /api/users/123 HTTP/1.1       # Update entire resource
+DELETE /api/users/123 HTTP/1.1    # Remove resource
+PATCH /api/users/123 HTTP/1.1     # Partial update
+```
+
+**Request Headers**:
+```http
+Host: example.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+Referer: https://google.com
+Cookie: sessionid=abc123; userid=456
+```
+
+**Response Headers**:
+```http
+HTTP/1.1 200 OK
+Date: Mon, 01 Jan 2024 12:00:00 GMT
+Last-Modified: Sun, 31 Dec 2023 10:00:00 GMT
+Expires: Tue, 02 Jan 2024 12:00:00 GMT
+Set-Cookie: sessionid=xyz789; HttpOnly; Secure
+Content-Type: text/html; charset=UTF-8
+```
+
+**Response Codes**: 1xx=info, 2xx=success, 3xx=redirect, 4xx=client error, 5xx=server error
+
+**Security Policies**:
+- **Same-Origin Policy (SOP)**: Resources from same origin (protocol + host + port) can access each other
+- **CORS**: Allows controlled cross-origin requests via Access-Control headers
+- **Stateless**: Each request/response independent, no server-side session state
+
+**REST APIs:**   
+REST (Representational State Transfer) API is a way for applications to communicate over HTTP using a stateless architecture. It uses standard HTTP methods (GET, POST, PUT, DELETE) to perform CRUD operations on resources identified by URLs.
+- **Traditional Sessions**: State stored on server, user gets session ID token → vulnerable to session hijacking
+- **Stateless Sessions (JWT)**: Entire state in signed token, server doesn't keep state → more scalable, harder to revoke
+
 ### Spanning Tree Protocol (STP)
 **Purpose**: Prevents loops in Ethernet networks by creating loop-free topology at Layer 2.
 
