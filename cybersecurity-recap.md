@@ -1353,6 +1353,33 @@ openssl x509 -in certificate.der -inform DER -outform PEM -out certificate.pem  
 - **OV (Organization Validated)**: Domain + organization verification
 - **EV (Extended Validation)**: Strict legal entity verification (shows company name in browser)
 
+### TLS Protocol Stack
+TLS (Transport Layer Security) secures communications over networks, primarily used in HTTPS.
+
+**TLS Protocols**:
+| Protocol               | Header / Length Info         | Purpose                    | Details                                                                                                                       |
+| ---------------------- | ---------------------------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **TLS Record**         | **5 bytes header** + payload | Base protocol layer        | Header = Content Type (1), Version (2), Length (2). Provides encryption, authentication, integrity for all higher-layer data. |
+| **Handshake**          | Variable (≥4 bytes + data)   | Connection establishment   | Header = Type (1), Length (3). Content includes ClientHello, ServerHello, cert exchange, key exchange, etc.                   |
+| **Change Cipher Spec** | **1 byte**                   | Parameter activation       | Single fixed value `0x01` → signals switch to negotiated cipher suite.                                                        |
+| **Alert**              | **2 bytes**                  | Error/warning notification | Level (1 byte: 1 = warning, 2 = fatal) + Description (1 byte, e.g., close\_notify, bad\_record\_mac).                         |
+| **Application Data**   | Variable (inside Record)     | Encrypted payload          | Actual app data (HTTP, SMTP, etc.) encrypted with negotiated session keys.                                                    |
+| **Heartbeat**          | **3 bytes header** + data    | Keep-alive mechanism       | Header = Type (1), Payload Length (2). Sends small packets to check link status (basis of Heartbleed vuln).                   |
+
+**TLS Cipher Suite**   
+Defines algorithm combination for a session  
+
+![TLS Cipher Suite](/Assets/TLS.png)
+
+Example:
+```bash
+TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+```
+- **Key Exchange**: ECDHE (Ephemeral Elliptic Curve Diffie-Hellman)
+- **Authentication**: RSA
+- **Encryption**: AES-128 in GCM mode
+- **MAC**: SHA-256
+  
 ## Encoding & Data Representation
 Encoding transforms data from one format to another for storage, transmission, or compatibility purposes (reversible without a key).
 
