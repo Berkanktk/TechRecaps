@@ -2951,6 +2951,33 @@ IAM is a framework of policies and technologies to ensure that the right individ
 - **AAL2**: Multi-factor with approved authenticators
 - **AAL3**: Multi-factor with hardware-based protection
 
+### FIDO Alliance & Protocols
+Defines phishing-resistant authentication protocols
+
+**Protocols**:
+  * **FIDO UAF**: Passwordless login.
+  * **FIDO U2F / CTAP1**: Second factor authentication using USB/NFC.
+  * **FIDO2** = **WebAuthn** (browser API) + **CTAP2** (authenticator interface).
+
+**FIDO Flow**  
+* **Registration**:
+  1. User unlocks authenticator (biometric, PIN, button).
+  2. Device generates unique key pair (per service + account).
+  3. Public key → server; private key stays local.
+* **Authentication**:
+  1. Server sends challenge + credential IDs.
+  2. Authenticator signs with private key + counter.
+  3. Server verifies signature with stored public key + checks counter.
+
+**Core Concepts**
+* **Attestation Keys**: Built-in device keys proving model authenticity.
+* **Passkeys**: Discoverable WebAuthn credentials; sync across devices; passwordless.
+* **WebAuthn**: Browser API for registration/authentication via challenges.
+* **CTAP2**: Protocol (USB, NFC, BLE) for client ↔ authenticator.
+* **Authenticator Types**:
+  * **Platform**: Built-in (e.g., built-in fingerprint).
+  * **Roaming**: External (e.g., USB YubiKey).
+
 ### NIST Digital Identity Guidelines (SP 800-63)
 
 #### IAL (Identity Assurance Level)
