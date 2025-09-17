@@ -347,6 +347,18 @@ nslookup example.com
 
 ### Communication & Connectivity Protocols
 
+**Coupling vs Decoupling**
+* **Coupling**: Sender/receiver depend on each other in space (know identity) and time (must be active together). Example: Direct IP, synchronous calls.
+* **Decoupling**: Sender/receiver independent in space and/or time. Example: Pub-sub, message queues, email.
+
+**Direct vs Indirect Communication**
+* **Direct**: Sender talks straight to receiver (space + time coupled). Example: RPC, P2P.
+* **Indirect**: Through intermediary (broker/queue), allows decoupling. Example: Kafka, RabbitMQ, MQTT.
+
+**Synchronous vs Asynchronous**
+* **Synchronous**: Sender waits for reply (time coupled). Example: HTTP, RPC.
+* **Asynchronous**: Sender doesn’t wait, message handled later (time decoupled). Example: email, SMS, queues.
+
 **Event-Driven Architecture (EDA)**:  
 - **Components**: Producer (sends events) → Channel (distributes) → Consumer (processes)   
 - **Benefits**: Asynchronous communication, scalability, loose coupling
@@ -355,13 +367,15 @@ nslookup example.com
 **Communication Paradigms**:
 - **Request-Reply**: Synchronous interaction (REST, CoAP)
 - **Publish-Subscribe**: Asynchronous via broker (MQTT, AMQP, DDS)
-- **Direct vs Indirect:** Direct = coupled, Indirect = decoupled (space/time)
 
 **MQTT Protocol**: Lightweight pub-sub for IoT over TCP
 - **Topics**: Message filtering mechanism
 - **Wildcards**: Single-level (+), Multi-level (#)
 - **Features**: Lightweight, scalable, flexible QoS levels
 
+**Connectivity Protocols (IoT)**
+* **LoRaWAN / Sigfox**: Long-range (10 km), low-power (years on single battery), end-to-end encryption, massive IoT scalability
+  
 ## Network Hardware
 
 | Device            | OSI Layer           | Function                                  | Use Cases                            | Security Considerations                        |
