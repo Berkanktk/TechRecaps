@@ -1432,9 +1432,12 @@ ps aux | grep root               # Running processes as root
 - Monitor for privilege escalation attempts
 - Use application whitelisting and endpoint protection
 
-# Incident Response
-
-## NIST Framework
+# DFIR (Digital Forensics and Incident Response)
+**Purpose**: Investigate and analyze incidents.
+- Identify indicators of compromise (IoCs)
+- Capture and preserve forensic evidence
+- Use findings to improve organizational defense
+## Phases of Incident Response (NIST Framework)
 1. **Preparation**: Policies, procedures, tools
 2. **Detection & Analysis**: Monitoring, investigation
 3. **Containment**: Isolate threat, prevent spread
@@ -1442,10 +1445,45 @@ ps aux | grep root               # Running processes as root
 5. **Recovery**: Restore normal operations
 6. **Lessons Learned**: Post-incident review
 
+### Attack Lifecycle
+**Cyber Kill Chain**: Initial Access → Persistence → Defense Evasion → Credential Access → Discovery → Lateral Movement → Impact
+
 ## Digital Forensics
-Digital forensics involves the identification, preservation, analysis, and presentation of digital evidence.
+
+### Forensic Artifacts
+
+#### File/Folder Access
+- **MFT (Master File Table)**: NTFS file system metadata
+- **MAC(b) Timestamps**: Modified, Accessed, Changed, Birth timestamps
+- **Internet Explorer file access**: Browser file interaction history
+- **Shell Bags**: Windows Explorer folder access history
+
+#### Program Execution
+- **BAM/DAM**: Background Activity Moderator - execution paths and timestamps
+- **SRUM**: System Resource Usage Monitor - performance history, responsible users
+- **Amcache.hve**: Installed applications registry hive with SHA1 hashes
+
+#### Command Execution
+- **PowerShell**:
+  - `ConsoleHost_History.txt`: Command history
+  - Script Block Logging: Detailed script execution logs
+- **Windows Event Logs**: Command-line auditing (Event ID 4688)
+
+#### Logins
+- **Windows Event Logs**: Security.evtx
+  - **4624**: Successful logon
+  - **4625**: Failed logon attempt
+  - **4648**: Explicit credential use
+
+### Forensic Tooling
+- **Triage Collection**: Fast collection of key artifacts
+- **Full Disk Imaging**: Complete bit-by-bit disk copy
 
 ```bash
+# KAPE Examples
+kape.exe --tsource C: --tdest D:\Collection --target !BasicCollection
+kape.exe --msource D:\Collection --mdest D:\Analysis --module !EZParser
+
 # Memory dump
 volatility -f memory.dump imageinfo
 volatility -f memory.dump --profile=Win7SP1x64 pslist
