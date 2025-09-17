@@ -3135,6 +3135,25 @@ tcpdump -i any -w malware_traffic.pcap
 inotifywait -m -r /tmp/
 ```
 
+## Symbolic Execution
+Symbolic execution is a program analysis technique that runs programs with **symbolic inputs** instead of concrete values, allowing exploration of multiple execution paths and detection of vulnerabilities. It tracks **path constraints** across branches (`if`, `while`), replacing variables with symbols (e.g., α, β), and then uses a **constraint solver (Satisfiability Modulo Theories (SMT))** like Z3 to check feasibility and generate concrete inputs. This enables finding deep bugs, generating test cases, and even exploit creation when combined with taint tracking.
+
+**Symbolic vs Concrete Execution**
+* **Concrete**: Runs with fixed inputs, follows one path.
+* **Symbolic**: Explores many paths simultaneously by reasoning over symbolic inputs.
+
+### Key Challenges & Techniques
+
+* **Path Explosion**: Conditionals multiply paths exponentially (3 inputs = 8 paths).
+* **Path Merging**: Combines paths with conditional expressions (e.g., `y = (x > 0) ? 1 : -1`) to reduce states.
+* **Search Strategies**: Depth-first (fast but stuck), breadth-first (complete but memory-heavy), heuristics (guided to bugs), random (unbiased, good with time limits).
+
+### Use Cases
+
+* Vulnerability detection (e.g., assertion violations, memory errors).
+* Input generation for testing (coverage-guided).
+* Exploit generation by finding feasible, exploitable paths.
+
 ## Reverse Engineering
 Reverse engineering is the process of analyzing a compiled program to understand its design, architecture, and functionality, often to identify vulnerabilities or malicious behavior.
 
