@@ -375,7 +375,17 @@ nslookup example.com
 
 **Connectivity Protocols (IoT)**
 * **LoRaWAN / Sigfox**: Long-range (10 km), low-power (years on single battery), end-to-end encryption, massive IoT scalability
-  
+
+### Address Resolution Protocol (ARP)
+**Purpose**: Maps IP addresses to MAC addresses on local networks (Layer 2-3 bridge)
+
+**Process**: Host broadcasts ARP request → Target responds with MAC address → Cached in ARP table
+
+**ARP Attacks**:
+- **ARP Poisoning/Spoofing**: Attacker sends fake ARP responses mapping victim's IP to attacker's MAC
+- **Impact**: Man-in-the-middle attacks, traffic interception, denial of service
+- **Prevention**: Static ARP entries, ARP monitoring tools, switch port security
+
 ## Network Hardware
 
 | Device            | OSI Layer           | Function                                  | Use Cases                            | Security Considerations                        |
