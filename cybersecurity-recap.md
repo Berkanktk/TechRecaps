@@ -121,11 +121,9 @@
 - [AWS Security](#aws-security)
 - [Container Security](#container-security)
 ### 9. [Identity & Access Management](#identity--access-management)
-- [Security Fundamentals](#security-fundamentals)
-  - [CIA Triad](#cia-triad)
-  - [Extended Security Properties](#extended-security-properties)
-  - [STRIDE Threat Model](#stride-threat-model)
 - [General Concepts](#general-concepts)
+  - [Authentication Factors](#authentication-factors)
+  - [Types of Authenticators](#types-of-authenticators)
 - [Active Directory](#active-directory)
 - [LDAP](#ldap)
 - [Single Sign-On (SSO)](#single-sign-on-sso)
@@ -2771,7 +2769,6 @@ IAM is a framework of policies and technologies to ensure that the right individ
 - **Authentication**: Verifying identity (e.g., passwords, biometrics)
 - **Authorization**: Granting access to resources based on permissions
 - **Accounting**: Tracking user activities (logs, audits)
-- **MFA (Multi-Factor Authentication)**: Using multiple methods to verify identity (e.g., password + OTP)
 - **Identification:** Selecting a unique entity based on identifying information within a context.
 - **Identifier:** Any attribute (or set) that uniquely identifies an entity.
 - **Linkability:** Ability to associate different data sets with the same identity.
@@ -2783,6 +2780,51 @@ IAM is a framework of policies and technologies to ensure that the right individ
 - **Federation**: Trusting identities from external systems (e.g., SAML, OAuth)
 - **Provisioning/Deprovisioning**: Creating/removing user accounts and access
 - **Directory Services**: Centralized user and resource management (e.g., LDAP, Active Directory)
+
+### Authentication Factors
+
+**Three Primary Factors**:
+1. **Something You Know (Knowledge Factor)**:
+   - **Passwords**: Secret phrases or character combinations
+   - **PINs**: Numeric codes (4-8 digits)
+   - **Security Questions**: Personal information-based challenges
+   - **Passphrases**: Longer, sentence-like passwords
+2. **Something You Have (Possession Factor)**:
+   - **Hardware Tokens**: Physical devices generating OTP codes
+   - **Smart Cards**: Chip-embedded cards with cryptographic keys
+   - **Mobile Phones**: SMS codes or authenticator apps
+   - **USB Security Keys**: FIDO2/WebAuthn compatible devices
+3. **Something You Are (Inherence Factor)**:
+   - **Fingerprints**: Biometric scanning of finger ridges
+   - **Facial Recognition**: Analyzing facial features and geometry
+   - **Voice Recognition**: Vocal pattern and speech analysis
+   - **Iris/Retina Scans**: Eye-based biometric identification
+
+**Additional Authentication Factors**:
+1. **Somewhere You Are (Location Factor)**:
+   - **GPS Coordinates**: Physical location verification
+   - **IP Geolocation**: Network-based location tracking
+   - **Network Access**: Specific network or VPN requirements
+2. **Something You Do (Behavioral Factor)**:
+   - **Typing Patterns**: Keystroke dynamics and timing
+   - **Mouse Movement**: Unique cursor movement patterns
+   - **Gait Analysis**: Walking pattern recognition
+
+### Types of Authenticators
+**Authenticator Security Levels**:
+- **AAL1 (Authenticator Assurance Level 1)**: Single-factor
+- **AAL2**: Multi-factor with approved authenticators
+- **AAL3**: Multi-factor with hardware-based protection
+
+**Single-Factor Authenticators**:
+- **Password-only**: Traditional username/password
+- **PIN-only**: Numeric code verification
+- **Biometric-only**: Single biometric method
+
+**Multi-Factor Authenticators**:
+- **2FA (Two-Factor)**: Combines two different factor types
+- **3FA (Three-Factor)**: Uses all three primary factors
+- **Adaptive Authentication**: Risk-based factor selection
 
 ### RBAC vs ABAC
 **RBAC (Role-Based Access Control)**:
