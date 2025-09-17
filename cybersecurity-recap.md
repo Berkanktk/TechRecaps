@@ -2005,6 +2005,17 @@ ps aux | grep root               # Running processes as root
 - Capture and preserve forensic evidence
 - Use findings to improve organizational defense
 
+## Incident Management
+**Purpose**: Processes to detect, report, assess, respond to, resolve, and learn from security incidents.
+
+**Key Elements**:
+- **Data Collection**: Gathering relevant data from various sources
+- **Data Aggregation**: Combining data from multiple sources for analysis
+- **Data Normalization**: Standardizing data for consistency
+- **Correlation**: Identifying patterns and connections in data
+- **Alerting**: Generating notifications about potential incidents
+- **Reporting/Compliance**: Documenting incidents for compliance and learning
+
 ## Phases of Incident Response (NIST Framework)
 1. **Preparation**: Policies, procedures, tools
 2. **Detection & Analysis**: Monitoring, investigation
