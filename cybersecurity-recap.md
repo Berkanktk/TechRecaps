@@ -542,17 +542,30 @@ output {
 - Enhanced performance through traffic isolation
 
 ## VPN Technologies
+VPN (Virtual Private Network) creates secure connections over public networks.
+
+### VPN Types
 - **IPSec**: Network layer VPN, site-to-site
 - **OpenVPN**: SSL/TLS based, flexible
 - **WireGuard**: Modern, fast, minimal attack surface
-```bash
-# OpenVPN client config
-client
-remote vpn.example.com 1194
-proto udp
-cert client.crt
-key client.key
-```
+
+### IPsec VPN Setup
+IPsec (Internet Protocol Security) is a suite of protocols used to secure communication over IP networks.
+
+**Policy-based VPN**: Encrypts traffic based on rules (IP, ports, protocols). Each type can use its own Security Association (SA).
+**Route-based VPN**: All traffic through virtual interface encrypted using single SA pair.
+
+### IPsec Protocols & Modes
+**Protocols**:
+- **AH (Authentication Header)**: Provides authentication & integrity (no encryption).
+- **ESP (Encapsulating Security Payload)**: Provides encryption, integrity, or both.
+
+**Modes**:
+- **Transport Mode**: Encrypts only the payload, not the IP header.
+- **Tunnel Mode**: Encrypts the entire IP packet (header + payload).
+
+**Algorithms**: MD5/SHA-1/SHA-256 (hashing), AES/3DES (encryption)  
+**Key Exchange**: IKE (Internet Key Exchange) protocol negotiates keys dynamically. Phase 1 establishes secure channel, Phase 2 negotiates SAs.
 
 # Web Application Security
 
