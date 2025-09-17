@@ -51,6 +51,7 @@
 ### 4. [Penetration Testing](#penetration-testing)
 - [Reconnaissance](#reconnaissance)
 - [Vulnerability Scanning](#vulnerability-scanning)
+- [CVE and CVSS](#cve-and-cvss)
 - [Exploitation Frameworks](#exploitation-frameworks)
   - [Metasploit](#metasploit)
   - [Burp Suite](#burp-suite)
@@ -1297,6 +1298,60 @@ sqlmap.py -u "http://target.com/login" -D <database_name> --tables # List tables
 sqlmap.py -u "http://target.com/login" -D <database_name> -T <table_name> --columns # List columns
 sqlmap.py -u "http://target.com/login" -D <database_name> -T <table_name> -C <column_name> --dump # Dump data
 ```
+
+## CVE and CVSS
+
+### CVE (Common Vulnerabilities and Exposures)
+Standardized identifier system for publicly known security vulnerabilities.
+
+**CVE Format**: CVE-YYYY-NNNN (e.g., CVE-2021-44228 for Log4Shell)
+- **YYYY**: Year of assignment
+- **NNNN**: Sequential number (4+ digits)
+
+**CVE Process**:
+1. **Discovery**: Vulnerability identified by researcher or vendor
+2. **Assignment**: CVE Numbering Authority (CNA) assigns CVE ID
+3. **Publication**: Details published in CVE database
+4. **Scoring**: CVSS score assigned for severity assessment
+
+### CVSS (Common Vulnerability Scoring System)
+Standardized method for rating vulnerability severity (0.0-10.0 scale) to help prioritize patching and risk management.
+
+**Base Metrics → intrinsic characteristics (don’t change):**
+- **Attack Vector (AV)**: Network (N), Adjacent (A), Local (L), Physical (P)
+- **Attack Complexity (AC)**: Low (L), High (H)
+- **Privileges Required (PR)**: None (N), Low (L), High (H)
+- **User Interaction (UI)**: None (N), Required (R)
+- **Scope (S)**: Unchanged (U), Changed (C)
+- **Confidentiality/Integrity/Availability (C/I/A):** None (N), Low (L), High (H)
+
+**Temporal Metrics (Time-dependent factors)**:
+- **Exploit Code Maturity**: Not Defined, Proof-of-Concept, Functional, High
+- **Remediation Level**: Official Fix, Temporary Fix, Workaround, Unavailable
+- **Report Confidence**: Unknown, Reasonable, Confirmed
+
+**Environmental Metrics (Local environment-specific)**:
+- **Environmental Metrics:** Specific to an organization’s context (asset value, mitigations).
+
+#### CVSS Score Ranges
+| Score Range | Severity Level | Risk Level |
+|-------------|---------------|------------|
+| 0.0 | None | Informational |
+| 0.1-3.9 | Low | Low Priority |
+| 4.0-6.9 | Medium | Medium Priority |
+| 7.0-8.9 | High | High Priority |
+| 9.0-10.0 | Critical | Emergency |
+
+#### Example CVSS Calculation
+**CVE-2021-44228 (Log4Shell)**:
+- **AV:N** (Network) - Remote exploitation
+- **AC:L** (Low) - Simple to exploit
+- **PR:N** (None) - No authentication required
+- **UI:N** (None) - No user interaction needed
+- **S:C** (Changed) - Affects other components
+- **C:H/I:H/A:H** (High impact on all)
+
+**Result**: AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H → Score: 10.0 (Critical)
 
 ## Exploitation Frameworks
 
