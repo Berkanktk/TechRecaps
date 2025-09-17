@@ -3028,6 +3028,36 @@ spec:
   - Egress
 ```
 
+## Cloud Architecture & Deployment Models
+
+### Service Models
+- **IaaS**: Virtualized infrastructure (VMs, storage, networks)
+- **PaaS**: Development platforms and tools 
+- **SaaS**: Fully managed software applications
+
+### Deployment Models
+- **Public Cloud**: Shared infrastructure, cost-effective
+- **Private Cloud**: Dedicated infrastructure, higher control
+- **Hybrid Cloud**: Mix of public and private 
+- **Community Cloud**: Shared among organizations with common requirements
+
+### Computing Models
+**Fog Computing**: Extends cloud services closer to devices using a multi-layer, hierarchical architecture (e.g., gateways, routers, local servers). Designed to support both IoT and cloud, handling processing, storage, and networking across layers.
+
+**Edge Computing**: Runs computation directly at the network edge (on IoT devices or nearby gateways) in a single layer. Focused on real-time processing close to the data source with minimal reliance on the cloud.
+
+### Virtualization & Containerization
+**Hypervisors**: Type 1 (bare metal), Type 2 (hosted)
+**Containers vs VMs**:
+- **VMs**: Full OS isolation, larger attack surface, slower, more secure isolation
+- **Containers**: Process-level isolation, smaller attack surface, faster, shared kernel vulnerabilities
+
+![Hypervizors](/Assets/hypervisors.png)
+
+### Architecture Patterns
+**Monolithic**: Single deployable unit, simpler security management, centralized vulnerabilities  
+**Microservices**: Distributed services, complex security management, isolated failure domains
+
 # Identity & Access Management (IAM)
 IAM is a framework of policies and technologies to ensure that the right individuals access the right resources at the right times for the right reasons.
 
