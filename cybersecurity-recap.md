@@ -127,6 +127,8 @@
 - [General Concepts](#general-concepts)
   - [Authentication Factors](#authentication-factors)
   - [Types of Authenticators](#types-of-authenticators)
+  - [NIST Digital Identity Guidelines](#nist-digital-identity-guidelines-sp-800-63)
+  - [PBAC (Policy-Based Access Control)](#pbac-policy-based-access-control)
 - [Active Directory](#active-directory)
 - [LDAP](#ldap)
 - [Single Sign-On (SSO)](#single-sign-on-sso)
@@ -2946,6 +2948,36 @@ IAM is a framework of policies and technologies to ensure that the right individ
 - **AAL2**: Multi-factor with approved authenticators
 - **AAL3**: Multi-factor with hardware-based protection
 
+### NIST Digital Identity Guidelines (SP 800-63)
+
+#### IAL (Identity Assurance Level)
+Robustness of identity proofing and binding to authenticator.
+
+- **IAL1**: Self-asserted identity, no identity verification required
+- **IAL2**: Remote or in-person identity verification required
+- **IAL3**: In-person identity verification by authorized representative required
+
+#### AAL (Authenticator Assurance Level)
+Confidence that claimant is the same as the previous subscriber.
+
+- **AAL1**: Single-factor authentication (password, biometric)
+- **AAL2**: Multi-factor authentication with approved authenticators
+- **AAL3**: Multi-factor authentication with hardware-based cryptographic protection
+
+#### FAL (Federation Assurance Level)
+Strength of federation, assertion protection, and presentation.
+
+- **FAL1**: Bearer assertion, signed by IdP
+- **FAL2**: Bearer assertion, signed by IdP and encrypted to RP
+- **FAL3**: Subscriber key-based assertion, signed by IdP and encrypted to RP
+
+**NIST Level Relationships**:
+```
+Higher IAL = Stronger Identity Verification
+Higher AAL = Stronger Authentication Requirements
+Higher FAL = Stronger Federation Security
+```
+
 **Single-Factor Authenticators**:
 - **Password-only**: Traditional username/password
 - **PIN-only**: Numeric code verification
@@ -2956,7 +2988,7 @@ IAM is a framework of policies and technologies to ensure that the right individ
 - **3FA (Three-Factor)**: Uses all three primary factors
 - **Adaptive Authentication**: Risk-based factor selection
 
-### RBAC vs ABAC
+### RBAC vs ABAC VS PBAC
 **RBAC (Role-Based Access Control)**:
 - Access based on user roles
 - Users assigned to roles, roles have permissions
@@ -2964,11 +2996,41 @@ IAM is a framework of policies and technologies to ensure that the right individ
 - Example: "Manager" role can access financial reports
 - Suitable for stable organizational structures
 
+```txt
+Access Control Matrix:
+| User   | Role     | Resource          | Permission  |
+|--------|----------|-------------------|-------------|
+| Alice  | Manager  | Financial Report  | Read, Write |
+| Bob    | Employee | Financial Report  | Read        |
+```
+
 **ABAC (Attribute-Based Access Control)**:
 - Access based on dynamic attributes (user, resource, environment, and action attributes)
 - Dynamic, context-aware decisions
 - Example: Access granted if user=employee AND time=business_hours AND location=office
 - Suitable for complex, dynamic environments
+
+```txt
+Attribute Rules:
+| Attribute        | Value               | Condition                |
+|------------------|---------------------|--------------------------|
+| User Role        | Employee            | Must be 'Employee'       |
+| Time             | Business Hours      | Must be within 9am-5pm   |
+| Location         | Office              | Must be accessing from office |
+| Resource Type    | Financial Document  | Must be 'Financial Document' |
+```
+
+**PBAC (Policy-Based Access Control)**:
+- Hybrid model combining RBAC and ABAC
+- Policies expressed as assignment relationships
+- Access rights acquired through relationships called associations
+- Graphical visualization and manipulation of policies
+- Example: Access granted based on role and contextual attributes
+
+```txt
+Policy Example:
+If User.Role == 'Manager' AND Resource.Type == 'Financial Report' AND Time == 'Business Hours' THEN Allow Access
+```
 
 ### eIDAS Levels of Assurance (LoA)
 
