@@ -2226,6 +2226,21 @@ systemctl start kibana                                    # Start Kibana
 ## Malware Types
 **Malware** is malicious software designed to harm, exploit, or gain unauthorized access to computer systems.
 
+**Structure**:
+- **Infection Mechanism**: How malware spreads and replicates
+- **Trigger**: Event/condition that activates the malware (logic bomb)
+- **Payload**: Actions performed, causing harm or effects
+
+**Phases**:
+1. **Dormant**: Idle, may activate later (not all viruses have this)
+2. **Propagation**: Replicates to other programs/system areas
+3. **Triggering**: Activates due to system events
+4. **Execution**: Performs intended function and impact
+
+**Types**:
+- **Polymorphic**: Changes appearance (encryption) while keeping core code same, evades signature detection
+- **Metamorphic**: Completely rewrites code with each infection, making detection extremely difficult
+
 ### Virus
 - **Definition**: Self-replicating code that attaches to executable files
 - **Behavior**: Requires host file execution to spread
