@@ -777,6 +777,18 @@ SELECT * FROM users WHERE username = 'admin' OR '1'='1' --' AND password = ''
 SELECT * FROM users WHERE username = ? AND password = ?
 ```
 
+## Buffer Overflow
+```c
+// Vulnerable code
+char buffer[10];
+strcpy(buffer, user_input); // No bounds checking
+
+// Attack: Input longer than buffer size overwrites adjacent memory
+// Prevention: Use safe functions, bounds checking
+strncpy(buffer, user_input, sizeof(buffer) - 1);
+buffer[sizeof(buffer) - 1] = '\0';
+```
+
 ## Cross-Site Scripting (XSS)
 ```javascript
 // Stored XSS
