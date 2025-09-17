@@ -139,6 +139,11 @@
 - [Risk Management](#risk-management)
 - [Access Control](#access-control)
 - [Malware Analysis](#malware-analysis-1)
+### 15. [Bug Bounty Hunting](#bug-bounty-hunting)
+- [Types of Disclosures](#types-of-disclosures)
+- [Bug Bounty Actors](#bug-bounty-actors)
+- [Vulnerability Reports and Triaging](#vulnerability-reports-and-triaging)
+- [Threat Actor Naming](#threat-actor-naming)
 
 # Network Security
 
@@ -3133,4 +3138,42 @@ Process:
 - **Behavioral**: Process names, command lines, user accounts
 - **Usage**: Threat hunting, detection rules, incident response
 
-This comprehensive guide covers essential cybersecurity concepts, tools, and techniques for defensive security operations and interview preparation.
+# Bug Bounty Hunting
+
+## Types of Disclosures
+- **Full Disclosure**: Vulnerability details shared publicly immediately (risk to end-users if unpatched).  
+- **Responsible Disclosure**: Researcher informs company privately, allows time to fix before public release.  
+- **Private Disclosure**: Researcher informs company, but details are never made public (internal only).  
+
+## Bug Bounty Actors
+- **Platforms**: Third-party (HackerOne, Bugcrowd, Intigriti, YesWeHack, Synack). Connect orgs ↔ researchers, handle rewards.  
+- **Programs (Companies)**: Define scope, rules, payouts, legal protections.  
+- **Researchers (Hunters)**: Ethical hackers finding/reporting weaknesses.  
+- **Triagers**: Validate reports, reproduce issues, assign severity.  
+- **Security Teams**: Fix vulnerabilities, verify remediation.  
+
+## Bug Bounty Types & Approaches
+- **Bug Bounty Hunting (BBH)**: Monetary rewards, payout depends on severity (e.g. RCE > XSS).  
+- **Vulnerability Disclosure Programs (VDP)**: Usually no financial reward, provide reporting channel, sometimes acknowledgements/reputation.  
+
+## Vulnerability Reports & Triaging
+- **Report Structure**:  
+  - Reproduction Steps → step-by-step instructions  
+  - Proof-of-Concept (PoC) → demonstrates flaw  
+  - Attacker Abuse Scenario → possible impact/damage  
+
+- **Outcomes**:  
+  - Duplicate (already reported)  
+  - Out of Scope (outside program boundaries)  
+  - Needs More Information (clarification required)  
+  - Accepted / Triaged (confirmed, severity assigned)  
+
+- **Severity Assignment**:  
+  - Often CVSSv3 or custom scale  
+  - Determines bounty & remediation priority  
+
+## Threat Actor Naming (Microsoft)
+- **Storm**: Emerging threats, unknown motives  
+- **Tempest**: Financially motivated  
+- **Tsunami**: Private sector threats vs. corporations  
+- **Nation-State Actors**: APT, cyberwarfare  
