@@ -1967,15 +1967,31 @@ $ fierce -dns target.com          # DNS reconnaissance
 ```
 
 ## Vulnerability Scanning
+
+### Nessus
+**Purpose**: Commercial vulnerability scanner for comprehensive network and application security assessment.
+- **Capabilities**: 50,000+ vulnerability checks, compliance auditing, malware detection
+- **Use Cases**: Enterprise vulnerability management, regulatory compliance, risk assessment
+
+### OpenVAS
+**Purpose**: Open-source vulnerability scanner and security management platform.
+- **Capabilities**: Network vulnerability testing, authenticated scanning, compliance checks
+- **Use Cases**: Free alternative to commercial scanners, security research, SMB security testing
+
+### Nikto
+**Purpose**: Web server vulnerability scanner focused on web application security flaws.
+- **Capabilities**: 6,700+ potentially dangerous files/programs, server configuration issues, outdated software detection
+- **Use Cases**: Web application pentesting, quick web server assessment, CI/CD security checks
+
 ```bash
 # Nessus scan
 nessuscli -q localhost 8834 user pass scan new policy_id target_ip scan_name
 
-# OpenVAS
+# OpenVAS scan
 openvas-cli -X '<create_task><name>Scan</name><target>target_ip</target></create_task>'
 
 # Nikto web scanner
-nikto -h http://target.com
+nikto -h http://target.com -Format txt -output nikto_results.txt
 
 # SQLmap
 sqlmap.py -u "http://target.com/login" --dbs  # List databases
