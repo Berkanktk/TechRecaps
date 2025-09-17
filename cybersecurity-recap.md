@@ -2232,6 +2232,51 @@ systemctl start kibana                                    # Start Kibana
 # Access via http://localhost:5601
 ```
 
+### Zeek (Network Security Monitor)
+Open-source network analysis framework for traffic monitoring and intrusion detection.
+
+#### Zeek Scripting Basics
+**Data Types**:
+```py
+# Set: Stores unique elements
+local banned_ips: set[addr] = {192.168.1.100, 10.0.0.50};
+
+# Table: Maps keys to values
+local connection_count: table[addr] of count = table();
+
+# Vector: Collection of same-type objects
+local ports: vector of port = {80/tcp, 443/tcp, 22/tcp};
+
+# Record: Custom complex data types
+type HostInfo: record {
+    ip: addr;
+    hostname: string;
+    last_seen: time;
+};
+```
+
+**Event Handling**:
+```py
+# Event triggered on new TCP connections
+event new_connection(c: connection) {
+    print fmt("New connection: %s -> %s", c$id$orig_h, c$id$resp_h);
+}
+
+# Event for HTTP requests
+event http_request(c: connection, method: string, original_URI: string) {
+    if (method == "POST" && /login/ in original_URI) {
+        print fmt("Login attempt from %s", c$id$orig_h);
+    }
+}
+
+# Event for DNS queries
+event dns_request(c: connection, msg: dns_msg, query: string) {
+    if (/malware\.com/ in query) {
+        print fmt("Suspicious DNS query: %s from %s", query, c$id$orig_h);
+    }
+}
+```
+
 # Types of Cyber Attacks
 
 ## Malware Types
