@@ -2,7 +2,12 @@
 
 ## Table of Contents
 
-### 1. [Network Security](#network-security)
+### 1. [Security Fundamentals](#security-fundamentals)
+- [CIA Triad](#cia-triad)
+- [Extended Security Properties](#extended-security-properties)
+- [STRIDE Threat Model](#stride-threat-model)
+
+### 2. [Network Security](#network-security)
 - [TCP/IP Stack](#tcpip-stack)
 - [IP Addressing and Subnetting](#ip-addressing-and-subnetting)
 - [Network Protocols](#network-protocols)
@@ -115,6 +120,10 @@
 - [AWS Security](#aws-security)
 - [Container Security](#container-security)
 ### 9. [Identity & Access Management](#identity--access-management)
+- [Security Fundamentals](#security-fundamentals)
+  - [CIA Triad](#cia-triad)
+  - [Extended Security Properties](#extended-security-properties)
+  - [STRIDE Threat Model](#stride-threat-model)
 - [General Concepts](#general-concepts)
 - [Active Directory](#active-directory)
 - [LDAP](#ldap)
@@ -160,6 +169,44 @@
 - [Bug Bounty Actors](#bug-bounty-actors)
 - [Vulnerability Reports and Triaging](#vulnerability-reports-and-triaging)
 - [Threat Actor Naming](#threat-actor-naming)
+
+# Security Fundamentals
+
+## CIA Triad
+Core principles of information security.
+
+- **Confidentiality**: Information is accessible only to authorized individuals
+  - *Implementation*: Encryption, access controls, data classification
+  - *Threats*: Data breaches, unauthorized disclosure, eavesdropping
+- **Integrity**: Information remains accurate and unaltered
+  - *Implementation*: Digital signatures, hashing, version control
+  - *Threats*: Data tampering, unauthorized modifications, corruption
+- **Availability**: Information and services are accessible when needed
+  - *Implementation*: Redundancy, load balancing, disaster recovery
+  - *Threats*: DDoS attacks, system failures, natural disasters
+
+**Extended Security Properties**
+- **Non-Repudiation**: Preventing denial of actions or transactions
+  - *Implementation*: Digital signatures, audit logs, timestamps
+  - *Use Case*: Legal evidence, transaction accountability
+- **Authenticity**: Verification that information comes from legitimate source
+  - *Implementation*: Digital certificates, cryptographic signatures
+  - *Relationship*: Works with integrity to ensure trusted communication
+- **Accountability**: Ability to trace actions to specific entities
+  - *Implementation*: Comprehensive logging, identity tracking
+  - *Requirement*: Supports compliance and forensic investigations
+
+## STRIDE Threat Model
+**Purpose**: Microsoft's framework for identifying security threats in system design.
+
+| Threat Category            | Meaning                              | Examples                                          | Countermeasures                                  | CIA+ Mapping                    |
+| -------------------------- | ------------------------------------ | ------------------------------------------------- | ------------------------------------------------ | ------------------------------- |
+| **Spoofing**               | Impersonating someone/something else | IP spoofing, email spoofing, fake websites        | Strong authentication, digital certificates      | **Authentication**              |
+| **Tampering**              | Modifying data or code               | SQL injection, MITM, file modification            | Input validation, integrity checks, encryption   | **Integrity**                   |
+| **Repudiation**            | Denying performing an action         | Denying transactions, deleting audit logs         | Digital signatures, audit logging                | **Integrity / Non-Repudiation** |
+| **Information Disclosure** | Unauthorized data exposure           | Data breaches, privilege escalation, info leakage | Access control, encryption, data classification  | **Confidentiality**             |
+| **Denial of Service**      | Making services unavailable          | DDoS, resource exhaustion, system crashes         | Rate limiting, redundancy, monitoring            | **Availability**                |
+| **Elevation of Privilege** | Gaining higher access than allowed   | Buffer overflow, privilege escalation, weak auth  | Least privilege, secure coding, input validation | **Authorization**               |
 
 # Network Security
 
@@ -3308,6 +3355,8 @@ SecItemAdd(query as CFDictionary, nil)
   * For less severe breaches, fines up to **€10 million** or **2% of global turnover**.
 
 ## PCI DSS
+Payment Card Industry Data Security Standard (PCI DSS) is a set of security standards to protect cardholder data.
+
 **Requirements**
 1. Firewall configuration
 2. Default passwords
