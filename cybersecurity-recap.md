@@ -50,6 +50,7 @@
   - [ElGamal](#elgamal)
   - [DSA (Digital Signature Algorithm)](#dsa-digital-signature-algorithm)
 - [Digital Signatures](#digital-signatures)
+- [Digital Certificates](#digital-certificates)
 - [Encoding & Data Representation](#encoding--data-representation)
 - [Hashing](#hashing)
 - [Cryptographic Algorithms Comprehensive Comparison](#cryptographic-algorithms-comprehensive-comparison)
@@ -1152,6 +1153,73 @@ public_key.verify(
     hashes.SHA256()
 )
 ```
+
+## Digital Certificates
+* Issued by **Certificate Authorities (CAs)**.
+* Bind a **public key** to an entity (person, org, domain).
+* Provide **trust, authenticity, and confidentiality** in secure communications.
+* Used in TLS/HTTPS, VPNs, PKI.
+  
+**How Certificates Work in TLS**
+1. Client requests secure connection (e.g., browser → netflix.com).
+2. Server sends certificate containing its **public key** + info.
+3. Browser checks certificate against trusted CA list.
+4. If valid, client and server agree on a **session key** (symmetric crypto like AES).
+5. Secure channel established for fast encrypted communication.
+
+### X.509 Certificate Standard
+International standard for public key certificates used in TLS/HTTPS and PKI systems.
+
+**X.509 Certificate Structure**:
+- **Version**: X.509 version (v1, v2, v3)
+- **Serial Number**: Unique identifier within CA
+- **Signature Algorithm**: Algorithm used to sign certificate (RSA with SHA-256)
+- **Issuer**: Distinguished Name (DN) of Certificate Authority
+- **Validity**: Not Before and Not After timestamps
+- **Subject**: Distinguished Name of certificate holder
+- **Subject Public Key Info**: Public key and algorithm
+- **Additional Extensions (v3):** SAN (extra domains), Key Usage, Extended Key Usage, Basic Constraints,  Authority Key Identifier 
+
+**Certificate Chain of Trust**:
+- **Root CA**: Self-signed, pre-installed in browsers/OS
+- **Intermediate CA**: Signed by Root CA, issues end-entity certificates
+- **End-Entity Certificate**: Issued to specific domain/organization
+> Browser validates the whole chain → if broken, trust fails.
+
+```bash
+# View certificate details (X.509 structure)
+openssl x509 -in certificate.crt -text -noout
+
+# Extract certificate from website
+openssl s_client -connect netflix.com:443 -showcerts
+
+# View specific X.509 fields
+openssl x509 -in certificate.crt -noout -subject -issuer -dates
+
+# Check X.509 extensions
+openssl x509 -in certificate.crt -noout -ext subjectAltName,keyUsage
+
+# Verify certificate chain
+openssl verify -CAfile root-ca.crt -untrusted intermediate.crt end-entity.crt
+
+# Generate Certificate Signing Request (CSR) with X.509 extensions
+openssl req -new -key private.key -out certificate.csr -config openssl.cnf
+
+# Convert between X.509 formats
+openssl x509 -in certificate.crt -outform DER -out certificate.der  # PEM to DER
+openssl x509 -in certificate.der -inform DER -outform PEM -out certificate.pem  # DER to PEM
+```
+
+**Certificate Validation Process**:
+1. **Domain Validation**: Certificate matches requested domain
+2. **Chain Validation**: Certificate signed by trusted CA
+3. **Expiration Check**: Certificate within validity period
+4. **Revocation Check**: Certificate not in CRL/OCSP blacklist
+
+**Common Certificate Types**:
+- **DV (Domain Validated)**: Basic domain ownership verification
+- **OV (Organization Validated)**: Domain + organization verification
+- **EV (Extended Validation)**: Strict legal entity verification (shows company name in browser)
 
 ## Encoding & Data Representation
 Encoding transforms data from one format to another for storage, transmission, or compatibility purposes (reversible without a key).
