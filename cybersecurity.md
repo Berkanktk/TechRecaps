@@ -91,7 +91,8 @@
    6. [Encoding & Data Representation](#encoding--data-representation)
    7. [Hashing](#hashing)
       1. [Hash Function Security Properties](#hash-function-security-properties)
-      2. [MAC (Message Authentication Code) and HMAC](#mac-message-authentication-code-and-hmac)
+      2. [MAC (Message Authentication Code)](#mac-message-authentication-code)
+      3. [HMAC (Hash-based Message Authentication Code)](#hmac-hash-based-message-authentication-code)
    8. [Cryptographic Algorithms Comprehensive Comparison](#cryptographic-algorithms-comprehensive-comparison)
       1. [Symmetric Encryption Algorithms](#symmetric-encryption-algorithms)
       2. [Asymmetric Encryption Algorithms](#asymmetric-encryption-algorithms)
@@ -1887,9 +1888,7 @@ Cryptographic hash functions must satisfy three fundamental resistance propertie
 
 ---
 
-### MAC (Message Authentication Code) and HMAC
-
-#### MAC (Message Authentication Code)
+### MAC (Message Authentication Code)
 **Purpose**: Provides both data integrity and authentication by combining a message with a secret key.
 
 **How MAC Works**:
@@ -1919,7 +1918,7 @@ mac = simple_mac(key, message)
 - **Timing Attacks**: Information leakage through computation time
 
 ---
-#### HMAC (Hash-based Message Authentication Code)
+### HMAC (Hash-based Message Authentication Code)
 **Purpose**: Secure MAC construction that addresses vulnerabilities of simple MAC schemes.
 
 **HMAC Construction** (RFC 2104):
