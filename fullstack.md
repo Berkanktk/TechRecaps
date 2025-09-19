@@ -5783,19 +5783,27 @@ docker-compose exec app sh
 
 **Kubernetes (K8s)** is a container orchestration platform that automates deployment, scaling, and management of containerized applications. While Docker runs containers, Kubernetes manages them at scale across multiple machines.
 
-**Core Concepts:**
-- **Pods**: Smallest deployable units (usually one container)
-- **Deployments**: Manage replicas and updates of pods
-- **Services**: Expose pods to network traffic
-- **ConfigMaps/Secrets**: Manage configuration and sensitive data
-- **Ingress**: Handle external access and load balancing
+**Key Components:**  
+- **Nodes**: Servers running the containers (roles include Control-Plane, Etcd, Worker).
+- **Worker**: A node in a Kubernetes cluster that runs application workloads. Communicates with the control-plane to receive instructions and updates
+- **Control Plane:** Coordinates the cluster, managing nodes and workloads.
+- **Etcd:** Stores configuration data and cluster state in a key/value store.
+- **Pods:** Smallest deployable unit, representing one or more containers sharing the same network and storage. Represents a single instance of a container
+- **Deployments:** Manages the lifecycle of pods, enabling updates and scaling.
+- **Services:** Exposes pods to the network and handles load balancing.
+- **ConfigMap and Secret:** Resources for managing configuration data and sensitive information.
+- **Persistent Volume:** Provides storage decoupled from pod lifecycles.
+- **Persistent Volume Claim:** A Kubernetes resource that requests a specific amount and type of storage resource from a cluster's available persistent volume pool (fancy talk for “mount”)
+- **Kubernetes API:** Set of RESTful APIs for managing the cluster resources, such as pods, deployments, and services
+- **Ingress:** Manages external access to services within a cluster commonly http/https
+- **Load Balancer:** A Kubernetes resource that automatically distributes incoming network traffic to multiple replicas of a service or application, improving availability and scalability
 
-**Why Use Kubernetes:**
-- **Auto-scaling**: Scale pods based on CPU/memory usage
-- **Self-healing**: Restart failed containers automatically
-- **Rolling updates**: Deploy new versions without downtime
-- **Load balancing**: Distribute traffic across healthy pods
-- **Service discovery**: Pods can find and communicate with each other
+**Advantages of Kubernetes:**
+- **Scalability:** Dynamically scales resources based on demand.
+- **High Availability:** Replaces failed containers automatically.
+- **Flexibility:** Runs various containerized applications, including stateful workloads.
+- **Separation of concerns:** Common language and platform for developers.
+- **Segregation of Duties:** Implements role-based access control (RBAC).
 
 ```yaml
 # deployment.yaml
