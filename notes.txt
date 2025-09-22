@@ -1,3 +1,4 @@
-make a full on typescript learning markddown file in style like the other files, make examples brief and sharp just perfect to get how it works and stuff from basics to advanced
 
-make a full on python learning markddown file in style like the other files, make examples brief and sharp just perfect to get how it works and stuff from basics to advanced
+make a full on [SOMETHING] learning markddown file in style like the other files, make examples brief and sharp just perfect to get how it works and stuff from basics to advanced
+
+make a full on [SOMETHING] learning markddown file in style like the other files, make examples brief and sharp just perfect to get how it works and stuff from basics to advanced. Make this in  stages and not at once (one stage should be max 20k tokens) 
